@@ -30,7 +30,7 @@ _ROOT = _HERE.parent
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from src.normalization import normalize_answer  # noqa: E402
+from .normalization import normalize_answer  # noqa: E402
 
 from .llm_client import build_client, resolve_local_image  # noqa: E402
 from .prompts import (  # noqa: E402
@@ -56,8 +56,20 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     p.add_argument(
         "--vqa-samples",
         type=int,
+        default=5,
+        help="简答VQA 多次采样次数 (>=1, 1 = 不采样, 5 是默认值)",
+    )
+    p.add_argument(
+        "--choice-samples",
+        type=int,
         default=3,
-        help="简答VQA 多次采样次数（>=1, 1 = 不采样）",
+        help="选择题多次采样投票次数 (1 = 关闭, 3 是默认值, 5 更稳但贵)",
+    )
+    p.add_argument(
+        "--judge-samples",
+        type=int,
+        default=3,
+        help="判断题多次采样投票次数 (1 = 关闭, 3 是默认值)",
     )
     p.add_argument(
         "--resume",
@@ -191,7 +203,7 @@ def run(args: argparse.Namespace) -> None:
             raw = ""
             try:
                 if is_short_vqa and args.vqa_samples > 1:
-                    # 多次采样投票
+                    # 简答VQA: 多次采样投票
                     samples = client.generate_n(
                         system, user, image_path,
                         n=args.vqa_samples,
@@ -199,14 +211,42 @@ def run(args: argparse.Namespace) -> None:
                         max_tokens=64,
                     )
                     voted = majority_vote(samples, section)
-                    raw = samples[0]  # raw_answer 留首条做排查
+                    raw = samples[0]
+                    answer = voted or pick_answer(samples[0], section)
+                elif "选择" in section and args.choice_samples > 1:
+                    # 选择题: CoT + 多次采样投票 (sampling 必须 temp>0)
+                    samples = client.generate_n(
+                        system, user, image_path,
+                        n=args.choice_samples,
+                        temperature=0.5,
+                        max_tokens=320,
+                    )
+                    voted = majority_vote(samples, section)
+                    raw = samples[0]
+                    answer = voted or pick_answer(samples[0], section)
+                elif "判断" in section and args.judge_samples > 1:
+                    # 判断题: CoT + 多次采样投票
+                    samples = client.generate_n(
+                        system, user, image_path,
+                        n=args.judge_samples,
+                        temperature=0.5,
+                        max_tokens=200,
+                    )
+                    voted = majority_vote(samples, section)
+                    raw = samples[0]
                     answer = voted or pick_answer(samples[0], section)
                 else:
-                    # 单次贪心
+                    # 单次贪心 -- 选择题 CoT 给 320 tokens, 判断题直答只需 16
+                    if "选择" in section:
+                        max_tok = 320
+                    elif "判断" in section:
+                        max_tok = 16
+                    else:
+                        max_tok = 64
                     raw = client.generate(
                         system, user, image_path,
                         temperature=0.0,
-                        max_tokens=128 if "选择" in section or "判断" in section else 64,
+                        max_tokens=max_tok,
                     )
                     answer = pick_answer(raw, section)
             except Exception as e:

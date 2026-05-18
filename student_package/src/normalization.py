@@ -72,4 +72,3 @@ def normalize_choice_letters(text: str) -> str:
             letter = chr(ord("A") + full_width.index(letter))
         letters.append(letter)
     return "".join(sorted(set(letters)))
-
