@@ -1,0 +1,352 @@
+[
+  {
+    "index": 26,
+    "section": "选择QA",
+    "question": "在湖北朱家台遗址出土的龙山文化陶器中，下列哪种器物的口缘特征被描述为'呈花边状'？A.鼎B.罐C.锅D.缸",
+    "image_url": "",
+    "expected_answer": "B"
+  },
+  {
+    "index": 41,
+    "section": "选择QA",
+    "question": "商代墓葬中常见的腰坑习俗通常放置什么动物牺牲？A.牛B.马C.狗D.猪",
+    "image_url": "",
+    "expected_answer": "C"
+  },
+  {
+    "index": 5589,
+    "section": "选择QA",
+    "question": "辛店文化早期年代不晚于哪个时期？A. 商代中期 B. 商代晚期 C. 西周早期 D. 春秋初期",
+    "image_url": "",
+    "expected_answer": "B"
+  },
+  {
+    "index": 5536,
+    "section": "选择QA",
+    "question": "内蒙古自治区太仆寺旗出土的汉代金柄铁剑腐蚀活泼性检测中，使用什么化学试剂检测可溶性盐类的存在？",
+    "image_url": "",
+    "expected_answer": "A"
+  },
+  {
+    "index": 358,
+    "section": "选择QA",
+    "question": "先秦时期衅浴祓除的巫术方法包括哪些？A. 用牲血祭祀 B. 用清水沐浴 C. 焚烧活人 D. 舞蹈求雨",
+    "image_url": "",
+    "expected_answer": "AB"
+  },
+  {
+    "index": 504,
+    "section": "选择QA",
+    "question": "商代晚期，根据甲骨卜辞记载，柚地位于黄河的哪一侧？A. 河东兆B. 河西兆C. 河南兆D. 河北兆",
+    "image_url": "",
+    "expected_answer": "B"
+  },
+  {
+    "index": 5200,
+    "section": "选择QA",
+    "question": "燕国'殳类兵器'的器身截面呈什么形状？A. 圆形 B. 四边形 C. 六边形 D. 八边形",
+    "image_url": "",
+    "expected_answer": "C"
+  },
+  {
+    "index": 5243,
+    "section": "选择QA",
+    "question": "郑伯匜铭文记载郑伯为哪位女子制作了媵器？A. 宋孟姬 B. 叔媸 C. 季姜 D. 郑姬",
+    "image_url": "",
+    "expected_answer": "A"
+  },
+  {
+    "index": 5344,
+    "section": "选择QA",
+    "question": "根据上博三《彭祖》研究，作者王晶对简文中哪些文字提出了新的训释？A. 老 B. 句 C. 是 D. 孳",
+    "image_url": "",
+    "expected_answer": "ABCD"
+  },
+  {
+    "index": 5462,
+    "section": "选择QA",
+    "question": "朱郎埠墓群发掘报告中，哪些墓葬属于第一类墓（单葬墓）？选项：A. M16 B. M28 C. M29 D. M32",
+    "image_url": "",
+    "expected_answer": "ABCD"
+  },
+  {
+    "index": 588,
+    "section": "选择VQA",
+    "question": "如图所示，南阳名门华府M38:14出土的这件圆形玉片属于哪种玉器类型？  A. 璧 B. 环 C. 璧芯形器 D. 镯",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1957484903484973056.jpg",
+    "expected_answer": "C"
+  },
+  {
+    "index": 596,
+    "section": "选择VQA",
+    "question": "如图所示，偃师商城遗址出土的这件陶鬲的腹部纹饰属于哪种类型？  A. 绳纹 B. 刻划纹 C. 印纹 D. 涂抹纹",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1957484916260823040.jpg",
+    "expected_answer": "A"
+  },
+  {
+    "index": 677,
+    "section": "选择VQA",
+    "question": "如图所示，清华简第4竹段的斜线标记覆盖了多少枚竹简？  A. 25枚 B. 26枚 C. 30枚 D. 35枚",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1959860407538114561.jpg",
+    "expected_answer": "B"
+  },
+  {
+    "index": 630,
+    "section": "选择VQA",
+    "question": "图中所示的图案最有可能象征什么？  A. 四方观念 B. 八方观念 C. 太阳崇拜 D. 农业丰收",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1958855646894448641.jpg",
+    "expected_answer": "C"
+  },
+  {
+    "index": 683,
+    "section": "选择VQA",
+    "question": "如图所示，随州文峰塔出土的这件青铜鼎内放置的器具是什么？  A. 刀 B. 匕 C. 筷子 D. 勺子",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1959860368619167744.jpg",
+    "expected_answer": "B"
+  },
+  {
+    "index": 609,
+    "section": "选择VQA",
+    "question": "如图所示，湖北随州叶家山M111出土的这件青铜器具有哪些特征？  A. 双耳设计 B. 直棱纹装饰 C. 圈足结构 D. 铭文记载",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1957484918035013632.jpg",
+    "expected_answer": "ABC"
+  },
+  {
+    "index": 654,
+    "section": "选择VQA",
+    "question": "图中所示的作册般甗，其鬲腹部装饰的主要纹饰是什么？  A. 饕餮纹 B. 龙虎纹 C. 牛首纹 D. 虎头纹",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1958867431823335424.jpg",
+    "expected_answer": "C"
+  },
+  {
+    "index": 679,
+    "section": "选择VQA",
+    "question": "如图所示，图中残字“民”经过修复和补摹，最终拟补为哪个字？  A. 畿 B. 菑 C. 啬 D. 昧",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1959860434826256384.jpg",
+    "expected_answer": "C"
+  },
+  {
+    "index": 689,
+    "section": "选择VQA",
+    "question": "如图所示，‘光■凷宇’瓦当中的‘■’字最可能的释读是什么？  A. 朝 B. 爵 C. 耀 D. 曜",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1959860435887415296.jpg",
+    "expected_answer": "C"
+  },
+  {
+    "index": 760,
+    "section": "判断QA",
+    "question": "睡虎地秦简《秦律十八种·仓律》记载秦代造籍在三月进行。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1021,
+    "section": "判断QA",
+    "question": "龙山时代的聚落群结构表明当时社会已进入国家社会阶段。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1068,
+    "section": "判断QA",
+    "question": "秦汉时期，令的实质作用是作为对律的补充、修订或说明。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1031,
+    "section": "判断QA",
+    "question": "在汉朝时期，州郡地记与舆地图结合形成了图记。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 936,
+    "section": "判断QA",
+    "question": "西周时期司寇作为重要的司法长官执掌刑法，职权独立。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 953,
+    "section": "判断QA",
+    "question": "根据刘仙洲和史树青的研究，独轮车创始于西汉。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1203,
+    "section": "判断QA",
+    "question": "仰韶文化史家遗址的墓葬形式以多人二次合葬为主。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1212,
+    "section": "判断QA",
+    "question": "李楼遗址一期灰坑H1中出土了炭化稻米。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1523,
+    "section": "判断QA",
+    "question": "在朱开沟遗址第二段遗存中，轮制陶器技术被引入使用。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1806,
+    "section": "判断QA",
+    "question": "湖北阳新出土的商代铜铙年代被施劲松推定为不晚于殷墟二期。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1866,
+    "section": "判断QA",
+    "question": "中堡岛遗址的屈家岭文化遗存主要分布在第4层。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2019,
+    "section": "判断VQA",
+    "question": "如图所示，该青铜鼎的腹部纹饰属于兽面纹类型。",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1959860408586690560.jpg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2123,
+    "section": "判断VQA",
+    "question": "上甲以下商王世系表中，大乙的妣名为妣丙。",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1958855613834944512.jpg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2137,
+    "section": "判断VQA",
+    "question": "作册般甗铭文中的 '舞' 字应当写作 '無'。",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1958867426827919360.jpg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2130,
+    "section": "判断VQA",
+    "question": "图中显示汉高祖五年一月前后历法后天数值在五年10月达到最高点。",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1958867032739504128.jpg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2107,
+    "section": "判断VQA",
+    "question": "凌家滩遗址出土的玉鹰图案中，双翅作猪首形的设计反映了猪崇拜的文化内涵。",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1958855658894352384.jpg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2128,
+    "section": "判断VQA",
+    "question": "图中显示西周时期的黄河在获嘉县南约四十里处流入获嘉界，这一描述是正确的。",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1958867034614358016.jpg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2135,
+    "section": "判断VQA",
+    "question": "作册般甗的甑部装饰有饕餮纹和蕉叶纹，这一描述是正确的。",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1958867431823335424.jpg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2148,
+    "section": "判断VQA",
+    "question": "如图所示，‘即墨太守’封泥中的‘太守’写作‘大守’，这表明该封泥属于秦代而非汉代。",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1959860454954721280.jpg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2170,
+    "section": "判断VQA",
+    "question": "如图所示，殷墟卜用龟腹甲中甲钻凿数量为四者，其排列方式为右上左下，斜向相对排列。",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1959860372108828672.jpg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2211,
+    "section": "简答QA",
+    "question": "《散氏盘》铭文中记载的'传弃之'相当于周代五刑中的哪种刑罚？",
+    "image_url": "",
+    "expected_answer": "相当于流放刑"
+  },
+  {
+    "index": 2377,
+    "section": "简答QA",
+    "question": "江西收集的西汉铜钾的器物名称是什么？",
+    "image_url": "",
+    "expected_answer": "该器物名称为铜钾。"
+  },
+  {
+    "index": 2467,
+    "section": "简答QA",
+    "question": "《释“中庸”》一文中认为“中庸”精义的本来源头是什么？",
+    "image_url": "",
+    "expected_answer": "实事求是"
+  },
+  {
+    "index": 4273,
+    "section": "简答QA",
+    "question": "辉县市古共城南城墙的始筑年代是什么时期？",
+    "image_url": "",
+    "expected_answer": "战国中晚期。"
+  },
+  {
+    "index": 6295,
+    "section": "简答VQA",
+    "question": "铭文右侧第二列从上至下第三个字的篆书形体对应现代汉字是什么？",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1985661425790083072.jpg",
+    "expected_answer": "宝"
+  },
+  {
+    "index": 6299,
+    "section": "简答VQA",
+    "question": "铭文中从右至左第一列最上方的字符所代表的殷商时期王室称谓是什么？",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1985661426184347648.jpg",
+    "expected_answer": "王"
+  },
+  {
+    "index": 6473,
+    "section": "简答VQA",
+    "question": "该器物中心纹饰外围的四个对称图案中，左测马匹图案下方铭文是什么汉字？",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1985661472619487232.jpg",
+    "expected_answer": "甲"
+  },
+  {
+    "index": 6234,
+    "section": "简答VQA",
+    "question": "该器物上可见的穿孔数量是多少？",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1985637886374567936.jpg",
+    "expected_answer": "2"
+  },
+  {
+    "index": 6213,
+    "section": "简答VQA",
+    "question": "镜面中心圆形区域内雕刻的动物形象，其头部朝向是左、右、上还是下？",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1985637883279171584.jpg",
+    "expected_answer": "上"
+  },
+  {
+    "index": 6164,
+    "section": "简答VQA",
+    "question": "图中猴子雕塑握持的是什么物体？",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1985637868246786048.jpg",
+    "expected_answer": "链条"
+  },
+  {
+    "index": 6319,
+    "section": "简答VQA",
+    "question": "铭文右侧第二列从上至下第三字是什么？",
+    "image_url": "http://marking-platform-external.oss-cn-shanghai.aliyuncs.com/1985661428218585088.jpg",
+    "expected_answer": "于"
+  }
+]
