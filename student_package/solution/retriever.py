@@ -5,7 +5,7 @@ embedder 三档自动选择（按可用性）：
   1. LocalGMEEmbedder       : 评测环境，QWEN_MODEL_PATH 指向本地 GME-Qwen2-VL（3584 维，与集合匹配）
   2. DashScopeApiEmbedder   : 本地 dev，走 DashScope multimodal-embedding-v1 / text-embedding-v3
                               （维度由 API 决定，启动时与集合做兼容性校验）
-  3. NullRetriever          : 二者皆不可用，闭卷推理
+  3. **失败** —— 抛 RetrievalUnavailableError，由 main 决定是 fail-loud 还是降级闭卷
 
 环境变量：
   DASHVECTOR_ENDPOINT       : DashVector endpoint
@@ -17,19 +17,25 @@ embedder 三档自动选择（按可用性）：
   DASHSCOPE_API_KEY         : DashScope API Key（fallback：用 QWEN_API_KEY 同一把）
   DASHSCOPE_EMBED_MODEL     : DashScope 模型名（默认 multimodal-embedding-v1）
 
-  DISABLE_RETRIEVAL=1       : 强制走 NullRetriever（最快闭卷推理）
+  DISABLE_RETRIEVAL=1       : 强制走 NullRetriever（最快闭卷推理；仅用于调试）
 
-设计要点：
-  - 集合启动时探测维度（query 一次 0 向量），与 embedder 输出维度做匹配校验
-  - 维度不匹配 → 日志清晰说明 + 自动降级 NullRetriever，不让整个 run 崩
-  - 多向量集合的 query API：vector 必须是 dict，例如 {'text': [...]}
-  - 调用方负责计时（在 search() 调用前后用 perf_counter）
+设计原则（v3 修订）：
+  - **不静默降级**：检索系统真坏掉时抛 RetrievalUnavailableError
+  - 维度不匹配视为"系统不可用"，必须显式告知调用方
+  - 调用方（main.py）拿到异常后决定：
+      * 默认 → 直接 sys.exit(1)，避免误以为在做 RAG
+      * --allow-closed-book → 切到 NullRetriever，明确进入闭卷模式
+  - 调用方负责计时
 """
 from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
+
+
+class RetrievalUnavailableError(RuntimeError):
+    """检索系统不可用 —— 维度不匹配 / 网络挂 / 模型加载失败 等。"""
 
 
 # ============================================================================
