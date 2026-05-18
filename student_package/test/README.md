@@ -1,13 +1,17 @@
 # test/ —— 简易测试套件
 
-针对 `solution/` 提供两种策略的对比测试:
+针对 `solution/` 提供两种模式的对比测试:
 
-- **baseline**: 无任何检索, 直接调用 Qwen2.5-VL
-- **rag**: 借鉴 `chuangzhi-summer-camp` 的 TF-IDF + BM25 RRF 融合检索, 在公开样例上做"留一"相似题检索作为 few-shot
+- **baseline**: 仅"题型分支 prompt"（关 few-shot、关 VQA 多采样投票）
+- **enhanced**: 默认全开（few-shot + 简答VQA 多采样投票）
 
-每次测试都会在 `test/outputs/<时间戳>_<策略>/` 下生成:
+> 本地无 DashVector / GME 模型，retriever 自动降级为 NullRetriever
+> （由 `DISABLE_RETRIEVAL=1` 显式禁用），效果等同闭卷推理。
+> 正式评测环境需另外 `export DASHVECTOR_*` + `GME_MODEL_PATH` 启用检索。
 
-```
+每次测试都会在 `test/outputs/<时间戳>_<模式>/` 下生成:
+
+```text
 predictions.jsonl       # 模型预测
 time_cost.jsonl         # 检索与推理耗时
 run.log                 # 完整 stdout/stderr
@@ -23,16 +27,16 @@ solution_snapshot/      # 本次跑的 solution/ 代码副本
 ```bash
 cd student_package
 
-# 基线 (无检索)
-python test/run_test.py --strategy baseline
+# 仅题型分支 prompt
+python test/run_test.py --mode baseline
 
-# 检索策略
-python test/run_test.py --strategy rag
+# 完整 prompt 栈（few-shot + VQA 投票）
+python test/run_test.py --mode enhanced
 
 # 调试: 只跑前 5 条
-python test/run_test.py --strategy baseline --limit 5
+python test/run_test.py --mode enhanced --limit 5
 
-# 一次跑两种策略并生成对比报告
+# 一次跑两种模式并生成对比报告
 python test/compare_strategies.py
 ```
 
@@ -41,5 +45,6 @@ python test/compare_strategies.py
 - `QWEN_API_KEY` (必需): DashScope / OpenAI 兼容服务的 API Key
 - `QWEN_MODEL_NAME` (可选, 默认 `qwen2.5-vl-7b-instruct`)
 - `QWEN_BASE_URL`   (可选, 默认 `https://dashscope.aliyuncs.com/compatible-mode/v1`)
+- `DISABLE_RETRIEVAL=1` (本地默认): 禁用 DashVector 检索，闭卷推理
 
 `run_test.py` / `compare_strategies.py` 已经把题目中提供的 API key 作为默认值塞进 env, 直接跑就行。

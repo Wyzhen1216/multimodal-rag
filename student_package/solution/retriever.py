@@ -1,138 +1,339 @@
 """
-检索器: 借鉴 chuangzhi-summer-camp 的 TF-IDF cosine + BM25 RRF 融合。
+检索器 —— DashVector + 多模态 embedding。
 
-由于本项目没有外部知识库的本地副本, 用例间相互检索作为 "类似历史问答" 上下文。
-为避免训练泄漏, 检索时排除查询自身的 index。
+embedder 三档自动选择（按可用性）：
+  1. LocalGMEEmbedder       : 评测环境，QWEN_MODEL_PATH 指向本地 GME-Qwen2-VL（3584 维，与集合匹配）
+  2. DashScopeApiEmbedder   : 本地 dev，走 DashScope multimodal-embedding-v1 / text-embedding-v3
+                              （维度由 API 决定，启动时与集合做兼容性校验）
+  3. NullRetriever          : 二者皆不可用，闭卷推理
+
+环境变量：
+  DASHVECTOR_ENDPOINT       : DashVector endpoint
+  DASHVECTOR_API_KEY        : DashVector api key
+  DASHVECTOR_COLLECTION     : collection 名
+  DASHVECTOR_VECTOR_FIELD   : 多向量集合的字段名，默认 'text'（可选 'image'/'fused'）
+
+  GME_MODEL_PATH            : 本地 GME 模型路径（评测环境必填，本地 dev 留空）
+  DASHSCOPE_API_KEY         : DashScope API Key（fallback：用 QWEN_API_KEY 同一把）
+  DASHSCOPE_EMBED_MODEL     : DashScope 模型名（默认 multimodal-embedding-v1）
+
+  DISABLE_RETRIEVAL=1       : 强制走 NullRetriever（最快闭卷推理）
+
+设计要点：
+  - 集合启动时探测维度（query 一次 0 向量），与 embedder 输出维度做匹配校验
+  - 维度不匹配 → 日志清晰说明 + 自动降级 NullRetriever，不让整个 run 崩
+  - 多向量集合的 query API：vector 必须是 dict，例如 {'text': [...]}
+  - 调用方负责计时（在 search() 调用前后用 perf_counter）
 """
 from __future__ import annotations
 
-import math
-import re
-from collections import Counter, defaultdict
-from typing import List, Tuple
-
-_WORD_RE = re.compile(r"[^\W_]+", re.UNICODE)
+import os
+from pathlib import Path
+from typing import List, Optional, Tuple
 
 
-def _featurize(text: str) -> list:
-    s = (text or "").lower()
-    feats = list(_WORD_RE.findall(s))
-    compact = re.sub(r"\s+", "", s)
-    for n in (2, 3):
-        if len(compact) >= n:
-            for i in range(len(compact) - n + 1):
-                feats.append(f"#{n}#{compact[i:i + n]}")
-    return feats
+# ============================================================================
+# 主类
+# ============================================================================
 
+class DashVectorRetriever:
+    """DashVector + 多模态 embedding。"""
 
-class HybridRetriever:
-    def __init__(self):
-        self._docs: List[dict] = []
-        self._doc_tf: List[Counter] = []
-        self._doc_len: List[int] = []
-        self._inverted: dict = defaultdict(list)
-        self._df: Counter = Counter()
-        self._N = 0
-        self._total_len = 0
-        self._doc_norm_cache: List[float] = []
+    def __init__(
+        self,
+        endpoint: Optional[str] = None,
+        api_key: Optional[str] = None,
+        collection: Optional[str] = None,
+        embed_model_path: Optional[str] = None,
+        topk: int = 5,
+        text_field: str = "content",     # collection 里的文本字段名
+        vector_field: Optional[str] = None,
+    ):
+        self.endpoint = endpoint or os.environ.get("DASHVECTOR_ENDPOINT", "")
+        self.api_key = api_key or os.environ.get("DASHVECTOR_API_KEY", "")
+        self.collection_name = collection or os.environ.get("DASHVECTOR_COLLECTION", "")
+        self.embed_model_path = embed_model_path or os.environ.get("GME_MODEL_PATH", "")
+        self.topk = topk
+        self.text_field = text_field
+        self.vector_field = (
+            vector_field
+            or os.environ.get("DASHVECTOR_VECTOR_FIELD", "text")
+        )
 
-    def add(self, doc: dict, text: str) -> None:
-        ctr = Counter(_featurize(text))
-        idx = self._N
-        self._N += 1
-        self._docs.append(doc)
-        self._doc_tf.append(ctr)
-        dl = sum(ctr.values())
-        self._doc_len.append(dl)
-        self._total_len += dl
-        self._doc_norm_cache.append(0.0)
-        for t in ctr:
-            self._inverted[t].append(idx)
-            self._df[t] += 1
+        self._collection = None
+        self._collection_dim: Optional[int] = None
+        self._embedder = None
+        self._disabled = False
 
-    def _idf(self, t: str) -> float:
-        df = self._df.get(t, 0)
-        if df == 0:
-            return 0.0
-        return math.log((self._N + 1.0) / (df + 0.5))
+        if os.environ.get("DISABLE_RETRIEVAL") == "1":
+            self._disabled = True
 
-    def _doc_norm(self, idx: int) -> float:
-        n = self._doc_norm_cache[idx]
-        if n > 0:
-            return n
-        s = 0.0
-        for t, c in self._doc_tf[idx].items():
-            w = c * self._idf(t)
-            s += w * w
-        n = math.sqrt(s) or 1.0
-        self._doc_norm_cache[idx] = n
-        return n
+    # ---- collection ----------------------------------------------------
 
-    def _tfidf(self, text: str, k: int) -> List[Tuple[float, int]]:
-        if self._N == 0:
+    def _ensure_collection(self) -> None:
+        if self._collection is not None or self._disabled:
+            return
+        if not (self.endpoint and self.api_key and self.collection_name):
+            print("[retriever] DashVector env not set, disabling retrieval", flush=True)
+            self._disabled = True
+            return
+        try:
+            import dashvector
+            client = dashvector.Client(api_key=self.api_key, endpoint=self.endpoint)
+            self._collection = client.get(self.collection_name)
+            # 探测集合的向量字段 schema
+            self._collection_dim = self._probe_collection_dim()
+            print(
+                f"[retriever] DashVector connected: {self.collection_name}, "
+                f"vector_field={self.vector_field}, dim={self._collection_dim}",
+                flush=True,
+            )
+        except Exception as e:
+            print(f"[retriever] DashVector connect failed: {e}; disabling retrieval", flush=True)
+            self._disabled = True
+
+    def _probe_collection_dim(self) -> Optional[int]:
+        """从集合描述中读出指定 vector field 的维度。"""
+        try:
+            desc = str(self._collection)
+            # collection.__str__ 包含 fields_schema/vectors_schema 信息
+            # 例如：vectors_schema={'text': {'dimension': 3584, ...}, ...}
+            import json
+            obj = json.loads(desc)
+            vs = obj.get("vectors_schema") or {}
+            if self.vector_field in vs:
+                return int(vs[self.vector_field].get("dimension") or 0)
+            # 单向量场景
+            if "dimension" in obj:
+                return int(obj["dimension"])
+        except Exception:
+            pass
+        return None
+
+    # ---- embedder ------------------------------------------------------
+
+    def _ensure_embedder(self) -> None:
+        if self._embedder is not None or self._disabled:
+            return
+
+        # 优先级 1：本地 GME（评测环境）
+        if self.embed_model_path and Path(self.embed_model_path).exists():
+            try:
+                self._embedder = _LocalGMEEmbedder(self.embed_model_path)
+                print(f"[retriever] embedder=LocalGMEEmbedder({self.embed_model_path})", flush=True)
+                self._check_dim_compat("LocalGMEEmbedder")
+                return
+            except Exception as e:
+                print(f"[retriever] LocalGMEEmbedder failed: {e}", flush=True)
+
+        # 优先级 2：DashScope API
+        ds_key = os.environ.get("DASHSCOPE_API_KEY") or os.environ.get("QWEN_API_KEY")
+        if ds_key:
+            try:
+                self._embedder = _DashScopeApiEmbedder(api_key=ds_key)
+                print(
+                    f"[retriever] embedder=DashScopeApiEmbedder(model={self._embedder.model})",
+                    flush=True,
+                )
+                self._check_dim_compat("DashScopeApiEmbedder")
+                return
+            except Exception as e:
+                print(f"[retriever] DashScopeApiEmbedder failed: {e}", flush=True)
+
+        print("[retriever] no embedder available, disabling retrieval", flush=True)
+        self._disabled = True
+
+    def _check_dim_compat(self, embedder_name: str) -> None:
+        """探测一次 embed dim，与 collection dim 比对；不匹配 → 自动降级。"""
+        if self._collection_dim is None or self._embedder is None:
+            return
+        try:
+            sample_vec = self._embedder.encode(text="维度探测")
+        except Exception as e:
+            print(f"[retriever] dim probe failed: {e}; disabling retrieval", flush=True)
+            self._disabled = True
+            return
+        ed = len(sample_vec)
+        if ed != self._collection_dim:
+            print(
+                f"[retriever] DIMENSION MISMATCH: {embedder_name} produces {ed}-dim, "
+                f"collection requires {self._collection_dim}-dim. "
+                f"Disabling retrieval (will use closed-book inference).",
+                flush=True,
+            )
+            print(
+                "[retriever] To enable retrieval: set GME_MODEL_PATH to a local "
+                "GME-Qwen2-VL model (eval env).",
+                flush=True,
+            )
+            self._disabled = True
+        else:
+            print(f"[retriever] dim check OK: embedder={ed} == collection={self._collection_dim}", flush=True)
+
+    # ---- public --------------------------------------------------------
+
+    def search(
+        self,
+        text: str,
+        image_path: Optional[str] = None,
+        topk: Optional[int] = None,
+    ) -> List[str]:
+        """检索 top-k 文档文本。失败时返回 []。"""
+        if self._disabled:
             return []
-        q_ctr = Counter(_featurize(text))
-        q_vec = {t: c * self._idf(t) for t, c in q_ctr.items() if self._df.get(t, 0) > 0}
-        if not q_vec:
+        self._ensure_collection()
+        if self._disabled:
             return []
-        q_norm = math.sqrt(sum(v * v for v in q_vec.values())) or 1.0
-        scores: dict = {}
-        for t, qv in q_vec.items():
-            wt = self._idf(t)
-            for d in self._inverted.get(t, ()):
-                dc = self._doc_tf[d].get(t, 0)
-                if dc:
-                    scores[d] = scores.get(d, 0.0) + qv * dc * wt
-        ranked = [(dot / (q_norm * self._doc_norm(d)), d) for d, dot in scores.items()]
-        ranked.sort(reverse=True)
-        return ranked[:k]
+        self._ensure_embedder()
+        if self._disabled:
+            return []
 
-    def _bm25(self, text: str, k: int, k1: float = 1.5, b: float = 0.75) -> List[Tuple[float, int]]:
-        if self._N == 0:
+        k = topk or self.topk
+        try:
+            vec = self._embedder.encode(text=text, image_path=image_path)
+        except Exception as e:
+            print(f"[retriever] embed failed: {e}", flush=True)
             return []
-        avgdl = (self._total_len / self._N) or 1.0
-        q_ctr = Counter(_featurize(text))
-        q_tokens = [t for t in q_ctr if self._df.get(t, 0) > 0]
-        if not q_tokens:
-            return []
-        scores: dict = {}
-        for t in q_tokens:
-            idf = self._idf(t)
-            if idf <= 0:
-                continue
-            for d in self._inverted.get(t, ()):
-                f = self._doc_tf[d].get(t, 0)
-                if not f:
-                    continue
-                dl = self._doc_len[d] or 1
-                denom = f + k1 * (1.0 - b + b * dl / avgdl)
-                scores[d] = scores.get(d, 0.0) + idf * f * (k1 + 1.0) / denom
-        ranked = [(s, d) for d, s in scores.items()]
-        ranked.sort(reverse=True)
-        return ranked[:k]
 
-    def search(self, text: str, k: int = 5, exclude_index: int | None = None) -> List[dict]:
-        """RRF 融合 TF-IDF cosine + BM25, 返回 top-k 文档(原 dict)。"""
-        if self._N == 0:
+        try:
+            resp = self._collection.query(
+                vector={self.vector_field: list(vec)},
+                topk=k,
+            )
+            if not getattr(resp, "output", None):
+                return []
+            docs: List[str] = []
+            for doc in resp.output:
+                fields = getattr(doc, "fields", None) or {}
+                txt = (
+                    fields.get(self.text_field)
+                    or fields.get("content")
+                    or fields.get("text")
+                    or fields.get("chunk")
+                    or ""
+                )
+                if txt:
+                    docs.append(str(txt))
+            return docs
+        except Exception as e:
+            print(f"[retriever] query failed: {e}", flush=True)
             return []
-        M = max(k * 3, 30)
-        tfidf = self._tfidf(text, M)
-        bm25 = self._bm25(text, M)
-        if not tfidf and not bm25:
-            return []
-        RRF_K = 60.0
-        rrf: dict = {}
-        for rank, (_, d) in enumerate(tfidf):
-            rrf[d] = rrf.get(d, 0.0) + 1.0 / (RRF_K + rank + 1)
-        for rank, (_, d) in enumerate(bm25):
-            rrf[d] = rrf.get(d, 0.0) + 1.0 / (RRF_K + rank + 1)
-        ranked = sorted(rrf.items(), key=lambda x: -x[1])
-        out: List[dict] = []
-        for d, _s in ranked:
-            doc = self._docs[d]
-            if exclude_index is not None and doc.get("index") == exclude_index:
-                continue
-            out.append(doc)
-            if len(out) >= k:
-                break
-        return out
+
+
+# ============================================================================
+# Embedder 实现
+# ============================================================================
+
+class _LocalGMEEmbedder:
+    """GME-Qwen2-VL 本地推理。评测环境用。"""
+
+    def __init__(self, model_path: str, device: Optional[str] = None):
+        import torch
+        from transformers import AutoModel, AutoProcessor
+
+        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.torch = torch
+        self.processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
+        self.model = AutoModel.from_pretrained(
+            model_path,
+            trust_remote_code=True,
+            torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
+        ).to(self.device).eval()
+
+    def encode(self, text: str, image_path: Optional[str] = None) -> list:
+        import torch
+        from PIL import Image
+
+        images = None
+        if image_path and Path(image_path).exists():
+            try:
+                images = [Image.open(image_path).convert("RGB")]
+            except Exception:
+                images = None
+
+        # 优先走模型自带的 encode（GME 通常提供）
+        if hasattr(self.model, "encode"):
+            try:
+                vec = self.model.encode(text=[text], images=images)
+                return _to_list(vec)
+            except Exception:
+                pass
+
+        # 通用路径
+        if images is not None:
+            inputs = self.processor(text=text, images=images, return_tensors="pt").to(self.device)
+        else:
+            inputs = self.processor(text=text, return_tensors="pt").to(self.device)
+        with torch.no_grad():
+            out = self.model(**inputs)
+        if hasattr(out, "last_hidden_state"):
+            vec = out.last_hidden_state.mean(dim=1)
+        elif hasattr(out, "pooler_output"):
+            vec = out.pooler_output
+        else:
+            vec = out[0] if isinstance(out, tuple) else out
+        return _to_list(vec)
+
+
+class _DashScopeApiEmbedder:
+    """走 DashScope API 的 embedding。
+
+    模型选择优先级：
+      - DASHSCOPE_EMBED_MODEL 环境变量（如果设置）
+      - multimodal-embedding-v1（支持图+文，1024-dim）
+    """
+
+    def __init__(self, api_key: str, model: Optional[str] = None):
+        import dashscope
+        self.dashscope = dashscope
+        self.dashscope.api_key = api_key
+        self.model = model or os.environ.get("DASHSCOPE_EMBED_MODEL", "multimodal-embedding-v1")
+        self._is_multimodal = "multimodal" in self.model
+
+    def encode(self, text: str, image_path: Optional[str] = None) -> list:
+        if self._is_multimodal:
+            payload = [{"text": text or ""}]
+            if image_path and Path(image_path).exists():
+                # multimodal-embedding-v1 接受 base64 或公网 URL
+                # 这里走 base64 inline
+                import base64
+                with open(image_path, "rb") as f:
+                    b64 = base64.b64encode(f.read()).decode("ascii")
+                suffix = Path(image_path).suffix.lower().lstrip(".") or "jpeg"
+                if suffix == "jpg":
+                    suffix = "jpeg"
+                payload.append({"image": f"data:image/{suffix};base64,{b64}"})
+            r = self.dashscope.MultiModalEmbedding.call(model=self.model, input=payload)
+        else:
+            r = self.dashscope.TextEmbedding.call(model=self.model, input=[text or ""])
+
+        if r.status_code != 200:
+            raise RuntimeError(f"DashScope embedding failed: {r.status_code} {r.message}")
+        embs = r.output["embeddings"]
+        return list(embs[0]["embedding"])
+
+
+def _to_list(vec) -> list:
+    if hasattr(vec, "detach"):
+        return vec.detach().cpu().float().numpy().reshape(-1).tolist()
+    if hasattr(vec, "tolist"):
+        return list(vec.reshape(-1).tolist() if hasattr(vec, "reshape") else vec.tolist())
+    return list(vec)
+
+
+# ============================================================================
+# Null + factory
+# ============================================================================
+
+class NullRetriever:
+    """空检索器，所有 search 返回 []。"""
+
+    def search(self, text: str, image_path: Optional[str] = None, topk: Optional[int] = None) -> List[str]:
+        return []
+
+
+def build_retriever() -> object:
+    if os.environ.get("DISABLE_RETRIEVAL") == "1":
+        print("[retriever] DISABLE_RETRIEVAL=1, using NullRetriever", flush=True)
+        return NullRetriever()
+    return DashVectorRetriever()

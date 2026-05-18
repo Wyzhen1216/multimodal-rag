@@ -1,17 +1,20 @@
 """
 run_test.py
 ============
-跑一次测试: 调 solution/main.py, 创建以时间戳命名的输出目录, 落预测、日志、metrics、错误分析。
+跑一次测试：调 solution/main.py，落预测、日志、metrics、错误分析。
+
+模式（与新版 solution/main.py 对齐）：
+  - baseline : 仅"题型分支 prompt"（关闭 few-shot 和 VQA 多采样投票）
+  - enhanced : 默认全开（few-shot + VQA 多采样投票）
+
+本地测试（无 DashVector / GME）：
+  retriever 会自动降级为 NullRetriever，效果上 = 闭卷推理。
+  正式评测环境需 export DASHVECTOR_* 和 GME_MODEL_PATH 才会启用检索。
 
 用法:
-    # 基线 (无检索)
-    python test/run_test.py --strategy baseline
-
-    # 检索策略 (借鉴 chuangzhi-summer-camp 的 BM25+TF-IDF RRF)
-    python test/run_test.py --strategy rag
-
-    # 仅跑前 5 条 (调试)
-    python test/run_test.py --strategy baseline --limit 5
+    python test/run_test.py --mode baseline
+    python test/run_test.py --mode enhanced
+    python test/run_test.py --mode enhanced --limit 5    # 调试用
 """
 from __future__ import annotations
 
@@ -26,25 +29,44 @@ from datetime import datetime
 from pathlib import Path
 
 
-HERE = Path(__file__).resolve().parent                # student_package/test
-PKG_DIR = HERE.parent                                  # student_package
-OUTPUT_ROOT = HERE / "outputs"                         # student_package/test/outputs/<ts>
+HERE = Path(__file__).resolve().parent
+PKG_DIR = HERE.parent
+OUTPUT_ROOT = HERE / "outputs"
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="单策略测试执行器")
+    p = argparse.ArgumentParser(description="单模式测试执行器")
     p.add_argument(
-        "--strategy",
-        choices=("baseline", "rag"),
-        default="baseline",
-        help="baseline = 无检索; rag = TF-IDF + BM25 RRF 检索",
+        "--mode",
+        choices=("baseline", "enhanced"),
+        default="enhanced",
+        help="baseline = 仅题型分支 prompt; enhanced = + few-shot + VQA 投票",
     )
     p.add_argument("--input", default=str(PKG_DIR / "data" / "public_examples.full.json"))
     p.add_argument("--gold", default="")
     p.add_argument("--limit", type=int, default=0)
-    p.add_argument("--topk", type=int, default=4)
-    p.add_argument("--tag", default="", help="附加在输出目录名后, 便于区分")
+    p.add_argument("--topk", type=int, default=5)
+    p.add_argument("--vqa-samples", type=int, default=0, help="覆盖默认: 0 表示按 mode 决定")
+    p.add_argument("--tag", default="")
     return p.parse_args()
+
+
+def _build_cmd(args: argparse.Namespace, pred_path: Path) -> list[str]:
+    cmd = [
+        sys.executable, "-u", "-m", "solution.main",
+        "--input", args.input,
+        "--output", str(pred_path),
+        "--topk", str(args.topk),
+        "--llm", "api",  # 本地 dev 强制走 API
+    ]
+    if args.mode == "baseline":
+        cmd += ["--no-fewshot", "--vqa-samples", "1"]
+    else:
+        vqa_n = args.vqa_samples if args.vqa_samples > 0 else 3
+        cmd += ["--vqa-samples", str(vqa_n)]
+    if args.limit:
+        cmd += ["--limit", str(args.limit)]
+    return cmd
 
 
 def main() -> int:
@@ -58,7 +80,7 @@ def main() -> int:
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     suffix = f"_{args.tag}" if args.tag else ""
-    out_dir = OUTPUT_ROOT / f"{ts}_{args.strategy}{suffix}"
+    out_dir = OUTPUT_ROOT / f"{ts}_{args.mode}{suffix}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     pred_path = out_dir / "predictions.jsonl"
@@ -67,7 +89,7 @@ def main() -> int:
     meta_path = out_dir / "meta.json"
     metrics_path = out_dir / "metrics.json"
 
-    # ---- 快照 solution/ (便于回看本次测试代码) ----
+    # 快照 solution/
     snap = out_dir / "solution_snapshot"
     snap.mkdir(exist_ok=True)
     for f in (PKG_DIR / "solution").glob("*.py"):
@@ -76,23 +98,27 @@ def main() -> int:
     if req.exists():
         shutil.copy2(req, snap / "requirements.txt")
 
-    # ---- 调 solution.main ----
     env = os.environ.copy()
     env.setdefault("PYTHONIOENCODING", "utf-8")
     env.setdefault("PYTHONUNBUFFERED", "1")
     env.setdefault("QWEN_API_KEY", "sk-REPLACE-WITH-YOUR-OWN-QWEN-KEY")
     env.setdefault("QWEN_MODEL_NAME", "qwen2.5-vl-7b-instruct")
+    # DashVector 凭证（评测环境同款），本地连得上但因没有本地 GME 会自动降级
+    env.setdefault(
+        "DASHVECTOR_ENDPOINT",
+        "vrs-cn-71j49hani00061.dashvector.cn-hangzhou.aliyuncs.com",
+    )
+    env.setdefault(
+        "DASHVECTOR_API_KEY",
+        "sk-REPLACE-WITH-YOUR-OWN-VECTOR-KEY",
+    )
+    env.setdefault("DASHVECTOR_COLLECTION", "ccv_cb_student_20260508")
+    env.setdefault("DASHVECTOR_VECTOR_FIELD", "text")
+    # DashScope embedding（与 QWEN_API_KEY 同一把 key）
+    env.setdefault("DASHSCOPE_API_KEY", env["QWEN_API_KEY"])
+    env.setdefault("DASHSCOPE_EMBED_MODEL", "multimodal-embedding-v1")
 
-    cmd = [
-        sys.executable, "-u", "-m", "solution.main",
-        "--input", args.input,
-        "--output", str(pred_path),
-        "--strategy", args.strategy,
-        "--topk", str(args.topk),
-    ]
-    if args.limit:
-        cmd += ["--limit", str(args.limit)]
-
+    cmd = _build_cmd(args, pred_path)
     started = datetime.now()
     print(f"[run_test] 输出目录: {out_dir}")
     print(f"[run_test] 命令: {' '.join(cmd)}")
@@ -136,26 +162,32 @@ def main() -> int:
     print("-" * 60)
     print(f"[run_test] 结束: {finished.isoformat(timespec='seconds')}  耗时 {elapsed:.1f}s  exit={exit_code}")
 
-    # ---- check_output.py 格式校验 ----
+    # check_output.py
     print("[run_test] 校验输出格式 ...")
-    check_cmd = [
-        sys.executable, str(PKG_DIR / "scripts" / "check_output.py"),
-        "--input", args.input,
-        "--prediction", str(pred_path),
-    ]
-    check_ret = subprocess.run(check_cmd, cwd=str(PKG_DIR), env=env)
+    check_ret = subprocess.run(
+        [
+            sys.executable, str(PKG_DIR / "scripts" / "check_output.py"),
+            "--input", args.input,
+            "--prediction", str(pred_path),
+        ],
+        cwd=str(PKG_DIR),
+        env=env,
+    )
 
-    # ---- evaluate.py 评分 ----
+    # evaluate.py
     print("[run_test] 评分 ...")
-    eval_cmd = [
-        sys.executable, str(PKG_DIR / "scripts" / "evaluate.py"),
-        "--gold", args.gold,
-        "--prediction", str(pred_path),
-        "--output", str(metrics_path),
-    ]
-    eval_ret = subprocess.run(eval_cmd, cwd=str(PKG_DIR), env={**env, "PYTHONPATH": str(PKG_DIR)})
+    eval_ret = subprocess.run(
+        [
+            sys.executable, str(PKG_DIR / "scripts" / "evaluate.py"),
+            "--gold", args.gold,
+            "--prediction", str(pred_path),
+            "--output", str(metrics_path),
+        ],
+        cwd=str(PKG_DIR),
+        env={**env, "PYTHONPATH": str(PKG_DIR)},
+    )
 
-    # ---- 错误样例分析 ----
+    # 错误分析
     print("[run_test] 错误样例分析 ...")
     sys.path.insert(0, str(HERE))
     from error_analysis import analyze  # noqa: E402
@@ -165,13 +197,12 @@ def main() -> int:
         prediction_path=pred_path,
         time_cost_path=time_path,
         out_dir=out_dir,
-        strategy=args.strategy,
+        strategy=args.mode,
     )
 
-    # ---- meta.json ----
     meta = {
         "timestamp": ts,
-        "strategy": args.strategy,
+        "mode": args.mode,
         "tag": args.tag,
         "limit": args.limit,
         "topk": args.topk,

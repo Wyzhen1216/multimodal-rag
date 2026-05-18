@@ -1,21 +1,29 @@
 """
-solution.main — 多模态历史 RAG Agent 入口。
+solution.main —— 多模态历史 RAG Agent 主入口。
 
-支持两种策略:
-  --strategy baseline  : 无检索, 直接调用 Qwen2.5-VL
-  --strategy rag       : 用 TF-IDF + BM25 RRF 融合检索, 取相似历史题作 few-shot 上下文
-
-输出:
-  predictions.jsonl
-  time_cost.jsonl
+流程：
+  1. 加载输入 (data/public_examples.full.json)
+  2. 一次性初始化 LLM 客户端 + DashVector retriever
+  3. 按题逐条处理：
+       a. 题型路由：简答VQA 跳过检索
+       b. 构造检索 query（题干 + 选项）
+       c. DashVector 检索 top-k 文献片段 (retrieval_cost 计时)
+       d. 按题型分支构造 prompt
+       e. Qwen2.5-VL 推理 (infer_cost 计时)
+       f. 简答VQA：多次采样投票
+       g. 答案归一化 + 兜底
+       h. append 写入 predictions.jsonl + time_cost.jsonl
 """
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
+from collections import Counter
 from pathlib import Path
+from typing import List, Optional
 
 _HERE = Path(__file__).resolve().parent
 _ROOT = _HERE.parent
@@ -24,26 +32,45 @@ if str(_ROOT) not in sys.path:
 
 from src.normalization import normalize_answer  # noqa: E402
 
-from .llm_client import QwenVLClient
-from .prompts import SYSTEM_BASE, build_baseline_user, build_rag_user
-from .retriever import HybridRetriever
+from .llm_client import build_client, resolve_local_image  # noqa: E402
+from .prompts import (  # noqa: E402
+    build_user_message,
+    fallback_answer,
+    fewshot_block,
+    system_prompt_for,
+)
+from .retriever import build_retriever  # noqa: E402
 
 
-def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Multimodal RAG Agent runner")
-    p.add_argument("--input", required=True, help="输入 JSON (数组)")
-    p.add_argument("--output", required=True, help="输出 predictions.jsonl")
+# ============================================================================
+# CLI
+# ============================================================================
+
+def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
+    p = argparse.ArgumentParser(description="Multimodal History RAG Agent")
+    p.add_argument("--input", required=True, help="输入 JSON 数组路径")
+    p.add_argument("--output", required=True, help="输出 predictions.jsonl 路径")
+    p.add_argument("--topk", type=int, default=5, help="DashVector top-k")
+    p.add_argument("--limit", type=int, default=0, help=">0 时仅跑前 N 题（调试）")
+    p.add_argument("--no-fewshot", action="store_true", help="禁用 few-shot")
     p.add_argument(
-        "--strategy",
-        choices=("baseline", "rag"),
-        default="baseline",
-        help="baseline = 无检索; rag = 借鉴 chuangzhi-summer-camp 的 BM25+TF-IDF RRF",
+        "--vqa-samples",
+        type=int,
+        default=3,
+        help="简答VQA 多次采样次数（>=1, 1 = 不采样）",
     )
-    p.add_argument("--topk", type=int, default=4, help="RAG 检索条数")
-    p.add_argument("--limit", type=int, default=0, help=">0 时仅跑前 N 条 (调试用)")
-    p.add_argument("--corpus", default="", help="检索语料 JSON 路径; 默认与 --input 相同")
+    p.add_argument(
+        "--resume",
+        action="store_true",
+        help="若 predictions.jsonl 已存在，跳过已完成的 index",
+    )
+    p.add_argument("--llm", choices=("auto", "api", "local"), default="auto")
     return p.parse_args(argv)
 
+
+# ============================================================================
+# Helpers
+# ============================================================================
 
 def load_items(path: Path) -> list[dict]:
     rows = json.loads(path.read_text(encoding="utf-8"))
@@ -52,13 +79,52 @@ def load_items(path: Path) -> list[dict]:
     return rows
 
 
-def build_retriever(corpus: list[dict]) -> HybridRetriever:
-    r = HybridRetriever()
-    for item in corpus:
-        text = str(item.get("question") or "")
-        r.add(item, text)
-    return r
+def load_done_indexes(path: Path) -> set:
+    if not path.exists():
+        return set()
+    done = set()
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+                done.add(row.get("index"))
+            except Exception:
+                pass
+    return done
 
+
+def build_query(question: str) -> str:
+    """检索 query：直接使用题干即可（题干通常已包含关键考古学术语和选项内容）。"""
+    return (question or "").strip()
+
+
+def majority_vote(answers: List[str], section: str) -> str:
+    """对多次采样做归一化后投票，取多数票；票数相同时取第一个非空。"""
+    normed = [normalize_answer(section, a) for a in answers]
+    normed = [a for a in normed if a]
+    if not normed:
+        return ""
+    counter = Counter(normed)
+    top, _ = counter.most_common(1)[0]
+    return top
+
+
+def pick_answer(raw: str, section: str, fallback_if_empty: bool = True) -> str:
+    """对模型输出做归一化；失败兜底。"""
+    ans = normalize_answer(section, raw)
+    if ans:
+        return ans
+    if fallback_if_empty:
+        return fallback_answer(section)
+    return ""
+
+
+# ============================================================================
+# 主循环
+# ============================================================================
 
 def run(args: argparse.Namespace) -> None:
     in_path = Path(args.input)
@@ -70,65 +136,115 @@ def run(args: argparse.Namespace) -> None:
     if args.limit and args.limit > 0:
         items = items[: args.limit]
 
-    retriever = None
-    if args.strategy == "rag":
-        corpus_path = Path(args.corpus) if args.corpus else in_path
-        corpus = load_items(corpus_path)
-        retriever = build_retriever(corpus)
+    done = load_done_indexes(out_path) if args.resume else set()
+    if done:
+        print(f"[main] resume mode: skip {len(done)} done indexes", flush=True)
 
-    client = QwenVLClient()
+    # 一次性初始化
+    retriever = build_retriever()
+    client = build_client(prefer=None if args.llm == "auto" else args.llm)
+    print(f"[main] llm={client.name}  retriever={type(retriever).__name__}", flush=True)
+    print(f"[main] total items: {len(items)}", flush=True)
 
-    n_total = len(items)
-    print(f"[main] strategy={args.strategy}  items={n_total}  model={client.model}", flush=True)
+    # 文件以 append 打开，支持续跑
+    open_mode = "a" if args.resume and out_path.exists() else "w"
+    fout = out_path.open(open_mode, encoding="utf-8")
+    ftime = time_path.open(open_mode, encoding="utf-8")
 
-    with out_path.open("w", encoding="utf-8") as fout, time_path.open("w", encoding="utf-8") as ftime:
+    try:
         for i, item in enumerate(items, 1):
             idx = item.get("index")
+            if idx in done:
+                continue
             section = str(item.get("section") or "")
+            question = str(item.get("question") or "")
             image_url = str(item.get("image_url") or "")
+            image_path = resolve_local_image(image_url) if image_url else None
 
+            is_short_vqa = section == "简答VQA"
+            skip_retrieval = is_short_vqa  # 简答VQA 跳过检索
+
+            # ---- 检索 ----
             t0 = time.perf_counter()
-            if args.strategy == "rag" and retriever is not None:
-                query = str(item.get("question") or "")
-                retrieved = retriever.search(query, k=args.topk, exclude_index=idx)
-                user_text = build_rag_user(item, retrieved)
-            else:
-                user_text = build_baseline_user(item)
+            contexts: List[str] = []
+            if not skip_retrieval:
+                query = build_query(question)
+                try:
+                    contexts = retriever.search(
+                        text=query,
+                        image_path=str(image_path) if image_path else None,
+                        topk=args.topk,
+                    )
+                except Exception as e:
+                    print(f"[idx={idx}] retrieval error: {e}", flush=True)
+                    contexts = []
             retrieval_cost = time.perf_counter() - t0
 
-            messages = client.build_messages(SYSTEM_BASE, user_text, image_url)
+            # ---- Prompt ----
+            system = system_prompt_for(section)
+            user = build_user_message(section, question, contexts)
+            if not args.no_fewshot:
+                user = fewshot_block(section) + user
 
+            # ---- 推理 ----
             t1 = time.perf_counter()
+            raw = ""
             try:
-                raw = client.chat(messages)
-                err = ""
+                if is_short_vqa and args.vqa_samples > 1:
+                    # 多次采样投票
+                    samples = client.generate_n(
+                        system, user, image_path,
+                        n=args.vqa_samples,
+                        temperature=0.7,
+                        max_tokens=64,
+                    )
+                    voted = majority_vote(samples, section)
+                    raw = samples[0]  # raw_answer 留首条做排查
+                    answer = voted or pick_answer(samples[0], section)
+                else:
+                    # 单次贪心
+                    raw = client.generate(
+                        system, user, image_path,
+                        temperature=0.0,
+                        max_tokens=128 if "选择" in section or "判断" in section else 64,
+                    )
+                    answer = pick_answer(raw, section)
             except Exception as e:
+                print(f"[idx={idx}] infer error: {e}", flush=True)
+                answer = fallback_answer(section)
                 raw = ""
-                err = f"{type(e).__name__}: {e}"
             infer_cost = time.perf_counter() - t1
 
-            answer = normalize_answer(section, raw)
-            out_row = {"index": idx, "answer": answer, "raw_answer": raw}
-            fout.write(json.dumps(out_row, ensure_ascii=False) + "\n")
+            # ---- 落盘 ----
+            fout.write(json.dumps(
+                {"index": idx, "answer": answer, "raw_answer": raw},
+                ensure_ascii=False,
+            ) + "\n")
             fout.flush()
-            ftime.write(
-                json.dumps(
-                    {"index": idx, "retrieval_cost": round(retrieval_cost, 4), "infer_cost": round(infer_cost, 4)},
-                    ensure_ascii=False,
-                )
-                + "\n"
-            )
+            ftime.write(json.dumps(
+                {
+                    "index": idx,
+                    "retrieval_cost": round(retrieval_cost, 4),
+                    "infer_cost": round(infer_cost, 4),
+                },
+                ensure_ascii=False,
+            ) + "\n")
             ftime.flush()
 
-            tag = "OK" if not err else "ERR"
-            print(f"[{i}/{n_total}] idx={idx} sec={section} {tag} ans={answer!r} t_infer={infer_cost:.2f}s", flush=True)
-            if err:
-                print(f"        {err}", flush=True)
+            print(
+                f"[{i}/{len(items)}] idx={idx} sec={section} "
+                f"ans={answer!r} t_ret={retrieval_cost:.2f}s t_inf={infer_cost:.2f}s "
+                f"ctx={len(contexts)}",
+                flush=True,
+            )
+    finally:
+        fout.close()
+        ftime.close()
 
     print(f"[main] done. predictions -> {out_path}\n         time_cost  -> {time_path}", flush=True)
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: Optional[list[str]] = None) -> int:
     args = parse_args(argv)
     run(args)
     return 0

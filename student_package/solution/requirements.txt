@@ -1,1 +1,7 @@
+# solution/ 的额外依赖
+
+# DashVector 检索 + DashScope API embedding（基础环境已预装 transformers / qwen-vl-utils / dashvector / pillow，
+# 这里显式列出代码直接 import 的库）
+dashvector>=1.0.23
+dashscope>=1.20.0
 openai>=1.30.0

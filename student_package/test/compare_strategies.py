@@ -1,7 +1,13 @@
 """
 compare_strategies.py
 =====================
-一次跑两种策略 (baseline + rag), 落到同一个时间戳目录, 产出对比报告 compare.md。
+一次跑两个模式 (baseline + enhanced)，落到同一个时间戳目录，产出对比报告 compare.md。
+
+新版模式定义（与新版 solution/main.py 对齐）：
+  - baseline : 仅题型分支 prompt （关 few-shot、关 VQA 投票）
+  - enhanced : few-shot + VQA 多采样投票
+
+本地无 DashVector / GME，DISABLE_RETRIEVAL=1 默认开启。
 """
 from __future__ import annotations
 
@@ -21,15 +27,33 @@ OUTPUT_ROOT = HERE / "outputs"
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="对比 baseline 与 rag 两种策略")
+    p = argparse.ArgumentParser(description="对比 baseline 与 enhanced 两种模式")
     p.add_argument("--input", default=str(PKG_DIR / "data" / "public_examples.full.json"))
     p.add_argument("--gold", default="")
     p.add_argument("--limit", type=int, default=0)
-    p.add_argument("--topk", type=int, default=4)
+    p.add_argument("--topk", type=int, default=5)
+    p.add_argument("--vqa-samples", type=int, default=3, help="enhanced 模式的 VQA 采样次数")
     return p.parse_args()
 
 
-def _run_one(strategy: str, args: argparse.Namespace, out_dir: Path) -> dict:
+def _build_cmd(mode: str, args: argparse.Namespace, pred_path: Path) -> list[str]:
+    cmd = [
+        sys.executable, "-u", "-m", "solution.main",
+        "--input", args.input,
+        "--output", str(pred_path),
+        "--topk", str(args.topk),
+        "--llm", "api",
+    ]
+    if mode == "baseline":
+        cmd += ["--no-fewshot", "--vqa-samples", "1"]
+    else:
+        cmd += ["--vqa-samples", str(args.vqa_samples)]
+    if args.limit:
+        cmd += ["--limit", str(args.limit)]
+    return cmd
+
+
+def _run_one(mode: str, args: argparse.Namespace, out_dir: Path) -> dict:
     pred_path = out_dir / "predictions.jsonl"
     time_path = out_dir / "time_cost.jsonl"
     log_path = out_dir / "run.log"
@@ -40,19 +64,22 @@ def _run_one(strategy: str, args: argparse.Namespace, out_dir: Path) -> dict:
     env.setdefault("PYTHONUNBUFFERED", "1")
     env.setdefault("QWEN_API_KEY", "sk-REPLACE-WITH-YOUR-OWN-QWEN-KEY")
     env.setdefault("QWEN_MODEL_NAME", "qwen2.5-vl-7b-instruct")
+    env.setdefault(
+        "DASHVECTOR_ENDPOINT",
+        "vrs-cn-71j49hani00061.dashvector.cn-hangzhou.aliyuncs.com",
+    )
+    env.setdefault(
+        "DASHVECTOR_API_KEY",
+        "sk-REPLACE-WITH-YOUR-OWN-VECTOR-KEY",
+    )
+    env.setdefault("DASHVECTOR_COLLECTION", "ccv_cb_student_20260508")
+    env.setdefault("DASHVECTOR_VECTOR_FIELD", "text")
+    env.setdefault("DASHSCOPE_API_KEY", env["QWEN_API_KEY"])
+    env.setdefault("DASHSCOPE_EMBED_MODEL", "multimodal-embedding-v1")
 
-    cmd = [
-        sys.executable, "-u", "-m", "solution.main",
-        "--input", args.input,
-        "--output", str(pred_path),
-        "--strategy", strategy,
-        "--topk", str(args.topk),
-    ]
-    if args.limit:
-        cmd += ["--limit", str(args.limit)]
-
+    cmd = _build_cmd(mode, args, pred_path)
     started = datetime.now()
-    print(f"\n[compare] ===== running {strategy} =====")
+    print(f"\n[compare] ===== running {mode} =====")
     print(f"[compare] 输出目录: {out_dir}")
     print(f"[compare] 命令: {' '.join(cmd)}")
 
@@ -80,7 +107,6 @@ def _run_one(strategy: str, args: argparse.Namespace, out_dir: Path) -> dict:
             logf.flush()
         rc = proc.wait()
 
-    # 评分
     subprocess.run(
         [
             sys.executable, str(PKG_DIR / "scripts" / "evaluate.py"),
@@ -100,22 +126,22 @@ def _run_one(strategy: str, args: argparse.Namespace, out_dir: Path) -> dict:
         prediction_path=pred_path,
         time_cost_path=time_path,
         out_dir=out_dir,
-        strategy=strategy,
+        strategy=mode,
     )
     summary["exit_code"] = rc
     summary["elapsed_seconds"] = round((datetime.now() - started).total_seconds(), 2)
     return summary
 
 
-def _render_compare_md(b: dict, r: dict) -> str:
+def _render_compare_md(b: dict, e: dict) -> str:
     md: list[str] = []
-    md.append(f"# 策略对比 — {datetime.now().isoformat(timespec='seconds')}")
+    md.append(f"# 模式对比 — {datetime.now().isoformat(timespec='seconds')}")
     md.append("")
     md.append("## 总览")
     md.append("")
-    md.append("| 策略 | 总数 | 正确 | 准确率 | 错误 | 平均检索 | 平均推理 | 耗时 |")
+    md.append("| 模式 | 总数 | 正确 | 准确率 | 错误 | 平均检索 | 平均推理 | 耗时 |")
     md.append("|---|---|---|---|---|---|---|---|")
-    for s in (b, r):
+    for s in (b, e):
         md.append(
             "| {strategy} | {total} | {correct} | {acc:.1f}% | {err} | "
             "{ret:.3f}s | {inf:.3f}s | {el:.1f}s |".format(
@@ -129,32 +155,32 @@ def _render_compare_md(b: dict, r: dict) -> str:
                 el=s.get("elapsed_seconds", 0.0),
             )
         )
-    delta = (r["accuracy"] - b["accuracy"]) * 100
+    delta = (e["accuracy"] - b["accuracy"]) * 100
     md.append("")
-    md.append(f"**RAG vs baseline 准确率差: {delta:+.1f} 个百分点**")
+    md.append(f"**enhanced vs baseline 准确率差: {delta:+.1f} 个百分点**")
     md.append("")
     md.append("## 按题型对比")
     md.append("")
-    sections = sorted(set(b["by_section"]) | set(r["by_section"]))
-    md.append("| section | baseline acc | rag acc | Δ |")
+    sections = sorted(set(b["by_section"]) | set(e["by_section"]))
+    md.append("| section | baseline acc | enhanced acc | Δ |")
     md.append("|---|---|---|---|")
     for sec in sections:
         ba = b["by_section"].get(sec, {}).get("accuracy", 0.0) * 100
-        ra = r["by_section"].get(sec, {}).get("accuracy", 0.0) * 100
-        md.append(f"| {sec} | {ba:.1f}% | {ra:.1f}% | {ra-ba:+.1f} |")
+        ea = e["by_section"].get(sec, {}).get("accuracy", 0.0) * 100
+        md.append(f"| {sec} | {ba:.1f}% | {ea:.1f}% | {ea-ba:+.1f} |")
     md.append("")
     md.append("## 错因分布对比")
     md.append("")
-    md.append("| 错因 | baseline | rag |")
+    md.append("| 错因 | baseline | enhanced |")
     md.append("|---|---|---|")
-    keys = sorted(set(b.get("error_types", {})) | set(r.get("error_types", {})))
+    keys = sorted(set(b.get("error_types", {})) | set(e.get("error_types", {})))
     for k in keys:
-        md.append(f"| {k} | {b.get('error_types', {}).get(k, 0)} | {r.get('error_types', {}).get(k, 0)} |")
+        md.append(f"| {k} | {b.get('error_types', {}).get(k, 0)} | {e.get('error_types', {}).get(k, 0)} |")
     md.append("")
     md.append("## 详细错误清单")
     md.append("")
     md.append("- baseline: `baseline/error_analysis.md`, `baseline/errors.jsonl`")
-    md.append("- rag:      `rag/error_analysis.md`, `rag/errors.jsonl`")
+    md.append("- enhanced: `enhanced/error_analysis.md`, `enhanced/errors.jsonl`")
     return "\n".join(md)
 
 
@@ -179,24 +205,24 @@ def main() -> int:
         shutil.copy2(req, snap / "requirements.txt")
 
     b_dir = root / "baseline"
-    r_dir = root / "rag"
+    e_dir = root / "enhanced"
     b_dir.mkdir(exist_ok=True)
-    r_dir.mkdir(exist_ok=True)
+    e_dir.mkdir(exist_ok=True)
 
     b_sum = _run_one("baseline", args, b_dir)
-    r_sum = _run_one("rag", args, r_dir)
+    e_sum = _run_one("enhanced", args, e_dir)
 
-    md = _render_compare_md(b_sum, r_sum)
+    md = _render_compare_md(b_sum, e_sum)
     (root / "compare.md").write_text(md, encoding="utf-8")
     (root / "compare.json").write_text(
-        json.dumps({"baseline": b_sum, "rag": r_sum}, ensure_ascii=False, indent=2),
+        json.dumps({"baseline": b_sum, "enhanced": e_sum}, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
 
     print()
     print("=" * 60)
-    print(f"[compare] baseline acc = {b_sum['accuracy']*100:.1f}%  rag acc = {r_sum['accuracy']*100:.1f}%")
-    print(f"[compare] Δ = {(r_sum['accuracy']-b_sum['accuracy'])*100:+.1f} 个百分点")
+    print(f"[compare] baseline acc = {b_sum['accuracy']*100:.1f}%  enhanced acc = {e_sum['accuracy']*100:.1f}%")
+    print(f"[compare] Δ = {(e_sum['accuracy']-b_sum['accuracy'])*100:+.1f} 个百分点")
     print(f"[compare] 报告: {root/'compare.md'}")
     return 0
 
