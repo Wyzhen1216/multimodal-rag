@@ -1,0 +1,48 @@
+# ---- 测试 / 评测输出 ----
+student_package/test/outputs/
+student_package/outputs/
+outputs/
+output/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- 虚拟环境 ----
+.venv/
+.venv-*/
+venv/
+env/
+ENV/
+
+# ---- 本地环境变量 / 凭证 ----
+.env
+.env.local
+*.env
+configs/env.local
+
+# ---- 日志 / 临时文件 ----
+*.log
+*.tmp
+*.swp
+
+# ---- IDE / 编辑器 ----
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+
+# ---- 构建产物 ----
+build/
+dist/

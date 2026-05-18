@@ -45,10 +45,15 @@ def normalize_judgment_answer(text: str) -> str:
 
 def normalize_short_answer(text: str) -> str:
     cleaned = str(text or "").strip()
+    if not cleaned:
+        return ""
     explicit = re.search(r"(?:答案|最终答案|答)\s*(?:是|为)?\s*[:：]\s*(.+)", cleaned)
     if explicit:
         cleaned = explicit.group(1).strip()
-    first_line = cleaned.splitlines()[0].strip()
+    lines = cleaned.splitlines()
+    if not lines:
+        return ""
+    first_line = lines[0].strip()
     first_line = re.split(r"[。；;]\s*", first_line)[0].strip()
     first_line = re.split(r"(?:依据|理由)\s*[:：]|因为", first_line)[0].strip()
     first_line = unicodedata.normalize("NFKC", first_line)
