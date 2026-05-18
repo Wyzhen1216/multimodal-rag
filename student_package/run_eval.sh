@@ -24,13 +24,15 @@ INPUT_FILE="${1:-$ROOT_DIR/data/public_examples.full.json}"
 GOLD_FILE="${GOLD_FILE:-$ROOT_DIR/data/public_examples.full.json}"
 
 # ---- model & vector-db config ----------------------------------------------
+# 路径以课题评测机为准（/inspire/qb-ilm2/project/26summer-camp-16/public/...）
+# 如果在其他环境跑，外部 export 同名变量即可覆盖
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
-export QWEN_MODEL_PATH="${QWEN_MODEL_PATH:-/path/to/qwen2.5-VL-7B-Instruct}"
-export GME_MODEL_PATH="${GME_MODEL_PATH:-/path/to/gem-Qwen2-VL-7B-Instruct}"
-export DASHVECTOR_ENDPOINT="${DASHVECTOR_ENDPOINT:-}"
-export DASHVECTOR_API_KEY="${DASHVECTOR_API_KEY:-}"
-export DASHVECTOR_COLLECTION="${DASHVECTOR_COLLECTION:-}"
+export QWEN_MODEL_PATH="${QWEN_MODEL_PATH:-/inspire/qb-ilm2/project/26summer-camp-16/public/Rag_Based_HistAgent/Models/qwen2.5-VL-7B-Instruct}"
+export GME_MODEL_PATH="${GME_MODEL_PATH:-/inspire/qb-ilm2/project/26summer-camp-16/public/Rag_Based_HistAgent/Models/gem-Qwen2-VL-7B-Instruct}"
+export DASHVECTOR_ENDPOINT="${DASHVECTOR_ENDPOINT:-vrs-cn-71j49hani00061.dashvector.cn-hangzhou.aliyuncs.com}"
+export DASHVECTOR_API_KEY="${DASHVECTOR_API_KEY:-sk-REPLACE-WITH-YOUR-OWN-VECTOR-KEY}"
+export DASHVECTOR_COLLECTION="${DASHVECTOR_COLLECTION:-ccv_cb_student_20260508}"
 export AGENT_MODE="${AGENT_MODE:-real}"
 
 # ---- python / venv ---------------------------------------------------------
