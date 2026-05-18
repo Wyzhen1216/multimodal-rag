@@ -1,16 +1,22 @@
-ROOT=/inspire/qb-ilm2/project/26summer-camp-16/26240052/multimodal-rang/student_package
-PUB=/inspire/qb-ilm2/project/26summer-camp-16/public/Rag_Based_HistAgent
+ROOT=/root/autodl-fs/multimodal-rang/student_package
 
 # ============================================================================
-# 必备环境变量(评测机配置)
+# 必备环境变量(本机配置)
 # ============================================================================
-export QWEN_MODEL_PATH=$PUB/Models/qwen2.5-VL-7B-Instruct
-export GME_MODEL_PATH=$PUB/Models/gem-Qwen2-VL-7B-Instruct
+# Qwen2.5-VL 走 DashScope API(本机不下载本地权重)
+export QWEN_API_KEY=sk-REPLACE-WITH-YOUR-OWN-QWEN-KEY
+export QWEN_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+export QWEN_MODEL_NAME=qwen2.5-vl-7b-instruct
+
+# GME embedding 仍走本地权重(DashScope 不暴露 GME embedding API)
+export GME_MODEL_PATH=/root/autodl-fs/model/gme-Qwen2-VL-7B-Instruct
+
 export DASHVECTOR_ENDPOINT=vrs-cn-71j49hani00061.dashvector.cn-hangzhou.aliyuncs.com
 export DASHVECTOR_API_KEY=sk-REPLACE-WITH-YOUR-OWN-VECTOR-KEY
 export DASHVECTOR_COLLECTION=ccv_cb_student_20260508
-export HF_HUB_OFFLINE=1
-export TRANSFORMERS_OFFLINE=1
+# 走 API 模式时不能开 transformers 离线(SDK 内部仍可能拉 tokenizer 元数据)
+# export HF_HUB_OFFLINE=1
+# export TRANSFORMERS_OFFLINE=1
 export PYTHONPATH=$ROOT:$PYTHONPATH
 
 cd "$ROOT" || exit 1

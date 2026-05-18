@@ -164,13 +164,13 @@ class LocalQwenVL(BaseQwenVL):
         self.image_dir = Path(image_dir) if image_dir else _DEFAULT_IMG_DIR
 
         import torch
-        from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
+        from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
 
         self.torch = torch
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"[local-vl] loading {self.model_path} on {self.device} ...", flush=True)
         self.processor = AutoProcessor.from_pretrained(self.model_path, trust_remote_code=True)
-        self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+        self.model = Qwen2VLForConditionalGeneration.from_pretrained(
             self.model_path,
             torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
             trust_remote_code=True,

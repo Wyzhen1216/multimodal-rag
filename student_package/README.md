@@ -31,7 +31,8 @@
 3. 运行自测：
 
 ```bash
-source /inspire/qb-ilm2/project/26summer-camp-16/public/Rag_Based_HistAgent/miniconda3/bin/activate
+# 激活本机 conda 环境（Group3）
+source /root/miniconda3/bin/activate /root/autodl-fs/Group3
 bash run_eval.sh
 ```
 
