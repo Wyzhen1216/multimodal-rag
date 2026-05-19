@@ -1,0 +1,562 @@
+[
+  {
+    "index": 1,
+    "section": "简答QA",
+    "question": "1. 中国古代“四大发明”分别是什么？",
+    "image_url": "",
+    "expected_answer": "造纸术、印刷术、火药、指南针。"
+  },
+  {
+    "index": 2,
+    "section": "简答QA",
+    "question": "2. 我国历史上第一个统一的中央集权的封建国家是哪个？",
+    "image_url": "",
+    "expected_answer": "秦朝。"
+  },
+  {
+    "index": 3,
+    "section": "简答QA",
+    "question": "3. “文景之治”是指哪两位皇帝的统治时期？",
+    "image_url": "",
+    "expected_answer": "汉文帝和汉景帝。"
+  },
+  {
+    "index": 4,
+    "section": "简答QA",
+    "question": "4. 世界上现存最早的兵书是哪一部？",
+    "image_url": "",
+    "expected_answer": "《孙子兵法》。"
+  },
+  {
+    "index": 5,
+    "section": "简答QA",
+    "question": "5. 唐朝时期，哪位皇帝开创了“贞观之治”？",
+    "image_url": "",
+    "expected_answer": "唐太宗李世民。"
+  },
+  {
+    "index": 6,
+    "section": "简答QA",
+    "question": "6. 我国古代著名的“丝绸之路”起点是哪里？",
+    "image_url": "",
+    "expected_answer": "长安（今西安）。"
+  },
+  {
+    "index": 7,
+    "section": "简答QA",
+    "question": "7. 宋朝时期，哪位皇帝实施了“庆历新政”？",
+    "image_url": "",
+    "expected_answer": "宋仁宗赵祯。"
+  },
+  {
+    "index": 8,
+    "section": "简答QA",
+    "question": "8. 明朝时期，哪位皇帝创立了“锦衣卫”？",
+    "image_url": "",
+    "expected_answer": "明太祖朱元璋。"
+  },
+  {
+    "index": 9,
+    "section": "简答QA",
+    "question": "9. 清朝时期，哪位皇帝领导了“康乾盛世”？",
+    "image_url": "",
+    "expected_answer": "康熙皇帝。"
+  },
+  {
+    "index": 10,
+    "section": "简答QA",
+    "question": "10. 我国历史上著名的“戊戌变法”发生在哪一年？",
+    "image_url": "",
+    "expected_answer": "1898年。"
+  },
+  {
+    "index": 11,
+    "section": "简答QA",
+    "question": "11. 我国古代著名的“焚书坑儒”事件发生在哪个朝代？",
+    "image_url": "",
+    "expected_answer": "秦朝。"
+  },
+  {
+    "index": 12,
+    "section": "简答QA",
+    "question": "12. “三顾茅庐”的故事中，刘备请的是哪位谋士？",
+    "image_url": "",
+    "expected_answer": "诸葛亮。"
+  },
+  {
+    "index": 13,
+    "section": "简答QA",
+    "question": "13. 唐朝时期，哪位文学家被誉为“诗仙”？",
+    "image_url": "",
+    "expected_answer": "李白。"
+  },
+  {
+    "index": 14,
+    "section": "简答QA",
+    "question": "14. 北宋时期，哪位文学家被誉为“词中之龙”？",
+    "image_url": "",
+    "expected_answer": "苏轼。"
+  },
+  {
+    "index": 15,
+    "section": "简答QA",
+    "question": "15. 明朝时期，哪位航海家七下西洋，传播中华文化？",
+    "image_url": "",
+    "expected_answer": "郑和。"
+  },
+  {
+    "index": 16,
+    "section": "简答QA",
+    "question": "16. 我国古代“四大美女”分别是谁？",
+    "image_url": "",
+    "expected_answer": "西施、王昭君、貂蝉、杨玉环。"
+  },
+  {
+    "index": 17,
+    "section": "简答QA",
+    "question": "17. 我国古代“战国七雄”是哪七个国家？",
+    "image_url": "",
+    "expected_answer": "齐、楚、燕、韩、赵、魏、秦。"
+  },
+  {
+    "index": 18,
+    "section": "简答QA",
+    "question": "18. 我国古代“三皇五帝”分别是谁？",
+    "image_url": "",
+    "expected_answer": "三皇：伏羲、神农、黄帝；五帝：黄帝、颛顼、帝喾、尧、舜。"
+  },
+  {
+    "index": 19,
+    "section": "简答QA",
+    "question": "19. 世界上最早的纸币“交子”出现在哪个朝代？",
+    "image_url": "",
+    "expected_answer": "宋朝。"
+  },
+  {
+    "index": 20,
+    "section": "简答QA",
+    "question": "20. 我国古代著名的“科举制度”始于哪个朝代？",
+    "image_url": "",
+    "expected_answer": "隋朝。"
+  },
+  {
+    "index": 21,
+    "section": "简答QA",
+    "question": "21. （原 Word 中此处题干缺失，请对照原稿补全）",
+    "image_url": "",
+    "expected_answer": "从墓地旁迁至市场旁，再迁至学校附近。"
+  },
+  {
+    "index": 22,
+    "section": "简答QA",
+    "question": "22. 中国古代著名的“三国演义”中，曹操、刘备、孙权分别建立了哪三个国家？",
+    "image_url": "",
+    "expected_answer": "魏、蜀、吴。"
+  },
+  {
+    "index": 23,
+    "section": "简答QA",
+    "question": "23. 唐朝时期，哪位女皇帝是中国历史上唯一的女皇帝？",
+    "image_url": "",
+    "expected_answer": "武则天。"
+  },
+  {
+    "index": 24,
+    "section": "简答QA",
+    "question": "24. “唐诗三百首”中，收录了哪位诗人最多的作品？",
+    "image_url": "",
+    "expected_answer": "杜甫。"
+  },
+  {
+    "index": 25,
+    "section": "简答QA",
+    "question": "25. 明朝时期，哪位皇帝实施了“一条鞭法”改革？",
+    "image_url": "",
+    "expected_answer": "明神宗朱翊钧。"
+  },
+  {
+    "index": 26,
+    "section": "简答QA",
+    "question": "26. 我国古代著名的“水浒传”中，梁山好汉共有多少人？",
+    "image_url": "",
+    "expected_answer": "一百零八人。"
+  },
+  {
+    "index": 27,
+    "section": "简答QA",
+    "question": "27. 清朝时期，哪位皇帝下令编纂了《四库全书》？",
+    "image_url": "",
+    "expected_answer": "乾隆皇帝。"
+  },
+  {
+    "index": 28,
+    "section": "简答QA",
+    "question": "28. 我国古代“五行”指的是哪五种物质？",
+    "image_url": "",
+    "expected_answer": "金、木、水、火、土。"
+  },
+  {
+    "index": 29,
+    "section": "简答QA",
+    "question": "29. “二十四节气”中，表示春天来临的节气是哪一个？",
+    "image_url": "",
+    "expected_answer": "立春。"
+  },
+  {
+    "index": 30,
+    "section": "简答QA",
+    "question": "30. 我国古代著名的“红楼梦”作者是谁？",
+    "image_url": "",
+    "expected_answer": "曹雪芹。"
+  },
+  {
+    "index": 31,
+    "section": "简答QA",
+    "question": "31. “三纲五常”中，“三纲”指的是哪三种关系？",
+    "image_url": "",
+    "expected_answer": "君为臣纲、父为子纲、夫为妻纲。"
+  },
+  {
+    "index": 32,
+    "section": "简答QA",
+    "question": "32. “五岳”分别指的是哪五座山？",
+    "image_url": "",
+    "expected_answer": "泰山、华山、衡山、嵩山、恒山。"
+  },
+  {
+    "index": 33,
+    "section": "简答QA",
+    "question": "33. 我国古代著名的“八卦”是由哪位哲学家创立的？",
+    "image_url": "",
+    "expected_answer": "伏羲。"
+  },
+  {
+    "index": 34,
+    "section": "简答QA",
+    "question": "34. “丝绸之路”上的著名古城“敦煌”位于哪个省份？",
+    "image_url": "",
+    "expected_answer": "甘肃省。"
+  },
+  {
+    "index": 35,
+    "section": "简答QA",
+    "question": "35. 我国古代“四大名著”分别是哪四部作品？",
+    "image_url": "",
+    "expected_answer": "《西游记》、《红楼梦》、《三国演义》、《水浒传》。"
+  },
+  {
+    "index": 36,
+    "section": "简答QA",
+    "question": "36. “江南四大才子”中，哪位才子擅长书法？",
+    "image_url": "",
+    "expected_answer": "文征明。"
+  },
+  {
+    "index": 37,
+    "section": "简答QA",
+    "question": "37. 清朝时期，哪位皇帝在位期间发生了“鸦片战争”？",
+    "image_url": "",
+    "expected_answer": "道光皇帝。"
+  },
+  {
+    "index": 38,
+    "section": "简答QA",
+    "question": "38. 我国古代著名的“贞观之治”和“开元盛世”分别出现在哪两位皇帝的统治时期？",
+    "image_url": "",
+    "expected_answer": "贞观之治出现在唐太宗时期，开元盛世出现在唐玄宗时期。"
+  },
+  {
+    "index": 39,
+    "section": "简答QA",
+    "question": "39. “五禽戏”是由哪位古代医学家创立的？",
+    "image_url": "",
+    "expected_answer": "华佗。"
+  },
+  {
+    "index": 40,
+    "section": "简答QA",
+    "question": "40. 我国古代著名的“都江堰”水利工程是由谁主持修建的？",
+    "image_url": "",
+    "expected_answer": "李冰父子。"
+  },
+  {
+    "index": 41,
+    "section": "简答QA",
+    "question": "41. 中国古代“六艺”指的是哪六种基本技能？",
+    "image_url": "",
+    "expected_answer": "礼、乐、射、御、书、数。"
+  },
+  {
+    "index": 42,
+    "section": "简答QA",
+    "question": "42. “春秋五霸”中，哪位霸主被称为“春秋第一霸”？",
+    "image_url": "",
+    "expected_answer": "齐桓公。"
+  },
+  {
+    "index": 43,
+    "section": "简答QA",
+    "question": "43. “楚汉争霸”最终由谁统一了中国，建立了汉朝？",
+    "image_url": "",
+    "expected_answer": "刘邦。"
+  },
+  {
+    "index": 44,
+    "section": "简答QA",
+    "question": "44. “黄巾起义”是哪个朝代的一次大规模农民起义？",
+    "image_url": "",
+    "expected_answer": "东汉。"
+  },
+  {
+    "index": 45,
+    "section": "简答QA",
+    "question": "45. 唐朝时期，哪位僧人西行取经，促进了中印文化交流？",
+    "image_url": "",
+    "expected_answer": "玄奘。"
+  },
+  {
+    "index": 46,
+    "section": "简答QA",
+    "question": "46. “白蛇传”故事中，白娘子与许仙的爱情故事发生在哪个城市？",
+    "image_url": "",
+    "expected_answer": "杭州。"
+  },
+  {
+    "index": 47,
+    "section": "简答QA",
+    "question": "47. “四大名楼”中，位于湖北省的楼是哪一座？",
+    "image_url": "",
+    "expected_answer": "黄鹤楼。"
+  },
+  {
+    "index": 48,
+    "section": "简答QA",
+    "question": "48. “唐宋八大家”中，哪位文学家是唯一的女作家？",
+    "image_url": "",
+    "expected_answer": "李清照。"
+  },
+  {
+    "index": 49,
+    "section": "简答QA",
+    "question": "49. 明朝时期，哪位航海家首次到达了非洲东海岸？",
+    "image_url": "",
+    "expected_answer": "郑和。"
+  },
+  {
+    "index": 50,
+    "section": "简答QA",
+    "question": "50. 清朝时期，哪位皇帝废除了科举制度？",
+    "image_url": "",
+    "expected_answer": "光绪皇帝。"
+  },
+  {
+    "index": 51,
+    "section": "简答QA",
+    "question": "51. 中国古代“三大战役”分别是哪三场战役？",
+    "image_url": "",
+    "expected_answer": "赤壁之战、淝水之战、官渡之战。"
+  },
+  {
+    "index": 52,
+    "section": "简答QA",
+    "question": "52. “三山五岳”中的“三山”指的是哪三座山？",
+    "image_url": "",
+    "expected_answer": "蓬莱、方丈、瀛洲。"
+  },
+  {
+    "index": 53,
+    "section": "简答QA",
+    "question": "53. “五代十国”时期，哪位皇帝被称为“儿皇帝”？",
+    "image_url": "",
+    "expected_answer": "石敬瑭。"
+  },
+  {
+    "index": 54,
+    "section": "简答QA",
+    "question": "54. “红楼梦”中的贾宝玉最终选择了出家为僧，他出家的地方是哪里？",
+    "image_url": "",
+    "expected_answer": "馒头庵。"
+  },
+  {
+    "index": 55,
+    "section": "简答QA",
+    "question": "55. “水浒传”中，宋江领导的梁山好汉最终被哪个朝代所招安？",
+    "image_url": "",
+    "expected_answer": "北宋。"
+  },
+  {
+    "index": 56,
+    "section": "简答QA",
+    "question": "56. “西游记”中，孙悟空的第一个师傅是谁？",
+    "image_url": "",
+    "expected_answer": "菩提祖师。"
+  },
+  {
+    "index": 57,
+    "section": "简答QA",
+    "question": "57. 中国古代“四大名镇”分别指的是哪四个地方？",
+    "image_url": "",
+    "expected_answer": "江西景德镇（瓷器）、湖北汉口（商业中心）、四川成都（锦织）、广东佛山（手工艺品）。"
+  },
+  {
+    "index": 58,
+    "section": "简答QA",
+    "question": "58. “二十四节气”中，表示夏天结束的节气是哪一个？",
+    "image_url": "",
+    "expected_answer": "处暑。"
+  },
+  {
+    "index": 59,
+    "section": "简答QA",
+    "question": "59. 中国古代“七音”指的是哪七个音阶？",
+    "image_url": "",
+    "expected_answer": "宫、商、角、徵、羽、变宫、变徵。"
+  },
+  {
+    "index": 60,
+    "section": "简答QA",
+    "question": "60. “五谷”通常指的是哪五种粮食作物？",
+    "image_url": "",
+    "expected_answer": "稻、麦、粟、豆、稷。"
+  },
+  {
+    "index": 61,
+    "section": "简答QA",
+    "question": "61. “罢黜百家，独尊儒术”是哪个朝代的思想政策？",
+    "image_url": "",
+    "expected_answer": "汉朝。"
+  },
+  {
+    "index": 62,
+    "section": "简答QA",
+    "question": "62. 三国时期著名的赤壁之战发生在哪个省份？",
+    "image_url": "",
+    "expected_answer": "湖北省。"
+  },
+  {
+    "index": 63,
+    "section": "简答QA",
+    "question": "63. 唐朝的首都是今天的哪里？",
+    "image_url": "",
+    "expected_answer": "西安"
+  },
+  {
+    "index": 64,
+    "section": "简答QA",
+    "question": "64. 五代十国中的“五代”是指哪五个朝代？",
+    "image_url": "",
+    "expected_answer": "后梁、后唐、后晋、后汉、后周"
+  },
+  {
+    "index": 65,
+    "section": "简答QA",
+    "question": "65. 宋太祖赵匡胤是通过什么事件夺取政权的？",
+    "image_url": "",
+    "expected_answer": "陈桥兵变"
+  },
+  {
+    "index": 66,
+    "section": "简答QA",
+    "question": "66. 成吉思汗建立的是哪个国家？",
+    "image_url": "",
+    "expected_answer": "蒙古帝国"
+  },
+  {
+    "index": 67,
+    "section": "简答QA",
+    "question": "67. 明朝永乐年间迁都至哪里？",
+    "image_url": "",
+    "expected_answer": "北京"
+  },
+  {
+    "index": 68,
+    "section": "简答QA",
+    "question": "68. 郑和七下西洋的起止时间是什么时候？",
+    "image_url": "",
+    "expected_answer": "1405年至1433年"
+  },
+  {
+    "index": 69,
+    "section": "简答QA",
+    "question": "69. 清朝入关后的第一位皇帝是谁？",
+    "image_url": "",
+    "expected_answer": "顺治帝"
+  },
+  {
+    "index": 70,
+    "section": "简答QA",
+    "question": "70. 《四库全书》是在哪位皇帝的命令下编纂的？",
+    "image_url": "",
+    "expected_answer": "乾隆帝"
+  },
+  {
+    "index": 71,
+    "section": "简答QA",
+    "question": "71. 第一次鸦片战争是哪一年爆发的？",
+    "image_url": "",
+    "expected_answer": "1840"
+  },
+  {
+    "index": 72,
+    "section": "简答QA",
+    "question": "72. 甲午战争的中日双方签订了什么条约？",
+    "image_url": "",
+    "expected_answer": "《马关条约》"
+  },
+  {
+    "index": 73,
+    "section": "简答QA",
+    "question": "73. 辛亥革命推翻了哪个王朝的统治？",
+    "image_url": "",
+    "expected_answer": "清朝"
+  },
+  {
+    "index": 74,
+    "section": "简答QA",
+    "question": "74. 九一八事变发生在哪一年？",
+    "image_url": "",
+    "expected_answer": "1931年"
+  },
+  {
+    "index": 75,
+    "section": "简答QA",
+    "question": "75. 中国古代四大发明分别是什么？",
+    "image_url": "",
+    "expected_answer": "造纸术、印刷术、火药、指南针"
+  },
+  {
+    "index": 76,
+    "section": "简答QA",
+    "question": "76. 科举制度创立于哪个朝代？",
+    "image_url": "",
+    "expected_answer": "隋朝"
+  },
+  {
+    "index": 77,
+    "section": "简答QA",
+    "question": "77. 元曲四大家分别是谁？",
+    "image_url": "",
+    "expected_answer": "关汉卿、白朴、马致远、郑光祖"
+  },
+  {
+    "index": 78,
+    "section": "简答QA",
+    "question": "78. 《本草纲目》的作者？",
+    "image_url": "",
+    "expected_answer": "李时珍"
+  },
+  {
+    "index": 79,
+    "section": "简答QA",
+    "question": "79. 辛亥革命的指导思想是什么？",
+    "image_url": "",
+    "expected_answer": "三民主义"
+  },
+  {
+    "index": 80,
+    "section": "简答QA",
+    "question": "80. 新文化运动中高举的两面旗帜是什么？",
+    "image_url": "",
+    "expected_answer": "民主和科学"
+  }
+]

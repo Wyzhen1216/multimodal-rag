@@ -1,0 +1,702 @@
+[
+  {
+    "index": 1000158,
+    "section": "判断VQA",
+    "question": "图中文物的名称是什么？ 该问题的答案是：“海兽葡萄纹铜镜”。",
+    "image_url": "data/mock/TF_VQA/img/cddd38ff4eaf212e3fcf97dd9636659812203b2f.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000293,
+    "section": "判断VQA",
+    "question": "图中的画作是在哪个朝代被创作的？ 该问题的答案是：“隋朝”。",
+    "image_url": "data/mock/TF_VQA/img/95743cf66dec5af4aeaee39dffe8e847c77e3523.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000285,
+    "section": "判断VQA",
+    "question": "图中画作所描绘的动物是什么？ 该问题的答案是：“蝴蝶”。",
+    "image_url": "data/mock/TF_VQA/img/568a81831154303ce86171ce12c69d2320534365.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000116,
+    "section": "判断VQA",
+    "question": "图中是我国十二生肖铜首之一，请问其刻画的动物是哪种？ 该问题的答案是：“兔”。",
+    "image_url": "data/mock/TF_VQA/img/e7229f9a928c24902362f257bc36637a66500027.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000253,
+    "section": "判断VQA",
+    "question": "图中所示传统舞蹈表演为？ 该问题的答案是：“傈僳族阿尺木刮”。",
+    "image_url": "data/mock/TF_VQA/img/36a54cff8202555f26738970c2eb4b0da436eccf.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000463,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“傣族”。",
+    "image_url": "data/mock/TF_VQA/img/ebe6198b61e11766015e01afe90218da5eba21b5.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000177,
+    "section": "判断VQA",
+    "question": "图中文物的名称是什么？ 该问题的答案是：“兽面纹鼎”。",
+    "image_url": "data/mock/TF_VQA/img/f8ebd7d095e9eef2f218fc54fab5e9d4d4e5bd63.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2000496,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“塔吉克族”。",
+    "image_url": "data/mock/TF_VQA/img/af06d3c6f1aa5a905381cb5d82138ed2f1b3f071.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2000458,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“白族”。",
+    "image_url": "data/mock/TF_VQA/img/8eccddcc4833219732b6092fc24352b22d9d5c25.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000034,
+    "section": "判断VQA",
+    "question": "图中所示景观所在地点为？ 该问题的答案是：“新疆”。",
+    "image_url": "data/mock/TF_VQA/img/4d4413b9fce83b49722c6724c51bb3f82f2ba281.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 313,
+    "section": "判断VQA",
+    "question": "图中所展示的是一幅傅抱石的画作，请问该画作的名称是什么？ 该问题的答案是：“暴风雨图”。",
+    "image_url": "data/mock/TF_VQA/img/9e420f5f18410e14efe3c84301b75ed5aa259027.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000124,
+    "section": "判断VQA",
+    "question": "图中是春秋战国时期的一件兵器，这件兵器的名称是什么？ 该问题的答案是：“青铜剑”。",
+    "image_url": "data/mock/TF_VQA/img/82864cce05bee3f84cfccb974fb359235254e527.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000487,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“毛南族”。",
+    "image_url": "data/mock/TF_VQA/img/fcbe452b339b88834b136c17a8f4386156bf62aa.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 320,
+    "section": "判断VQA",
+    "question": "图中展示的是王冕的一幅画作，请问其名称是什么 该问题的答案是：“墨梅图”。",
+    "image_url": "data/mock/TF_VQA/img/0b31877628db7c9fc8a870fd9338fce1b8eeb4e7.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2000013,
+    "section": "判断VQA",
+    "question": "下列那座城市存在图中所示场所？ 该问题的答案是：“南京”。",
+    "image_url": "data/mock/TF_VQA/img/fb2224da6431ee788f98aac22dea616785cfd6cc.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000120,
+    "section": "判断VQA",
+    "question": "请问图中的文物是什么？ 该问题的答案是：“虎符”。",
+    "image_url": "data/mock/TF_VQA/img/90f17737e728b108415621931054888e04aa32e0.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2000274,
+    "section": "判断VQA",
+    "question": "左图是谁的作品? 该问题的答案是：“徐悲鸿”。",
+    "image_url": "data/mock/TF_VQA/img/25c5618b43e1e5c51c24b70ab7d3f0fa829e87bb.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000485,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“拉祜族”。",
+    "image_url": "data/mock/TF_VQA/img/6aff55e0208ca33ed0ba4027034962fdd427669f.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000088,
+    "section": "判断VQA",
+    "question": "图中景观所在地点为？ 该问题的答案是：“沈阳”。",
+    "image_url": "data/mock/TF_VQA/img/46ac2a7d17af3bb84b70c525752bd63b8b734143.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 343,
+    "section": "判断VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。 该问题的答案是：“C.他是中国新文化运动的倡导者之一”。",
+    "image_url": "data/mock/TF_VQA/img/f8680b0ae7bfaf321c4fa236641a2bcd129e7ef9.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000183,
+    "section": "判断VQA",
+    "question": "图中的文物名称是什么？ 该问题的答案是：“德化窑白釉达摩像”。",
+    "image_url": "data/mock/TF_VQA/img/192b6ea5e4bb258f5d4c3909b9077c6de3daf237.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 238,
+    "section": "判断VQA",
+    "question": "图中所示剧种为？ 该问题的答案是：“侗戏”。",
+    "image_url": "data/mock/TF_VQA/img/c8ae46c9320de573cd36276b88c967fb9002ab09.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000009,
+    "section": "判断VQA",
+    "question": "图中所示景观所在地点为？ 该问题的答案是：“上海”。",
+    "image_url": "data/mock/TF_VQA/img/cbad52b57278aa340427a969b8af663015ed110f.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000477,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“仡佬族”。",
+    "image_url": "data/mock/TF_VQA/img/9cab31166b5455a85920f923a371c893ebd154fe.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 289,
+    "section": "判断VQA",
+    "question": "图中画作所描绘的动物是什么？ 该问题的答案是：“猎犬”。",
+    "image_url": "data/mock/TF_VQA/img/c548ffc61d2cfc44e87a4f4057439cff243b1258.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000184,
+    "section": "判断VQA",
+    "question": "图中的文物是哪幅画的节选？ 该问题的答案是：“清明上河图”。",
+    "image_url": "data/mock/TF_VQA/img/bcb4a7919a92e60e5f9cb9af43b9ffb7888f4dcf.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 177,
+    "section": "判断VQA",
+    "question": "图中文物的名称是什么？ 该问题的答案是：“兽面纹斝”。",
+    "image_url": "data/mock/TF_VQA/img/f8ebd7d095e9eef2f218fc54fab5e9d4d4e5bd63.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000243,
+    "section": "判断VQA",
+    "question": "图中所示传统舞蹈表演为？ 该问题的答案是：“花鼓灯”。",
+    "image_url": "data/mock/TF_VQA/img/3ec7f6ae50600690c413385254cd6430f7ce60bf.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 288,
+    "section": "判断VQA",
+    "question": "图中画作所描绘的动物是什么？ 该问题的答案是：“鸭”。",
+    "image_url": "data/mock/TF_VQA/img/c32bf710cb3d5837b5b0d9a030410a563e694988.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000410,
+    "section": "判断VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？ 该问题的答案是：“周瑜打黄盖”。",
+    "image_url": "data/mock/TF_VQA/img/452c755f4cbbeb5ced6c36427b2177e3fcff093e.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000460,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“白族”。",
+    "image_url": "data/mock/TF_VQA/img/e4e78ebc08ac8d7e942c778a07fdc7375f8a6155.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000260,
+    "section": "判断VQA",
+    "question": "图中所示是中国哪个传统节日？ 该问题的答案是：“妈祖祭典”。",
+    "image_url": "data/mock/TF_VQA/img/e41b0a673a19d126bb8ff8cf3dbaef1c30dfb248.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 510,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“蒙古族”。",
+    "image_url": "data/mock/TF_VQA/img/585c2b78b98d8d00fe52307b29d0bdc7da5ea8b1.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 346,
+    "section": "判断VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。 该问题的答案是：“C.他在宋朝时期有卓越的贡献”。",
+    "image_url": "data/mock/TF_VQA/img/eb976595835e130228af60f87077e255aac6e2d7.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000029,
+    "section": "判断VQA",
+    "question": "图中所示景观所在城市为？ 该问题的答案是：“广州”。",
+    "image_url": "data/mock/TF_VQA/img/86f20ad71c8bfbd703ff850b55a5aa7745776185.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000060,
+    "section": "判断VQA",
+    "question": "图中所示景观所在地点为？ 该问题的答案是：“湖南”。",
+    "image_url": "data/mock/TF_VQA/img/a8ff12789a5772955731089a3d379d9787f9ec85.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000150,
+    "section": "判断VQA",
+    "question": "图中文物的名称是什么？ 该问题的答案是：“噩侯壶”。",
+    "image_url": "data/mock/TF_VQA/img/eaf33f0a650cc31ec01ed3b15558c407c0950784.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000195,
+    "section": "判断VQA",
+    "question": "图中文物来源于明朝哪一个时期？ 该问题的答案是：“明朝嘉靖时期”。",
+    "image_url": "data/mock/TF_VQA/img/4d060606fefdce7c93bb218ab0ef3f3908a7c6d2.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 433,
+    "section": "判断VQA",
+    "question": "图上的美食叫什么名字 该问题的答案是：“粉蒸肉”。",
+    "image_url": "data/mock/TF_VQA/img/14340e0505ac03ecc5526c61de6457ddc7d97908.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000306,
+    "section": "判断VQA",
+    "question": "图中所展示的是一幅徐悲鸿的画作，请问该画作的名称是什么？ 该问题的答案是：“竹鸡图”。",
+    "image_url": "data/mock/TF_VQA/img/f750faad39cdedbc714627867b55fa02810da2b9.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000264,
+    "section": "判断VQA",
+    "question": "图中所示是中国哪个传统节日？ 该问题的答案是：“元宵节”。",
+    "image_url": "data/mock/TF_VQA/img/661e26b1d9ac71ee7a9c45d6bca82b1303bafaf6.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 16,
+    "section": "判断VQA",
+    "question": "图中所示景观所在城市为？ 该问题的答案是：“北京”。",
+    "image_url": "data/mock/TF_VQA/img/aa86024136d64f1a290a0e9fb2430a04ff5d6503.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000503,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“锡伯族”。",
+    "image_url": "data/mock/TF_VQA/img/6d0aeb2e4834983d8aa565e29803d5eb0bdd8db2.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2000417,
+    "section": "判断VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？ 该问题的答案是：“王婆卖瓜”。",
+    "image_url": "data/mock/TF_VQA/img/a6236f9d07a5e8d7bc1e1d9bd435d90055029bc6.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000535,
+    "section": "判断VQA",
+    "question": "这属于什么菜系? 该问题的答案是：“川菜”。",
+    "image_url": "data/mock/TF_VQA/img/40ef48445fdd33f4700ee77d9a0ddce436a4e022.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 299,
+    "section": "判断VQA",
+    "question": "图中所展示的是一幅北宋时期的画作，请问该画作的作者是谁？ 该问题的答案是：“王居正”。",
+    "image_url": "data/mock/TF_VQA/img/bb52d7b78ee8fdf8ef4ed3bf12366880fb4e8f40.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000394,
+    "section": "判断VQA",
+    "question": "这是一道看图猜成语题目，请问图中画面对应的是哪个成语？ 该问题的答案是：“狼狈为奸”。",
+    "image_url": "data/mock/TF_VQA/img/ea7d67c89b2822ec15e5acfd617376190c64aa10.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000015,
+    "section": "判断VQA",
+    "question": "图中所示景观所在城市为？ 该问题的答案是：“北京”。",
+    "image_url": "data/mock/TF_VQA/img/ca3e39c32fa814ddb1663f281e2fdafaa14cb4ac.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000238,
+    "section": "判断VQA",
+    "question": "图中所示剧种为？ 该问题的答案是：“京剧”。",
+    "image_url": "data/mock/TF_VQA/img/c8ae46c9320de573cd36276b88c967fb9002ab09.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 520,
+    "section": "判断VQA",
+    "question": "这属于什么菜系? 该问题的答案是：“鲁菜”。",
+    "image_url": "data/mock/TF_VQA/img/d3123e4305d3f7d15669275c3d5da0ca28a93154.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2000123,
+    "section": "判断VQA",
+    "question": "请问图中的文物是什么？ 该问题的答案是：“腰排”。",
+    "image_url": "data/mock/TF_VQA/img/23b395034abd4903917b2afcf8f41d06399f2746.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 133,
+    "section": "判断VQA",
+    "question": "图中文物的名称是什么？ 该问题的答案是：“猪首形陶器盖”。",
+    "image_url": "data/mock/TF_VQA/img/2c5a402799b6a65dc92b3929d4eac3e882006078.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 264,
+    "section": "判断VQA",
+    "question": "图中所示是中国哪个传统节日？ 该问题的答案是：“中秋节”。",
+    "image_url": "data/mock/TF_VQA/img/661e26b1d9ac71ee7a9c45d6bca82b1303bafaf6.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 188,
+    "section": "判断VQA",
+    "question": "图中的瓦当文物表现出来的是哪一个神兽？ 该问题的答案是：“白虎”。",
+    "image_url": "data/mock/TF_VQA/img/90f6ae5a476fc7534a2bc55205020a9200f34223.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 452,
+    "section": "判断VQA",
+    "question": "图上的美食叫什么名字 该问题的答案是：“松鼠桂鱼”。",
+    "image_url": "data/mock/TF_VQA/img/45c7c48f151c3ed6cce42bacada7f99acfdfa983.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000147,
+    "section": "判断VQA",
+    "question": "图中文物的名称是什么？ 该问题的答案是：“四联璜玉组佩”。",
+    "image_url": "data/mock/TF_VQA/img/084cacf477eba76e7c8ae2b7eeeb4374b64c4f8f.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 409,
+    "section": "判断VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？ 该问题的答案是：“铁打的公鸡”。",
+    "image_url": "data/mock/TF_VQA/img/40b20595a0b19474cdf60b2632d5affa880ebb77.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000467,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“东乡族”。",
+    "image_url": "data/mock/TF_VQA/img/1b7a9d2440b63da500b57234cde0b8f5b8324489.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 193,
+    "section": "判断VQA",
+    "question": "图中文物来源于中国古代清朝中的哪一个时期？ 该问题的答案是：“清朝康乾时期”。",
+    "image_url": "data/mock/TF_VQA/img/fd4c66b6a542b5ad4a160f260759da6208d2da16.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2000346,
+    "section": "判断VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。 该问题的答案是：“D.他是中国古代数学的奠基人”。",
+    "image_url": "data/mock/TF_VQA/img/eb976595835e130228af60f87077e255aac6e2d7.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 432,
+    "section": "判断VQA",
+    "question": "图上的美食叫什么名字 该问题的答案是：“红油抄手”。",
+    "image_url": "data/mock/TF_VQA/img/9c4ad0854b7828dbc8027172a84db9a86b864570.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000141,
+    "section": "判断VQA",
+    "question": "图中文物的名称是什么？ 该问题的答案是：“王子午鼎”。",
+    "image_url": "data/mock/TF_VQA/img/bcfb6c975004d9a9e6140feeca0d4c6de236b8de.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000525,
+    "section": "判断VQA",
+    "question": "这属于什么菜系? 该问题的答案是：“粤菜”。",
+    "image_url": "data/mock/TF_VQA/img/43b0092e544ee42cec0e8e951a69b3aa82271430.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000455,
+    "section": "判断VQA",
+    "question": "图上的美食叫什么名字 该问题的答案是：“松鼠桂鱼”。",
+    "image_url": "data/mock/TF_VQA/img/b0b730e5957052d14fe4e4a62085aff43b7e8b6e.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000506,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“苗族”。",
+    "image_url": "data/mock/TF_VQA/img/8c2520a3c613d2a2fc32f28b81d23e70653394c0.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 106,
+    "section": "判断VQA",
+    "question": "图中的文物出土于哪里？ 该问题的答案是：“殷墟”。",
+    "image_url": "data/mock/TF_VQA/img/35eb48a5dd5d8b0770472a49adcdce823834a84b.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000098,
+    "section": "判断VQA",
+    "question": "图中所示建筑名称为? 该问题的答案是：“土楼”。",
+    "image_url": "data/mock/TF_VQA/img/5f938c4e8efff156e8c4624d80567e8bcb342bc4.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000083,
+    "section": "判断VQA",
+    "question": "图中景观所在地点为？ 该问题的答案是：“台湾”。",
+    "image_url": "data/mock/TF_VQA/img/fbedbc95aff9008ac5232e4cf276f0ac8a20cd19.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000286,
+    "section": "判断VQA",
+    "question": "图中画作所描绘的动物是什么？ 该问题的答案是：“蝴蝶”。",
+    "image_url": "data/mock/TF_VQA/img/16ca27cf6052da9a960303c7174b5d61ef7d8867.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000276,
+    "section": "判断VQA",
+    "question": "左图是谁的作品? 该问题的答案是：“张大千”。",
+    "image_url": "data/mock/TF_VQA/img/ab872993f594aaefb923c55d4b7f2b39c88e3949.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000356,
+    "section": "判断VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。 该问题的答案是：“D.他是20世纪上半期中国最杰出的哲学家之一。”。",
+    "image_url": "data/mock/TF_VQA/img/993a8a8681aa2dfa57d8aaa69460aeb2ee666937.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000258,
+    "section": "判断VQA",
+    "question": "图中所示是中国哪个传统节日？ 该问题的答案是：“中秋节”。",
+    "image_url": "data/mock/TF_VQA/img/4293071390ec1a6c22a2eca975bfeb6ee423066a.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000470,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“鄂伦春族”。",
+    "image_url": "data/mock/TF_VQA/img/7293d8b11253090415833cbd06020157c759ebfe.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000491,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“撒拉族”。",
+    "image_url": "data/mock/TF_VQA/img/b33d24ae2a84147b1d50b9cc505940a3f29498e6.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000249,
+    "section": "判断VQA",
+    "question": "图中所示传统舞蹈表演为？ 该问题的答案是：“象脚鼓舞”。",
+    "image_url": "data/mock/TF_VQA/img/79d472facd7801ed32c8d4713dd08dea01c1efcf.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000111,
+    "section": "判断VQA",
+    "question": "请问图中的文物名称是什么？ 该问题的答案是：“龙虎纹尊”。",
+    "image_url": "data/mock/TF_VQA/img/68980d28e9e2582e8375d985c02b8a7c82403588.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 316,
+    "section": "判断VQA",
+    "question": "图中所展示的是一幅清代肖像图，请问其名称是什么？ 该问题的答案是：“洪承畴像”。",
+    "image_url": "data/mock/TF_VQA/img/da0e0b440fae28c23f1f6080df8fa05909a30498.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000387,
+    "section": "判断VQA",
+    "question": "这是一道看图猜成语题目，请问图中画面对应的是哪个成语？ 该问题的答案是：“豺狼虎豹”。",
+    "image_url": "data/mock/TF_VQA/img/8d2adea7a73759a969ba3f18e89145acf5fefc14.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000506,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“苗族”。",
+    "image_url": "data/mock/TF_VQA/img/8c2520a3c613d2a2fc32f28b81d23e70653394c0.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000169,
+    "section": "判断VQA",
+    "question": "图中文物来自哪个朝代？ 该问题的答案是：“东汉”。",
+    "image_url": "data/mock/TF_VQA/img/8dbd48664fd07f165e2749991221b1bcc0e57cd4.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2000519,
+    "section": "判断VQA",
+    "question": "这属于什么菜系? 该问题的答案是：“粤菜”。",
+    "image_url": "data/mock/TF_VQA/img/1f75b05017b68664e18e759b18a10c8f8d4091ee.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000083,
+    "section": "判断VQA",
+    "question": "图中景观所在地点为？ 该问题的答案是：“台湾”。",
+    "image_url": "data/mock/TF_VQA/img/fbedbc95aff9008ac5232e4cf276f0ac8a20cd19.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000103,
+    "section": "判断VQA",
+    "question": "图中所展示的是哪个朝代的历史文物？ 该问题的答案是：“明朝”。",
+    "image_url": "data/mock/TF_VQA/img/617e6b482ce7baf78b549f9e7d6aa46023440197.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000420,
+    "section": "判断VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？ 该问题的答案是：“水煮石头”。",
+    "image_url": "data/mock/TF_VQA/img/12a7844a46c3254efeb8ed64bb327adbb28d63f0.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000510,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“仫佬族”。",
+    "image_url": "data/mock/TF_VQA/img/585c2b78b98d8d00fe52307b29d0bdc7da5ea8b1.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 1000340,
+    "section": "判断VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。 该问题的答案是：“C.图中的人物对中国古代文学有深刻的研究”。",
+    "image_url": "data/mock/TF_VQA/img/09292abd19d6b6dd279851607ecca638dca2e9f4.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000422,
+    "section": "判断VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？ 该问题的答案是：“刘备借荆州”。",
+    "image_url": "data/mock/TF_VQA/img/0fde810a1197265f58da85a7d8e78710ba5f978e.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000404,
+    "section": "判断VQA",
+    "question": "这是一道看图猜古诗的题目，请问图中画面对应的是首古诗 该问题的答案是：“《元日》”。",
+    "image_url": "data/mock/TF_VQA/img/46827a5bad351c88be6980a8bc361a81c6185484.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 152,
+    "section": "判断VQA",
+    "question": "图中文物的名称是什么？ 该问题的答案是：“噩侯鬲”。",
+    "image_url": "data/mock/TF_VQA/img/85efda743199e66d5c624a62648456e49dce036f.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000408,
+    "section": "判断VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？ 该问题的答案是：“骑驴看唱本”。",
+    "image_url": "data/mock/TF_VQA/img/848d26085a61ef9a158bcbee51fd01bba88fb728.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2000440,
+    "section": "判断VQA",
+    "question": "图上的美食叫什么名字 该问题的答案是：“麻辣小龙虾”。",
+    "image_url": "data/mock/TF_VQA/img/1fed1da23fa010d54e66e960916053100b34cff4.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 58,
+    "section": "判断VQA",
+    "question": "图中所示景观所在地点为？ 该问题的答案是：“湖北”。",
+    "image_url": "data/mock/TF_VQA/img/1c6243d4c75b5362ff052ea94f29379d78182354.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000395,
+    "section": "判断VQA",
+    "question": "这是一道看图猜古诗的题目，请问图中画面对应的是首古诗 该问题的答案是：“《咏鹅》”。",
+    "image_url": "data/mock/TF_VQA/img/a833188e3fdfafffbd098ca4e106ca5f0836854e.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 1000221,
+    "section": "判断VQA",
+    "question": "图中所示的脸谱代表的人物是？ 该问题的答案是：“郑伦”。",
+    "image_url": "data/mock/TF_VQA/img/e277c38d54317a775781fab07e9ce21085a71f7a.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 512,
+    "section": "判断VQA",
+    "question": "这属于什么菜系? 该问题的答案是：“淮扬菜”。",
+    "image_url": "data/mock/TF_VQA/img/294a9d37047a075fadf838f66ab16cfb862acae3.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 2000105,
+    "section": "判断VQA",
+    "question": "请问图中文物的名称是什么？ 该问题的答案是：“青铜雁鱼灯”。",
+    "image_url": "data/mock/TF_VQA/img/5577af698bf5665286bba6ec89a37c1186c1ddaa.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 3000508,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“苗族”。",
+    "image_url": "data/mock/TF_VQA/img/2106a2d3b81da9ae2b7bb7b0444095933e8ad060.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 3000351,
+    "section": "判断VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。 该问题的答案是：“图中的人物在清朝时期有重要的政治影响力  C.”。",
+    "image_url": "data/mock/TF_VQA/img/46930fa784698ab072d294e26b91508519828180.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 2000260,
+    "section": "判断VQA",
+    "question": "图中所示是中国哪个传统节日？ 该问题的答案是：“春节”。",
+    "image_url": "data/mock/TF_VQA/img/e41b0a673a19d126bb8ff8cf3dbaef1c30dfb248.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 155,
+    "section": "判断VQA",
+    "question": "图中文物的材质是什么？ 该问题的答案是：“陶瓷”。",
+    "image_url": "data/mock/TF_VQA/img/0d45d6aed786379be7cb341c14d3f98b38ef8cc8.jpeg",
+    "expected_answer": "错误"
+  }
+]

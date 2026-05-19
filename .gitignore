@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv-student_package_solution/
+test/outputs/
+*.jsonl
+*.log

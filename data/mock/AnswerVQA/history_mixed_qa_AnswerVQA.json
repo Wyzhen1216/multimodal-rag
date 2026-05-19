@@ -1,0 +1,2256 @@
+[
+  {
+    "index": 7,
+    "section": "简答VQA",
+    "question": "图中所示建筑名称为？",
+    "image_url": "data/mock/AnswerVQA/img/7b74c0d0574e3ea152f4f34d47c85d5db22e3ba0.jpeg",
+    "expected_answer": "大雁塔"
+  },
+  {
+    "index": 17,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/696e95461d4e300c0c5085b5f8ccd39cb1eba4ba.jpeg",
+    "expected_answer": "豫园"
+  },
+  {
+    "index": 44,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/55d26f76b4f4abb4b3a724e46b323d92a036e7ae.jpeg",
+    "expected_answer": "成吉思汗陵"
+  },
+  {
+    "index": 47,
+    "section": "简答VQA",
+    "question": "下列诗句与图中景观有关的是？",
+    "image_url": "data/mock/AnswerVQA/img/3d35c1eebd40fa0990afcd37a236cd7c2dd87ebb.jpeg",
+    "expected_answer": "姑苏城外寒山寺，夜半钟声到客船。"
+  },
+  {
+    "index": 49,
+    "section": "简答VQA",
+    "question": "下列名著与图中景观有关的是？",
+    "image_url": "data/mock/AnswerVQA/img/3bf257a089b60bc6d057313ab0a2b9a1be5e5ffd.jpeg",
+    "expected_answer": "《西游记》"
+  },
+  {
+    "index": 64,
+    "section": "简答VQA",
+    "question": "图中景观所在地点为？",
+    "image_url": "data/mock/AnswerVQA/img/45e2b18ab71ee4cc8a43aa8c50e779ee831ba357.jpeg",
+    "expected_answer": "北京"
+  },
+  {
+    "index": 66,
+    "section": "简答VQA",
+    "question": "图中景观所在地点为？",
+    "image_url": "data/mock/AnswerVQA/img/e2f6396301ef1aa8ddb6bb9ec38b93412a6d2a4d.jpeg",
+    "expected_answer": "西安"
+  },
+  {
+    "index": 67,
+    "section": "简答VQA",
+    "question": "图中景观所在地点为？",
+    "image_url": "data/mock/AnswerVQA/img/d0e9b2fcaae27dcc29dd4c0092f79ac63a111fc0.jpeg",
+    "expected_answer": "武汉"
+  },
+  {
+    "index": 76,
+    "section": "简答VQA",
+    "question": "与图中景观最相关的历史人物是？",
+    "image_url": "data/mock/AnswerVQA/img/a71e092cdabbf6d5e1e803c995d782ae864269b7.jpeg",
+    "expected_answer": "杜甫"
+  },
+  {
+    "index": 79,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/14ce63f89b19df6e10fc4e2222f97ae39364a705.jpeg",
+    "expected_answer": "澳门塔"
+  },
+  {
+    "index": 95,
+    "section": "简答VQA",
+    "question": "图中所示建筑为哪一民族的特色民居？",
+    "image_url": "data/mock/AnswerVQA/img/ca4f866c84a96648a79f43badd43d1c65eff3c26.jpeg",
+    "expected_answer": "藏族"
+  },
+  {
+    "index": 96,
+    "section": "简答VQA",
+    "question": "图中所示建筑最常见于下列哪一地点？",
+    "image_url": "data/mock/AnswerVQA/img/5a21153c268d2106bf4332f8b7725523240cff33.jpeg",
+    "expected_answer": "陕西"
+  },
+  {
+    "index": 97,
+    "section": "简答VQA",
+    "question": "图中所示建筑为哪一民族的特色民居？",
+    "image_url": "data/mock/AnswerVQA/img/7b696e5d1c04ed4c1b106a55225a0f4281557588.jpeg",
+    "expected_answer": "客家族"
+  },
+  {
+    "index": 98,
+    "section": "简答VQA",
+    "question": "图中所示建筑名称为?",
+    "image_url": "data/mock/AnswerVQA/img/5f938c4e8efff156e8c4624d80567e8bcb342bc4.jpeg",
+    "expected_answer": "吊脚楼"
+  },
+  {
+    "index": 100,
+    "section": "简答VQA",
+    "question": "图中的文物出土于哪里？",
+    "image_url": "data/mock/AnswerVQA/img/32f56ea764d6578a361add0315cbeb212a7206b8.jpeg",
+    "expected_answer": "三星堆"
+  },
+  {
+    "index": 103,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的历史文物？",
+    "image_url": "data/mock/AnswerVQA/img/617e6b482ce7baf78b549f9e7d6aa46023440197.jpeg",
+    "expected_answer": "汉朝"
+  },
+  {
+    "index": 105,
+    "section": "简答VQA",
+    "question": "请问图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/5577af698bf5665286bba6ec89a37c1186c1ddaa.jpeg",
+    "expected_answer": "青铜雁鱼灯"
+  },
+  {
+    "index": 107,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/eb4d219145b9c154decdae0ea05d73b6db8ee990.jpeg",
+    "expected_answer": "博山炉"
+  },
+  {
+    "index": 108,
+    "section": "简答VQA",
+    "question": "请问图中的文物出自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/c199b2888925a4e0ad6fdc6c0f9c8fc1987d0446.jpeg",
+    "expected_answer": "秦朝"
+  },
+  {
+    "index": 109,
+    "section": "简答VQA",
+    "question": "请问图中的文物出自何处？",
+    "image_url": "data/mock/AnswerVQA/img/604b6615c3081e32d137f24dc9839d46ca5d5c24.jpeg",
+    "expected_answer": "敦煌莫高窟"
+  },
+  {
+    "index": 110,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/524dfe7b8213074c4f214401c8387bb39e9a7f8b.jpeg",
+    "expected_answer": "龙虎纹尊"
+  },
+  {
+    "index": 111,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/68980d28e9e2582e8375d985c02b8a7c82403588.jpeg",
+    "expected_answer": "楚王鼎"
+  },
+  {
+    "index": 112,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/6a24e3f86f728d7a3fb9ff50547edb8cb97ad326.jpeg",
+    "expected_answer": "作册般鼋"
+  },
+  {
+    "index": 120,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/90f17737e728b108415621931054888e04aa32e0.jpeg",
+    "expected_answer": "虎符"
+  },
+  {
+    "index": 122,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/49ebc69816cc66fa534c1cd72a5759ab18c0adb6.jpeg",
+    "expected_answer": "牙牌"
+  },
+  {
+    "index": 125,
+    "section": "简答VQA",
+    "question": "图中是春秋战国时期的一件兵器，这件兵器的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/c6873ce239e7ed622fbaf4a718baf3fbd7cc8a0b.jpeg",
+    "expected_answer": "青铜刀"
+  },
+  {
+    "index": 132,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/8f9a2e0ca448e3c45925ef23ebc940492da3423a.jpeg",
+    "expected_answer": "镶嵌绿松石兽面纹牌饰"
+  },
+  {
+    "index": 133,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/2c5a402799b6a65dc92b3929d4eac3e882006078.jpeg",
+    "expected_answer": "猪首形陶器盖"
+  },
+  {
+    "index": 134,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/37543bfd475c67e18fc5fecb3655571665da8042.jpeg",
+    "expected_answer": "镶嵌金银团花纹带流鼎"
+  },
+  {
+    "index": 136,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/5bba44ad0e8d7d21d4341bbb94f9b8ed01a167cb.jpeg",
+    "expected_answer": "商代"
+  },
+  {
+    "index": 137,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/9238590544e3cb30739a5ac7733ede15073e9f98.jpeg",
+    "expected_answer": "春秋"
+  },
+  {
+    "index": 138,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/677c2250d2ad72add593c7cf2dab35544a44d29f.jpeg",
+    "expected_answer": "西周"
+  },
+  {
+    "index": 139,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/1614e0ac88d7bbeeeef78c2162f4fcd2a6df54d3.jpeg",
+    "expected_answer": "战国"
+  },
+  {
+    "index": 140,
+    "section": "简答VQA",
+    "question": "图中的文物与下面哪位历史人物有关？",
+    "image_url": "data/mock/AnswerVQA/img/707033c5cc91f457636899830bb8a3b9ffc15044.jpeg",
+    "expected_answer": "商鞅"
+  },
+  {
+    "index": 141,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/bcfb6c975004d9a9e6140feeca0d4c6de236b8de.jpeg",
+    "expected_answer": "王子午鼎"
+  },
+  {
+    "index": 143,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/641384353eccc5f2a941d68ace0615229921d037.jpeg",
+    "expected_answer": "齐侯盂"
+  },
+  {
+    "index": 145,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/0441d1d17f3ba0b62be056fe42d153f0a7367a0a.jpeg",
+    "expected_answer": "凤首人身形玉佩"
+  },
+  {
+    "index": 149,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/772251dd0535a6b6fdc4bc9fb2e580e2ca8491d3.jpeg",
+    "expected_answer": "噩伯鼎"
+  },
+  {
+    "index": 150,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/eaf33f0a650cc31ec01ed3b15558c407c0950784.jpeg",
+    "expected_answer": "噩侯鬲"
+  },
+  {
+    "index": 152,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/85efda743199e66d5c624a62648456e49dce036f.jpeg",
+    "expected_answer": "噩侯壶"
+  },
+  {
+    "index": 154,
+    "section": "简答VQA",
+    "question": "图中文物的材质是什么？",
+    "image_url": "data/mock/AnswerVQA/img/4063fc68b9073717814858fde77e87a7d58dbf93.jpeg",
+    "expected_answer": "玛瑙"
+  },
+  {
+    "index": 155,
+    "section": "简答VQA",
+    "question": "图中文物的材质是什么？",
+    "image_url": "data/mock/AnswerVQA/img/0d45d6aed786379be7cb341c14d3f98b38ef8cc8.jpeg",
+    "expected_answer": "青金石"
+  },
+  {
+    "index": 156,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/cef86b09a783afa71de5ab54d443eb5a1fcc4021.jpeg",
+    "expected_answer": "海兽葡萄纹铜镜"
+  },
+  {
+    "index": 157,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/6b05516eeb1cb71de3e2493ae772d21cb1daa9ae.jpeg",
+    "expected_answer": "规矩四灵镜"
+  },
+  {
+    "index": 158,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/cddd38ff4eaf212e3fcf97dd9636659812203b2f.jpeg",
+    "expected_answer": "蓝色玻璃碗"
+  },
+  {
+    "index": 160,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的瓷器？",
+    "image_url": "data/mock/AnswerVQA/img/adf252f867512a3e7ef7080678d8cb76b84cb361.jpeg",
+    "expected_answer": "清代"
+  },
+  {
+    "index": 165,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的玉器？",
+    "image_url": "data/mock/AnswerVQA/img/ff5cbf4530464aa143b48b64d7cd0b26e7912a2c.jpeg",
+    "expected_answer": "汉代"
+  },
+  {
+    "index": 166,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的玉器？",
+    "image_url": "data/mock/AnswerVQA/img/ecbe0d992bd24359b3b371d39fa7a287fed5c54c.jpeg",
+    "expected_answer": "明代"
+  },
+  {
+    "index": 175,
+    "section": "简答VQA",
+    "question": "图中文物来自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/ed27396d3573a26c51c554096738036fdd9379fc.jpeg",
+    "expected_answer": "西汉"
+  },
+  {
+    "index": 176,
+    "section": "简答VQA",
+    "question": "图中文物来自清朝哪个时期？",
+    "image_url": "data/mock/AnswerVQA/img/bf9b46c988cdc574a0745e72d004125851c809b2.jpeg",
+    "expected_answer": "雍正时期"
+  },
+  {
+    "index": 177,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/f8ebd7d095e9eef2f218fc54fab5e9d4d4e5bd63.jpeg",
+    "expected_answer": "兽面纹鼎"
+  },
+  {
+    "index": 179,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/6be42dd322e192f7d891e3dfcf8d7351ee9e66a0.jpeg",
+    "expected_answer": "三羊尊"
+  },
+  {
+    "index": 181,
+    "section": "简答VQA",
+    "question": "图中文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/70597848c8d41cd48b0dbd966062685bcc6c35b1.jpeg",
+    "expected_answer": "敦煌长史武班碑"
+  },
+  {
+    "index": 182,
+    "section": "简答VQA",
+    "question": "图中的陶马文物来自于哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/64461ee7057be47e213cb4727f59157ee097b8b1.jpeg",
+    "expected_answer": "秦朝"
+  },
+  {
+    "index": 183,
+    "section": "简答VQA",
+    "question": "图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/192b6ea5e4bb258f5d4c3909b9077c6de3daf237.jpeg",
+    "expected_answer": "德化窑白釉达摩像"
+  },
+  {
+    "index": 186,
+    "section": "简答VQA",
+    "question": "图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/7b2d51c999f8af95e608aa0e08e33005e0e1dff2.jpeg",
+    "expected_answer": "玉玲珑琴"
+  },
+  {
+    "index": 187,
+    "section": "简答VQA",
+    "question": "图中的文物来自于清朝哪个时期？",
+    "image_url": "data/mock/AnswerVQA/img/027a44ba9740b7e46165c93b3e7b3b00fdaaa448.jpeg",
+    "expected_answer": "光绪时期"
+  },
+  {
+    "index": 188,
+    "section": "简答VQA",
+    "question": "图中的瓦当文物表现出来的是哪一个神兽？",
+    "image_url": "data/mock/AnswerVQA/img/90f6ae5a476fc7534a2bc55205020a9200f34223.jpeg",
+    "expected_answer": "白虎"
+  },
+  {
+    "index": 189,
+    "section": "简答VQA",
+    "question": "图中的碑刻来源于哪一个时期？",
+    "image_url": "data/mock/AnswerVQA/img/df30b7bbf57fb585961fad5a1d76f2c2ffd0c103.jpeg",
+    "expected_answer": "三国"
+  },
+  {
+    "index": 194,
+    "section": "简答VQA",
+    "question": "图中文物来源于中国古代哪一个时期？",
+    "image_url": "data/mock/AnswerVQA/img/1ae67afae6c26f01f1bf802235e2d08f8a314f7f.jpeg",
+    "expected_answer": "明朝"
+  },
+  {
+    "index": 197,
+    "section": "简答VQA",
+    "question": "图中文物来源于中国哪一个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/25fd4aef96378dafaa7b181b81877c59c6fcd136.jpeg",
+    "expected_answer": "清朝"
+  },
+  {
+    "index": 207,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/82eafca92b8c8e39e8c9621206f08b685480de9a.jpeg",
+    "expected_answer": "关羽"
+  },
+  {
+    "index": 220,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/d816d200838cc3a7262f1ad11865dbfe3b42c79b.jpeg",
+    "expected_answer": "护法罗汉"
+  },
+  {
+    "index": 293,
+    "section": "简答VQA",
+    "question": "图中的画作是在哪个朝代被创作的？",
+    "image_url": "data/mock/AnswerVQA/img/95743cf66dec5af4aeaee39dffe8e847c77e3523.jpeg",
+    "expected_answer": "唐朝"
+  },
+  {
+    "index": 294,
+    "section": "简答VQA",
+    "question": "图中的画作是在哪个朝代被创作的？",
+    "image_url": "data/mock/AnswerVQA/img/1e53a7c73759930b1f1376591c5254378e574ba7.jpeg",
+    "expected_answer": "北宋"
+  },
+  {
+    "index": 297,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅北宋时期的画作，请问该画作的作者是谁？",
+    "image_url": "data/mock/AnswerVQA/img/e877acdcb803229f14b6b96cc3d5f7897a420452.jpeg",
+    "expected_answer": "张先"
+  },
+  {
+    "index": 298,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅北宋时期的画作，请问该画作的作者是谁？",
+    "image_url": "data/mock/AnswerVQA/img/85445b5c890a901c18996a4c18686e600df06351.jpeg",
+    "expected_answer": "郭熙"
+  },
+  {
+    "index": 317,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅明代画，请问其名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/75c33f6db1a8633793e9febbcdbea5dee8fdd0d6.jpeg",
+    "expected_answer": "秋兴八景图册"
+  },
+  {
+    "index": 324,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/4bc78ce7ec147ef0db2cad0161bdb305662636e8.jpeg",
+    "expected_answer": "B.他曾极力推进第二次国共合作"
+  },
+  {
+    "index": 325,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/7b537e8ed6b408a3502654acd5ce651249bb9615.jpeg",
+    "expected_answer": "D.他是第一个获得图灵奖的华人计算机科学家"
+  },
+  {
+    "index": 327,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/030f408c3e9a940848209772893d0b541884571c.jpeg",
+    "expected_answer": "D.他获得了诺贝尔物理学奖"
+  },
+  {
+    "index": 331,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/575073064dc5dca55d4eb6d3410c125948d28748.jpeg",
+    "expected_answer": "D.他曾效力于清朝政府，为清朝的改革和现代化事业奋斗过"
+  },
+  {
+    "index": 342,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/28cc871468b802f5c1da0da3ba9d5998ae4743ed.jpeg",
+    "expected_answer": "C.这位人物是中国历史上最后一位皇帝"
+  },
+  {
+    "index": 345,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/05339248f29cf6341ae732c3c0c61a805f306a5a.jpeg",
+    "expected_answer": "D.他是明代思想家王阳明的导师"
+  },
+  {
+    "index": 350,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/e155f050324666d90aa20aa7545a8110af9543d6.jpeg",
+    "expected_answer": "B.图中的人物在初唐颁行的一些措施，确立了唐代的基本制度、政策"
+  },
+  {
+    "index": 351,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/46930fa784698ab072d294e26b91508519828180.jpeg",
+    "expected_answer": "D.图中的人物是中国现代化的推动者"
+  },
+  {
+    "index": 352,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/5787c407fb2a2ab2894b668548671500a354bfa7.jpeg",
+    "expected_answer": "D.图中的人物是中国历史上著名的诗人"
+  },
+  {
+    "index": 360,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/b059d61982d739ffcae549c881df0118a78cb85f.jpeg",
+    "expected_answer": "D.他主要擅长山水画，对花鸟画不甚关注。"
+  },
+  {
+    "index": 364,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/646601edf3bbc1d68a566ca879626d7104e9c5bd.jpeg",
+    "expected_answer": "B.他曾经担任过唐朝官员，并在宫廷中创作了不少优秀的绘画作品。"
+  },
+  {
+    "index": 365,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/0a9a80612829433a8fa1d24bbb380d615f48e3a3.jpeg",
+    "expected_answer": "D.他主张艺术应该追求真实和客观，反对形式化的表现方式。"
+  },
+  {
+    "index": 367,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/18e44930af73d093793d5c632980f83278c6a68b.jpeg",
+    "expected_answer": "B.他曾经担任过东晋的高级官员，并在宫廷中创作了不少优秀的绘画作品。"
+  },
+  {
+    "index": 368,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/bee87835ed250ac3b5877f3256aadfb60eb07d43.jpeg",
+    "expected_answer": "A.他是唐朝时期的绘画大师，被誉为“骊山七友”之一。"
+  },
+  {
+    "index": 370,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/1c68eae701c80ff7c87bcad5c94f796a4a042d3e.jpeg",
+    "expected_answer": "D.他曾经担任过清朝的高级官员，并在宫廷中创作了不少优秀的绘画作品。"
+  },
+  {
+    "index": 377,
+    "section": "简答VQA",
+    "question": "请问这位人物是什么运动的主要开创人和领袖之一？",
+    "image_url": "data/mock/AnswerVQA/img/acb3b88f14b763cae29ac7229edfc0a4ce027e42.jpeg",
+    "expected_answer": "新文化运动"
+  },
+  {
+    "index": 379,
+    "section": "简答VQA",
+    "question": "请问该人物是哪个运动奠基人与领袖之一？",
+    "image_url": "data/mock/AnswerVQA/img/4e0a162d8e967160723f088aa179d7d92fc7ffdd.jpeg",
+    "expected_answer": "新文化运动"
+  },
+  {
+    "index": 381,
+    "section": "简答VQA",
+    "question": "这是一道看图猜成语题目，请问图中画面对应的是哪个成语？",
+    "image_url": "data/mock/AnswerVQA/img/b05887d4ee11a729a05db813470d023f8584bebd.jpeg",
+    "expected_answer": "一石二鸟"
+  },
+  {
+    "index": 407,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/85ae0213b542443dd673ce2dbf9ab1facf6161ef.jpeg",
+    "expected_answer": "老鼠钻风箱"
+  },
+  {
+    "index": 408,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/848d26085a61ef9a158bcbee51fd01bba88fb728.jpeg",
+    "expected_answer": "骑驴看唱本"
+  },
+  {
+    "index": 410,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/452c755f4cbbeb5ced6c36427b2177e3fcff093e.jpeg",
+    "expected_answer": "周瑜打黄盖"
+  },
+  {
+    "index": 494,
+    "section": "简答VQA",
+    "question": "这是什么民族的服装?",
+    "image_url": "data/mock/AnswerVQA/img/620fd73288ca782db3837324ac9929494bbe6a8c.jpeg",
+    "expected_answer": "畲族"
+  },
+  {
+    "index": 1000001,
+    "section": "简答VQA",
+    "question": "图中所示建筑名称为？",
+    "image_url": "data/mock/AnswerVQA/img/0ee34eaeda3b7f6ba46249801358d961f6100b7e.jpeg",
+    "expected_answer": "长城"
+  },
+  {
+    "index": 1000045,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/4e83bb0a191926681184668002843022732ef4c9.jpeg",
+    "expected_answer": "贺兰山广宗寺"
+  },
+  {
+    "index": 1000047,
+    "section": "简答VQA",
+    "question": "下列诗句与图中景观有关的是？",
+    "image_url": "data/mock/AnswerVQA/img/3d35c1eebd40fa0990afcd37a236cd7c2dd87ebb.jpeg",
+    "expected_answer": "姑苏城外寒山寺，夜半钟声到客船。"
+  },
+  {
+    "index": 1000065,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/6b2f139e602acf6e480190db86e1e75371391bb4.jpeg",
+    "expected_answer": "狮子林"
+  },
+  {
+    "index": 1000067,
+    "section": "简答VQA",
+    "question": "图中景观所在地点为？",
+    "image_url": "data/mock/AnswerVQA/img/d0e9b2fcaae27dcc29dd4c0092f79ac63a111fc0.jpeg",
+    "expected_answer": "武汉"
+  },
+  {
+    "index": 1000096,
+    "section": "简答VQA",
+    "question": "图中所示建筑最常见于下列哪一地点？",
+    "image_url": "data/mock/AnswerVQA/img/5a21153c268d2106bf4332f8b7725523240cff33.jpeg",
+    "expected_answer": "陕西"
+  },
+  {
+    "index": 1000097,
+    "section": "简答VQA",
+    "question": "图中所示建筑为哪一民族的特色民居？",
+    "image_url": "data/mock/AnswerVQA/img/7b696e5d1c04ed4c1b106a55225a0f4281557588.jpeg",
+    "expected_answer": "客家族"
+  },
+  {
+    "index": 1000103,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的历史文物？",
+    "image_url": "data/mock/AnswerVQA/img/617e6b482ce7baf78b549f9e7d6aa46023440197.jpeg",
+    "expected_answer": "汉朝"
+  },
+  {
+    "index": 1000107,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/eb4d219145b9c154decdae0ea05d73b6db8ee990.jpeg",
+    "expected_answer": "博山炉"
+  },
+  {
+    "index": 1000108,
+    "section": "简答VQA",
+    "question": "请问图中的文物出自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/c199b2888925a4e0ad6fdc6c0f9c8fc1987d0446.jpeg",
+    "expected_answer": "秦朝"
+  },
+  {
+    "index": 1000111,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/68980d28e9e2582e8375d985c02b8a7c82403588.jpeg",
+    "expected_answer": "楚王鼎"
+  },
+  {
+    "index": 1000113,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/d5f233ee36f6bc412574c2bf412987dfc02c11ef.jpeg",
+    "expected_answer": "虎形足器座"
+  },
+  {
+    "index": 1000120,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/90f17737e728b108415621931054888e04aa32e0.jpeg",
+    "expected_answer": "虎符"
+  },
+  {
+    "index": 1000121,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/7c3f6effcbf31e94ca2e6dc946afae800bd3541c.jpeg",
+    "expected_answer": "鱼符"
+  },
+  {
+    "index": 1000123,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/23b395034abd4903917b2afcf8f41d06399f2746.jpeg",
+    "expected_answer": "腰排"
+  },
+  {
+    "index": 1000126,
+    "section": "简答VQA",
+    "question": "图中是春秋战国时期的一件兵器，这件兵器的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/31c58262bdd744e6f7555e2c1ca4c41b77879c40.jpeg",
+    "expected_answer": "青铜戈"
+  },
+  {
+    "index": 1000133,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/2c5a402799b6a65dc92b3929d4eac3e882006078.jpeg",
+    "expected_answer": "猪首形陶器盖"
+  },
+  {
+    "index": 1000134,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/37543bfd475c67e18fc5fecb3655571665da8042.jpeg",
+    "expected_answer": "镶嵌金银团花纹带流鼎"
+  },
+  {
+    "index": 1000138,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/677c2250d2ad72add593c7cf2dab35544a44d29f.jpeg",
+    "expected_answer": "西周"
+  },
+  {
+    "index": 1000140,
+    "section": "简答VQA",
+    "question": "图中的文物与下面哪位历史人物有关？",
+    "image_url": "data/mock/AnswerVQA/img/707033c5cc91f457636899830bb8a3b9ffc15044.jpeg",
+    "expected_answer": "商鞅"
+  },
+  {
+    "index": 1000141,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/bcfb6c975004d9a9e6140feeca0d4c6de236b8de.jpeg",
+    "expected_answer": "王子午鼎"
+  },
+  {
+    "index": 1000145,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/0441d1d17f3ba0b62be056fe42d153f0a7367a0a.jpeg",
+    "expected_answer": "凤首人身形玉佩"
+  },
+  {
+    "index": 1000153,
+    "section": "简答VQA",
+    "question": "图中文物的材质是什么？",
+    "image_url": "data/mock/AnswerVQA/img/c16f8f7ccb61a8ae7bafed68cd1fe999fef27b73.jpeg",
+    "expected_answer": "翡翠"
+  },
+  {
+    "index": 1000157,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/6b05516eeb1cb71de3e2493ae772d21cb1daa9ae.jpeg",
+    "expected_answer": "规矩四灵镜"
+  },
+  {
+    "index": 1000159,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/c8bcb5afee9366a36e4f432cb1c0c4f1e8143f9f.jpeg",
+    "expected_answer": "明代龙泉窑刻梵文大盘"
+  },
+  {
+    "index": 1000160,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的瓷器？",
+    "image_url": "data/mock/AnswerVQA/img/adf252f867512a3e7ef7080678d8cb76b84cb361.jpeg",
+    "expected_answer": "清代"
+  },
+  {
+    "index": 1000162,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的瓷器？",
+    "image_url": "data/mock/AnswerVQA/img/63cf713fcdd596c32dbb1194384b7bf5b79f8cbb.jpeg",
+    "expected_answer": "明代"
+  },
+  {
+    "index": 1000168,
+    "section": "简答VQA",
+    "question": "图中文物所呈现的是哪种文字？",
+    "image_url": "data/mock/AnswerVQA/img/e2248281bc02be99f351b9d989c838b3d43fc874.jpeg",
+    "expected_answer": "甲骨文"
+  },
+  {
+    "index": 1000169,
+    "section": "简答VQA",
+    "question": "图中文物来自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/8dbd48664fd07f165e2749991221b1bcc0e57cd4.jpeg",
+    "expected_answer": "东汉"
+  },
+  {
+    "index": 1000170,
+    "section": "简答VQA",
+    "question": "图中文物来自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/e44db00738b99a28dd3b69b9820c20fce5046cd9.jpeg",
+    "expected_answer": "南朝"
+  },
+  {
+    "index": 1000171,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/012c49eff4a1a56c3dd8e78a4124f95f9a686db3.jpeg",
+    "expected_answer": "乾隆款金胎掐丝珐琅镶宝石高足盖碗"
+  },
+  {
+    "index": 1000175,
+    "section": "简答VQA",
+    "question": "图中文物来自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/ed27396d3573a26c51c554096738036fdd9379fc.jpeg",
+    "expected_answer": "西汉"
+  },
+  {
+    "index": 1000176,
+    "section": "简答VQA",
+    "question": "图中文物来自清朝哪个时期？",
+    "image_url": "data/mock/AnswerVQA/img/bf9b46c988cdc574a0745e72d004125851c809b2.jpeg",
+    "expected_answer": "雍正时期"
+  },
+  {
+    "index": 1000178,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/71613ca825915e5e8cf8bae8935b2d29ae5fddd4.jpeg",
+    "expected_answer": "弦纹盉"
+  },
+  {
+    "index": 1000180,
+    "section": "简答VQA",
+    "question": "图中文物来源于哪个时期？",
+    "image_url": "data/mock/AnswerVQA/img/f2aeab9a6f7cc8eadc43548047e9886fb8e41edc.jpeg",
+    "expected_answer": "清朝"
+  },
+  {
+    "index": 1000182,
+    "section": "简答VQA",
+    "question": "图中的陶马文物来自于哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/64461ee7057be47e213cb4727f59157ee097b8b1.jpeg",
+    "expected_answer": "秦朝"
+  },
+  {
+    "index": 1000183,
+    "section": "简答VQA",
+    "question": "图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/192b6ea5e4bb258f5d4c3909b9077c6de3daf237.jpeg",
+    "expected_answer": "德化窑白釉达摩像"
+  },
+  {
+    "index": 1000187,
+    "section": "简答VQA",
+    "question": "图中的文物来自于清朝哪个时期？",
+    "image_url": "data/mock/AnswerVQA/img/027a44ba9740b7e46165c93b3e7b3b00fdaaa448.jpeg",
+    "expected_answer": "光绪时期"
+  },
+  {
+    "index": 1000188,
+    "section": "简答VQA",
+    "question": "图中的瓦当文物表现出来的是哪一个神兽？",
+    "image_url": "data/mock/AnswerVQA/img/90f6ae5a476fc7534a2bc55205020a9200f34223.jpeg",
+    "expected_answer": "白虎"
+  },
+  {
+    "index": 1000189,
+    "section": "简答VQA",
+    "question": "图中的碑刻来源于哪一个时期？",
+    "image_url": "data/mock/AnswerVQA/img/df30b7bbf57fb585961fad5a1d76f2c2ffd0c103.jpeg",
+    "expected_answer": "三国"
+  },
+  {
+    "index": 1000190,
+    "section": "简答VQA",
+    "question": "图中文物的名称是？",
+    "image_url": "data/mock/AnswerVQA/img/4a582535fa09b0ac982bfa9fd8f2c2e00285a47b.jpeg",
+    "expected_answer": "彩绘漆透雕座屏"
+  },
+  {
+    "index": 1000191,
+    "section": "简答VQA",
+    "question": "图中的文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/e69265490020b4a94fb773548079db8e74722934.jpeg",
+    "expected_answer": "三熊足石砚"
+  },
+  {
+    "index": 1000193,
+    "section": "简答VQA",
+    "question": "图中文物来源于中国古代清朝中的哪一个时期？",
+    "image_url": "data/mock/AnswerVQA/img/fd4c66b6a542b5ad4a160f260759da6208d2da16.jpeg",
+    "expected_answer": "清朝康乾时期"
+  },
+  {
+    "index": 1000194,
+    "section": "简答VQA",
+    "question": "图中文物来源于中国古代哪一个时期？",
+    "image_url": "data/mock/AnswerVQA/img/1ae67afae6c26f01f1bf802235e2d08f8a314f7f.jpeg",
+    "expected_answer": "明朝"
+  },
+  {
+    "index": 1000196,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/2de19408f1035454fd5473fb4b5b58c20aafa803.jpeg",
+    "expected_answer": "康熙款画珐琅莲花纹盖碗"
+  },
+  {
+    "index": 1000198,
+    "section": "简答VQA",
+    "question": "图中文物来源于中国哪一个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/8d7ff108ad151bc7aee6086213f9245be9a1c482.jpeg",
+    "expected_answer": "明朝"
+  },
+  {
+    "index": 1000206,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/c7323ad82f0e57b6d36b0c11d046064afa426ea1.jpeg",
+    "expected_answer": "姬僚"
+  },
+  {
+    "index": 1000208,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/0182dfafcfd165f0b987408e321b4080914804bc.jpeg",
+    "expected_answer": "朱温"
+  },
+  {
+    "index": 1000209,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/7fa6cd74ab0330983b4ad92b8e8318e690f61af4.jpeg",
+    "expected_answer": "周仓"
+  },
+  {
+    "index": 1000218,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/685e7fc9e578a60b8983ff53b1ecdd5f4f251944.jpeg",
+    "expected_answer": "陈九公"
+  },
+  {
+    "index": 1000234,
+    "section": "简答VQA",
+    "question": "图中所示是中国哪个传统节日？",
+    "image_url": "data/mock/AnswerVQA/img/a82bca3e0d786a6421212b1ad94317e9a97643d0.jpeg",
+    "expected_answer": "清明节·"
+  },
+  {
+    "index": 1000245,
+    "section": "简答VQA",
+    "question": "图中所示传统舞蹈表演为？",
+    "image_url": "data/mock/AnswerVQA/img/8953377ab3e55bcb5871765828ae34fcf85f5b40.jpeg",
+    "expected_answer": "塔吉克族鹰舞"
+  },
+  {
+    "index": 1000292,
+    "section": "简答VQA",
+    "question": "图中的画作是在哪个朝代被创作的？",
+    "image_url": "data/mock/AnswerVQA/img/5674092a3851720c204dace8843b1bef02de3172.jpeg",
+    "expected_answer": "隋朝"
+  },
+  {
+    "index": 1000293,
+    "section": "简答VQA",
+    "question": "图中的画作是在哪个朝代被创作的？",
+    "image_url": "data/mock/AnswerVQA/img/95743cf66dec5af4aeaee39dffe8e847c77e3523.jpeg",
+    "expected_answer": "唐朝"
+  },
+  {
+    "index": 1000294,
+    "section": "简答VQA",
+    "question": "图中的画作是在哪个朝代被创作的？",
+    "image_url": "data/mock/AnswerVQA/img/1e53a7c73759930b1f1376591c5254378e574ba7.jpeg",
+    "expected_answer": "北宋"
+  },
+  {
+    "index": 1000295,
+    "section": "简答VQA",
+    "question": "图中的画作是在哪个朝代被创作的？",
+    "image_url": "data/mock/AnswerVQA/img/9f9efff115dbf960c12f690de8a4fa40999202d4.jpeg",
+    "expected_answer": "元朝"
+  },
+  {
+    "index": 1000297,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅北宋时期的画作，请问该画作的作者是谁？",
+    "image_url": "data/mock/AnswerVQA/img/e877acdcb803229f14b6b96cc3d5f7897a420452.jpeg",
+    "expected_answer": "张先"
+  },
+  {
+    "index": 1000299,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅北宋时期的画作，请问该画作的作者是谁？",
+    "image_url": "data/mock/AnswerVQA/img/bb52d7b78ee8fdf8ef4ed3bf12366880fb4e8f40.jpeg",
+    "expected_answer": "张择端"
+  },
+  {
+    "index": 1000317,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅明代画，请问其名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/75c33f6db1a8633793e9febbcdbea5dee8fdd0d6.jpeg",
+    "expected_answer": "秋兴八景图册"
+  },
+  {
+    "index": 1000318,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅明代画，请问其作者是谁",
+    "image_url": "data/mock/AnswerVQA/img/176799ff5448adc7c230bd24019f558df51273d9.jpeg",
+    "expected_answer": "董其昌"
+  },
+  {
+    "index": 1000322,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/ce050f0082917279deea9030ea33e92bfef789d9.jpeg",
+    "expected_answer": "D.是中国古代蹴鞠的发明者"
+  },
+  {
+    "index": 1000323,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/7071de963e4d1c6aaca6b0941df9c2e916aae3b8.jpeg",
+    "expected_answer": "D.他是中国古代著名的科学家，他在数学和物理学等方面做出了杰出的贡献"
+  },
+  {
+    "index": 1000324,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/4bc78ce7ec147ef0db2cad0161bdb305662636e8.jpeg",
+    "expected_answer": "B.他曾极力推进第二次国共合作"
+  },
+  {
+    "index": 1000328,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/0eb8c99744d9a10a6aae3b7af971861de4c72bfb.jpeg",
+    "expected_answer": "D.他是清朝官员，曾经在中央政府中担任要职"
+  },
+  {
+    "index": 1000329,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/e7d7a51919eb28d5ce5c3b39372117d043040b1f.jpeg",
+    "expected_answer": "D.他是中国古代政治制度改革的开创者"
+  },
+  {
+    "index": 1000340,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/09292abd19d6b6dd279851607ecca638dca2e9f4.jpeg",
+    "expected_answer": "D.图中的人物是中国现代史研究的奠基人"
+  },
+  {
+    "index": 1000343,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/f8680b0ae7bfaf321c4fa236641a2bcd129e7ef9.jpeg",
+    "expected_answer": "D.他是中国共产主义青年团的创立者"
+  },
+  {
+    "index": 1000345,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/05339248f29cf6341ae732c3c0c61a805f306a5a.jpeg",
+    "expected_answer": "D.他是明代思想家王阳明的导师"
+  },
+  {
+    "index": 1000350,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/e155f050324666d90aa20aa7545a8110af9543d6.jpeg",
+    "expected_answer": "B.图中的人物在初唐颁行的一些措施，确立了唐代的基本制度、政策"
+  },
+  {
+    "index": 1000354,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/f8d015602d8b87b865bee1a250eb16c1e90d7f0c.jpeg",
+    "expected_answer": "C.他是中国北宋时期的宰相"
+  },
+  {
+    "index": 1000355,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/acbe3f8570590a7c6c8b5f4ab64fb0f681ee4292.jpeg",
+    "expected_answer": "D.图中的人物是中国现代史上知名的文化活动家和思想家"
+  },
+  {
+    "index": 1000356,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/993a8a8681aa2dfa57d8aaa69460aeb2ee666937.jpeg",
+    "expected_answer": "D.他是20世纪上半期中国最杰出的哲学家之一。"
+  },
+  {
+    "index": 1000359,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/a163be93d1ce70e418e3c6b104ade81e35a80e8e.jpeg",
+    "expected_answer": "D.她是一位著名的诗人，与李白、杜甫等人齐名。"
+  },
+  {
+    "index": 1000365,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/0a9a80612829433a8fa1d24bbb380d615f48e3a3.jpeg",
+    "expected_answer": "D.他主张艺术应该追求真实和客观，反对形式化的表现方式。"
+  },
+  {
+    "index": 1000366,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/626d90f3a055caa460a6c1003eef542e2a45ad09.jpeg",
+    "expected_answer": "A.他是南宋时期的书法和绘画大师，有“文人四君子”之称。"
+  },
+  {
+    "index": 1000367,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/18e44930af73d093793d5c632980f83278c6a68b.jpeg",
+    "expected_answer": "B.他曾经担任过东晋的高级官员，并在宫廷中创作了不少优秀的绘画作品。"
+  },
+  {
+    "index": 1000377,
+    "section": "简答VQA",
+    "question": "请问这位人物是什么运动的主要开创人和领袖之一？",
+    "image_url": "data/mock/AnswerVQA/img/acb3b88f14b763cae29ac7229edfc0a4ce027e42.jpeg",
+    "expected_answer": "新文化运动"
+  },
+  {
+    "index": 1000380,
+    "section": "简答VQA",
+    "question": "这是一道看图猜成语题目，请问图中画面对应的是哪个成语？",
+    "image_url": "data/mock/AnswerVQA/img/914d6cc16f99c31194e0d50bdf07b7712c3b5194.jpeg",
+    "expected_answer": "楚河汉界"
+  },
+  {
+    "index": 1000408,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/848d26085a61ef9a158bcbee51fd01bba88fb728.jpeg",
+    "expected_answer": "骑驴看唱本"
+  },
+  {
+    "index": 1000409,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/40b20595a0b19474cdf60b2632d5affa880ebb77.jpeg",
+    "expected_answer": "铁打的公鸡"
+  },
+  {
+    "index": 1000410,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/452c755f4cbbeb5ced6c36427b2177e3fcff093e.jpeg",
+    "expected_answer": "周瑜打黄盖"
+  },
+  {
+    "index": 1000495,
+    "section": "简答VQA",
+    "question": "这是什么民族的服装?",
+    "image_url": "data/mock/AnswerVQA/img/0f6193be3bf0622fd32598e96c46babb3992a639.jpeg",
+    "expected_answer": "水族"
+  },
+  {
+    "index": 1000496,
+    "section": "简答VQA",
+    "question": "这是什么民族的服装?",
+    "image_url": "data/mock/AnswerVQA/img/af06d3c6f1aa5a905381cb5d82138ed2f1b3f071.jpeg",
+    "expected_answer": "塔吉克族"
+  },
+  {
+    "index": 2000044,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/55d26f76b4f4abb4b3a724e46b323d92a036e7ae.jpeg",
+    "expected_answer": "成吉思汗陵"
+  },
+  {
+    "index": 2000063,
+    "section": "简答VQA",
+    "question": "图中建筑的设计师是？",
+    "image_url": "data/mock/AnswerVQA/img/36c2b503af743bc07df8e9b08eaf0ba9adecf2d2.jpeg",
+    "expected_answer": "贝聿铭"
+  },
+  {
+    "index": 2000064,
+    "section": "简答VQA",
+    "question": "图中景观所在地点为？",
+    "image_url": "data/mock/AnswerVQA/img/45e2b18ab71ee4cc8a43aa8c50e779ee831ba357.jpeg",
+    "expected_answer": "北京"
+  },
+  {
+    "index": 2000065,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/6b2f139e602acf6e480190db86e1e75371391bb4.jpeg",
+    "expected_answer": "狮子林"
+  },
+  {
+    "index": 2000066,
+    "section": "简答VQA",
+    "question": "图中景观所在地点为？",
+    "image_url": "data/mock/AnswerVQA/img/e2f6396301ef1aa8ddb6bb9ec38b93412a6d2a4d.jpeg",
+    "expected_answer": "西安"
+  },
+  {
+    "index": 2000079,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/14ce63f89b19df6e10fc4e2222f97ae39364a705.jpeg",
+    "expected_answer": "澳门塔"
+  },
+  {
+    "index": 2000095,
+    "section": "简答VQA",
+    "question": "图中所示建筑为哪一民族的特色民居？",
+    "image_url": "data/mock/AnswerVQA/img/ca4f866c84a96648a79f43badd43d1c65eff3c26.jpeg",
+    "expected_answer": "藏族"
+  },
+  {
+    "index": 2000098,
+    "section": "简答VQA",
+    "question": "图中所示建筑名称为?",
+    "image_url": "data/mock/AnswerVQA/img/5f938c4e8efff156e8c4624d80567e8bcb342bc4.jpeg",
+    "expected_answer": "吊脚楼"
+  },
+  {
+    "index": 2000103,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的历史文物？",
+    "image_url": "data/mock/AnswerVQA/img/617e6b482ce7baf78b549f9e7d6aa46023440197.jpeg",
+    "expected_answer": "汉朝"
+  },
+  {
+    "index": 2000105,
+    "section": "简答VQA",
+    "question": "请问图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/5577af698bf5665286bba6ec89a37c1186c1ddaa.jpeg",
+    "expected_answer": "青铜雁鱼灯"
+  },
+  {
+    "index": 2000108,
+    "section": "简答VQA",
+    "question": "请问图中的文物出自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/c199b2888925a4e0ad6fdc6c0f9c8fc1987d0446.jpeg",
+    "expected_answer": "秦朝"
+  },
+  {
+    "index": 2000111,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/68980d28e9e2582e8375d985c02b8a7c82403588.jpeg",
+    "expected_answer": "楚王鼎"
+  },
+  {
+    "index": 2000113,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/d5f233ee36f6bc412574c2bf412987dfc02c11ef.jpeg",
+    "expected_answer": "虎形足器座"
+  },
+  {
+    "index": 2000120,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/90f17737e728b108415621931054888e04aa32e0.jpeg",
+    "expected_answer": "虎符"
+  },
+  {
+    "index": 2000121,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/7c3f6effcbf31e94ca2e6dc946afae800bd3541c.jpeg",
+    "expected_answer": "鱼符"
+  },
+  {
+    "index": 2000122,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/49ebc69816cc66fa534c1cd72a5759ab18c0adb6.jpeg",
+    "expected_answer": "牙牌"
+  },
+  {
+    "index": 2000123,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/23b395034abd4903917b2afcf8f41d06399f2746.jpeg",
+    "expected_answer": "腰排"
+  },
+  {
+    "index": 2000126,
+    "section": "简答VQA",
+    "question": "图中是春秋战国时期的一件兵器，这件兵器的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/31c58262bdd744e6f7555e2c1ca4c41b77879c40.jpeg",
+    "expected_answer": "青铜戈"
+  },
+  {
+    "index": 2000132,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/8f9a2e0ca448e3c45925ef23ebc940492da3423a.jpeg",
+    "expected_answer": "镶嵌绿松石兽面纹牌饰"
+  },
+  {
+    "index": 2000134,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/37543bfd475c67e18fc5fecb3655571665da8042.jpeg",
+    "expected_answer": "镶嵌金银团花纹带流鼎"
+  },
+  {
+    "index": 2000135,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/ec95b501c0c4d6352634ecd674e8337b7aae46f9.jpeg",
+    "expected_answer": "网格纹鼎"
+  },
+  {
+    "index": 2000136,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/5bba44ad0e8d7d21d4341bbb94f9b8ed01a167cb.jpeg",
+    "expected_answer": "商代"
+  },
+  {
+    "index": 2000137,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/9238590544e3cb30739a5ac7733ede15073e9f98.jpeg",
+    "expected_answer": "春秋"
+  },
+  {
+    "index": 2000140,
+    "section": "简答VQA",
+    "question": "图中的文物与下面哪位历史人物有关？",
+    "image_url": "data/mock/AnswerVQA/img/707033c5cc91f457636899830bb8a3b9ffc15044.jpeg",
+    "expected_answer": "商鞅"
+  },
+  {
+    "index": 2000141,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/bcfb6c975004d9a9e6140feeca0d4c6de236b8de.jpeg",
+    "expected_answer": "王子午鼎"
+  },
+  {
+    "index": 2000145,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/0441d1d17f3ba0b62be056fe42d153f0a7367a0a.jpeg",
+    "expected_answer": "凤首人身形玉佩"
+  },
+  {
+    "index": 2000147,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/084cacf477eba76e7c8ae2b7eeeb4374b64c4f8f.jpeg",
+    "expected_answer": "四联璜玉组佩"
+  },
+  {
+    "index": 2000148,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/b36d609902bec69a3a1450fe4bdb316bead56a72.jpeg",
+    "expected_answer": "金腰带饰"
+  },
+  {
+    "index": 2000151,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/a7957ebe053c42561fa3ad94f00a34cba3fcf734.jpeg",
+    "expected_answer": "噩姜鬲"
+  },
+  {
+    "index": 2000153,
+    "section": "简答VQA",
+    "question": "图中文物的材质是什么？",
+    "image_url": "data/mock/AnswerVQA/img/c16f8f7ccb61a8ae7bafed68cd1fe999fef27b73.jpeg",
+    "expected_answer": "翡翠"
+  },
+  {
+    "index": 2000157,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/6b05516eeb1cb71de3e2493ae772d21cb1daa9ae.jpeg",
+    "expected_answer": "规矩四灵镜"
+  },
+  {
+    "index": 2000158,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/cddd38ff4eaf212e3fcf97dd9636659812203b2f.jpeg",
+    "expected_answer": "蓝色玻璃碗"
+  },
+  {
+    "index": 2000167,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的玉器？",
+    "image_url": "data/mock/AnswerVQA/img/fa1f28ed51567bc1d130bb8c47cd4cb1bc7105b9.jpeg",
+    "expected_answer": "清代"
+  },
+  {
+    "index": 2000168,
+    "section": "简答VQA",
+    "question": "图中文物所呈现的是哪种文字？",
+    "image_url": "data/mock/AnswerVQA/img/e2248281bc02be99f351b9d989c838b3d43fc874.jpeg",
+    "expected_answer": "甲骨文"
+  },
+  {
+    "index": 2000174,
+    "section": "简答VQA",
+    "question": "图中文物来自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/63c7f64f9376325d9ca16f4c1a2be55b8d89eb60.jpeg",
+    "expected_answer": "清朝"
+  },
+  {
+    "index": 2000175,
+    "section": "简答VQA",
+    "question": "图中文物来自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/ed27396d3573a26c51c554096738036fdd9379fc.jpeg",
+    "expected_answer": "西汉"
+  },
+  {
+    "index": 2000177,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/f8ebd7d095e9eef2f218fc54fab5e9d4d4e5bd63.jpeg",
+    "expected_answer": "兽面纹鼎"
+  },
+  {
+    "index": 2000178,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/71613ca825915e5e8cf8bae8935b2d29ae5fddd4.jpeg",
+    "expected_answer": "弦纹盉"
+  },
+  {
+    "index": 2000187,
+    "section": "简答VQA",
+    "question": "图中的文物来自于清朝哪个时期？",
+    "image_url": "data/mock/AnswerVQA/img/027a44ba9740b7e46165c93b3e7b3b00fdaaa448.jpeg",
+    "expected_answer": "光绪时期"
+  },
+  {
+    "index": 2000190,
+    "section": "简答VQA",
+    "question": "图中文物的名称是？",
+    "image_url": "data/mock/AnswerVQA/img/4a582535fa09b0ac982bfa9fd8f2c2e00285a47b.jpeg",
+    "expected_answer": "彩绘漆透雕座屏"
+  },
+  {
+    "index": 2000191,
+    "section": "简答VQA",
+    "question": "图中的文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/e69265490020b4a94fb773548079db8e74722934.jpeg",
+    "expected_answer": "三熊足石砚"
+  },
+  {
+    "index": 2000195,
+    "section": "简答VQA",
+    "question": "图中文物来源于明朝哪一个时期？",
+    "image_url": "data/mock/AnswerVQA/img/4d060606fefdce7c93bb218ab0ef3f3908a7c6d2.jpeg",
+    "expected_answer": "明朝宣德时期"
+  },
+  {
+    "index": 2000196,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/2de19408f1035454fd5473fb4b5b58c20aafa803.jpeg",
+    "expected_answer": "康熙款画珐琅莲花纹盖碗"
+  },
+  {
+    "index": 2000198,
+    "section": "简答VQA",
+    "question": "图中文物来源于中国哪一个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/8d7ff108ad151bc7aee6086213f9245be9a1c482.jpeg",
+    "expected_answer": "明朝"
+  },
+  {
+    "index": 2000208,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/0182dfafcfd165f0b987408e321b4080914804bc.jpeg",
+    "expected_answer": "朱温"
+  },
+  {
+    "index": 2000209,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/7fa6cd74ab0330983b4ad92b8e8318e690f61af4.jpeg",
+    "expected_answer": "周仓"
+  },
+  {
+    "index": 2000218,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/685e7fc9e578a60b8983ff53b1ecdd5f4f251944.jpeg",
+    "expected_answer": "陈九公"
+  },
+  {
+    "index": 2000221,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/e277c38d54317a775781fab07e9ce21085a71f7a.jpeg",
+    "expected_answer": "郑伦"
+  },
+  {
+    "index": 2000294,
+    "section": "简答VQA",
+    "question": "图中的画作是在哪个朝代被创作的？",
+    "image_url": "data/mock/AnswerVQA/img/1e53a7c73759930b1f1376591c5254378e574ba7.jpeg",
+    "expected_answer": "北宋"
+  },
+  {
+    "index": 2000297,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅北宋时期的画作，请问该画作的作者是谁？",
+    "image_url": "data/mock/AnswerVQA/img/e877acdcb803229f14b6b96cc3d5f7897a420452.jpeg",
+    "expected_answer": "张先"
+  },
+  {
+    "index": 2000299,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅北宋时期的画作，请问该画作的作者是谁？",
+    "image_url": "data/mock/AnswerVQA/img/bb52d7b78ee8fdf8ef4ed3bf12366880fb4e8f40.jpeg",
+    "expected_answer": "张择端"
+  },
+  {
+    "index": 2000316,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅清代肖像图，请问其名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/da0e0b440fae28c23f1f6080df8fa05909a30498.jpeg",
+    "expected_answer": "那彦成肖像"
+  },
+  {
+    "index": 2000318,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅明代画，请问其作者是谁",
+    "image_url": "data/mock/AnswerVQA/img/176799ff5448adc7c230bd24019f558df51273d9.jpeg",
+    "expected_answer": "董其昌"
+  },
+  {
+    "index": 2000323,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/7071de963e4d1c6aaca6b0941df9c2e916aae3b8.jpeg",
+    "expected_answer": "D.他是中国古代著名的科学家，他在数学和物理学等方面做出了杰出的贡献"
+  },
+  {
+    "index": 2000328,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/0eb8c99744d9a10a6aae3b7af971861de4c72bfb.jpeg",
+    "expected_answer": "D.他是清朝官员，曾经在中央政府中担任要职"
+  },
+  {
+    "index": 2000329,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/e7d7a51919eb28d5ce5c3b39372117d043040b1f.jpeg",
+    "expected_answer": "D.他是中国古代政治制度改革的开创者"
+  },
+  {
+    "index": 2000336,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/52e839150b304e60df8f18f65324ac6d2626409a.jpeg",
+    "expected_answer": "D.他是中国现代化的奠基人之一，他的思想对当时的新式教育、科学技术等领域产生了重大影响"
+  },
+  {
+    "index": 2000342,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/28cc871468b802f5c1da0da3ba9d5998ae4743ed.jpeg",
+    "expected_answer": "C.这位人物是中国历史上最后一位皇帝"
+  },
+  {
+    "index": 2000354,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/f8d015602d8b87b865bee1a250eb16c1e90d7f0c.jpeg",
+    "expected_answer": "C.他是中国北宋时期的宰相"
+  },
+  {
+    "index": 2000356,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/993a8a8681aa2dfa57d8aaa69460aeb2ee666937.jpeg",
+    "expected_answer": "D.他是20世纪上半期中国最杰出的哲学家之一。"
+  },
+  {
+    "index": 2000364,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/646601edf3bbc1d68a566ca879626d7104e9c5bd.jpeg",
+    "expected_answer": "B.他曾经担任过唐朝官员，并在宫廷中创作了不少优秀的绘画作品。"
+  },
+  {
+    "index": 2000365,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/0a9a80612829433a8fa1d24bbb380d615f48e3a3.jpeg",
+    "expected_answer": "D.他主张艺术应该追求真实和客观，反对形式化的表现方式。"
+  },
+  {
+    "index": 2000367,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/18e44930af73d093793d5c632980f83278c6a68b.jpeg",
+    "expected_answer": "B.他曾经担任过东晋的高级官员，并在宫廷中创作了不少优秀的绘画作品。"
+  },
+  {
+    "index": 2000370,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/1c68eae701c80ff7c87bcad5c94f796a4a042d3e.jpeg",
+    "expected_answer": "D.他曾经担任过清朝的高级官员，并在宫廷中创作了不少优秀的绘画作品。"
+  },
+  {
+    "index": 2000371,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/0b13f776e6bdebe860e2db1226965078edc60cf4.jpeg",
+    "expected_answer": "C.他提出了“三民主义”、“平均地权”等革命口号。"
+  },
+  {
+    "index": 2000379,
+    "section": "简答VQA",
+    "question": "请问该人物是哪个运动奠基人与领袖之一？",
+    "image_url": "data/mock/AnswerVQA/img/4e0a162d8e967160723f088aa179d7d92fc7ffdd.jpeg",
+    "expected_answer": "新文化运动"
+  },
+  {
+    "index": 2000386,
+    "section": "简答VQA",
+    "question": "这是一道看图猜成语题目，请问图中画面对应的是哪个成语？",
+    "image_url": "data/mock/AnswerVQA/img/471ba328941fb265cd92d85c8b11cbcdd77e243e.jpeg",
+    "expected_answer": "积少成多"
+  },
+  {
+    "index": 2000407,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/85ae0213b542443dd673ce2dbf9ab1facf6161ef.jpeg",
+    "expected_answer": "老鼠钻风箱"
+  },
+  {
+    "index": 2000408,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/848d26085a61ef9a158bcbee51fd01bba88fb728.jpeg",
+    "expected_answer": "骑驴看唱本"
+  },
+  {
+    "index": 2000409,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/40b20595a0b19474cdf60b2632d5affa880ebb77.jpeg",
+    "expected_answer": "铁打的公鸡"
+  },
+  {
+    "index": 2000410,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/452c755f4cbbeb5ced6c36427b2177e3fcff093e.jpeg",
+    "expected_answer": "周瑜打黄盖"
+  },
+  {
+    "index": 2000496,
+    "section": "简答VQA",
+    "question": "这是什么民族的服装?",
+    "image_url": "data/mock/AnswerVQA/img/af06d3c6f1aa5a905381cb5d82138ed2f1b3f071.jpeg",
+    "expected_answer": "塔吉克族"
+  },
+  {
+    "index": 3000044,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/55d26f76b4f4abb4b3a724e46b323d92a036e7ae.jpeg",
+    "expected_answer": "成吉思汗陵"
+  },
+  {
+    "index": 3000045,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/4e83bb0a191926681184668002843022732ef4c9.jpeg",
+    "expected_answer": "贺兰山广宗寺"
+  },
+  {
+    "index": 3000047,
+    "section": "简答VQA",
+    "question": "下列诗句与图中景观有关的是？",
+    "image_url": "data/mock/AnswerVQA/img/3d35c1eebd40fa0990afcd37a236cd7c2dd87ebb.jpeg",
+    "expected_answer": "姑苏城外寒山寺，夜半钟声到客船。"
+  },
+  {
+    "index": 3000049,
+    "section": "简答VQA",
+    "question": "下列名著与图中景观有关的是？",
+    "image_url": "data/mock/AnswerVQA/img/3bf257a089b60bc6d057313ab0a2b9a1be5e5ffd.jpeg",
+    "expected_answer": "《西游记》"
+  },
+  {
+    "index": 3000052,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/f496bd6428df0d2bb85a73c7420e83bfc6e83cd6.jpeg",
+    "expected_answer": "雍和宫"
+  },
+  {
+    "index": 3000063,
+    "section": "简答VQA",
+    "question": "图中建筑的设计师是？",
+    "image_url": "data/mock/AnswerVQA/img/36c2b503af743bc07df8e9b08eaf0ba9adecf2d2.jpeg",
+    "expected_answer": "贝聿铭"
+  },
+  {
+    "index": 3000065,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/6b2f139e602acf6e480190db86e1e75371391bb4.jpeg",
+    "expected_answer": "狮子林"
+  },
+  {
+    "index": 3000066,
+    "section": "简答VQA",
+    "question": "图中景观所在地点为？",
+    "image_url": "data/mock/AnswerVQA/img/e2f6396301ef1aa8ddb6bb9ec38b93412a6d2a4d.jpeg",
+    "expected_answer": "西安"
+  },
+  {
+    "index": 3000067,
+    "section": "简答VQA",
+    "question": "图中景观所在地点为？",
+    "image_url": "data/mock/AnswerVQA/img/d0e9b2fcaae27dcc29dd4c0092f79ac63a111fc0.jpeg",
+    "expected_answer": "武汉"
+  },
+  {
+    "index": 3000076,
+    "section": "简答VQA",
+    "question": "与图中景观最相关的历史人物是？",
+    "image_url": "data/mock/AnswerVQA/img/a71e092cdabbf6d5e1e803c995d782ae864269b7.jpeg",
+    "expected_answer": "杜甫"
+  },
+  {
+    "index": 3000079,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/14ce63f89b19df6e10fc4e2222f97ae39364a705.jpeg",
+    "expected_answer": "澳门塔"
+  },
+  {
+    "index": 3000095,
+    "section": "简答VQA",
+    "question": "图中所示建筑为哪一民族的特色民居？",
+    "image_url": "data/mock/AnswerVQA/img/ca4f866c84a96648a79f43badd43d1c65eff3c26.jpeg",
+    "expected_answer": "藏族"
+  },
+  {
+    "index": 3000097,
+    "section": "简答VQA",
+    "question": "图中所示建筑为哪一民族的特色民居？",
+    "image_url": "data/mock/AnswerVQA/img/7b696e5d1c04ed4c1b106a55225a0f4281557588.jpeg",
+    "expected_answer": "客家族"
+  },
+  {
+    "index": 3000100,
+    "section": "简答VQA",
+    "question": "图中的文物出土于哪里？",
+    "image_url": "data/mock/AnswerVQA/img/32f56ea764d6578a361add0315cbeb212a7206b8.jpeg",
+    "expected_answer": "三星堆"
+  },
+  {
+    "index": 3000101,
+    "section": "简答VQA",
+    "question": "图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/44710a0e117f095d4a79c4eae6732f587f40b8fd.jpeg",
+    "expected_answer": "曾侯乙编钟"
+  },
+  {
+    "index": 3000105,
+    "section": "简答VQA",
+    "question": "请问图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/5577af698bf5665286bba6ec89a37c1186c1ddaa.jpeg",
+    "expected_answer": "青铜雁鱼灯"
+  },
+  {
+    "index": 3000106,
+    "section": "简答VQA",
+    "question": "图中的文物出土于哪里？",
+    "image_url": "data/mock/AnswerVQA/img/35eb48a5dd5d8b0770472a49adcdce823834a84b.jpeg",
+    "expected_answer": "妇好墓"
+  },
+  {
+    "index": 3000110,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/524dfe7b8213074c4f214401c8387bb39e9a7f8b.jpeg",
+    "expected_answer": "龙虎纹尊"
+  },
+  {
+    "index": 3000111,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/68980d28e9e2582e8375d985c02b8a7c82403588.jpeg",
+    "expected_answer": "楚王鼎"
+  },
+  {
+    "index": 3000113,
+    "section": "简答VQA",
+    "question": "请问图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/d5f233ee36f6bc412574c2bf412987dfc02c11ef.jpeg",
+    "expected_answer": "虎形足器座"
+  },
+  {
+    "index": 3000121,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/7c3f6effcbf31e94ca2e6dc946afae800bd3541c.jpeg",
+    "expected_answer": "鱼符"
+  },
+  {
+    "index": 3000122,
+    "section": "简答VQA",
+    "question": "请问图中的文物是什么？",
+    "image_url": "data/mock/AnswerVQA/img/49ebc69816cc66fa534c1cd72a5759ab18c0adb6.jpeg",
+    "expected_answer": "牙牌"
+  },
+  {
+    "index": 3000134,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/37543bfd475c67e18fc5fecb3655571665da8042.jpeg",
+    "expected_answer": "镶嵌金银团花纹带流鼎"
+  },
+  {
+    "index": 3000136,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/5bba44ad0e8d7d21d4341bbb94f9b8ed01a167cb.jpeg",
+    "expected_answer": "商代"
+  },
+  {
+    "index": 3000137,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/9238590544e3cb30739a5ac7733ede15073e9f98.jpeg",
+    "expected_answer": "春秋"
+  },
+  {
+    "index": 3000138,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/677c2250d2ad72add593c7cf2dab35544a44d29f.jpeg",
+    "expected_answer": "西周"
+  },
+  {
+    "index": 3000139,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/1614e0ac88d7bbeeeef78c2162f4fcd2a6df54d3.jpeg",
+    "expected_answer": "战国"
+  },
+  {
+    "index": 3000141,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/bcfb6c975004d9a9e6140feeca0d4c6de236b8de.jpeg",
+    "expected_answer": "王子午鼎"
+  },
+  {
+    "index": 3000143,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/641384353eccc5f2a941d68ace0615229921d037.jpeg",
+    "expected_answer": "齐侯盂"
+  },
+  {
+    "index": 3000146,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/16c54faa5e92ebc98006db106f596fdc3c3f2238.jpeg",
+    "expected_answer": "跽坐人形玉佩"
+  },
+  {
+    "index": 3000148,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/b36d609902bec69a3a1450fe4bdb316bead56a72.jpeg",
+    "expected_answer": "金腰带饰"
+  },
+  {
+    "index": 3000150,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/eaf33f0a650cc31ec01ed3b15558c407c0950784.jpeg",
+    "expected_answer": "噩侯鬲"
+  },
+  {
+    "index": 3000153,
+    "section": "简答VQA",
+    "question": "图中文物的材质是什么？",
+    "image_url": "data/mock/AnswerVQA/img/c16f8f7ccb61a8ae7bafed68cd1fe999fef27b73.jpeg",
+    "expected_answer": "翡翠"
+  },
+  {
+    "index": 3000160,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的瓷器？",
+    "image_url": "data/mock/AnswerVQA/img/adf252f867512a3e7ef7080678d8cb76b84cb361.jpeg",
+    "expected_answer": "清代"
+  },
+  {
+    "index": 3000167,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的玉器？",
+    "image_url": "data/mock/AnswerVQA/img/fa1f28ed51567bc1d130bb8c47cd4cb1bc7105b9.jpeg",
+    "expected_answer": "清代"
+  },
+  {
+    "index": 3000168,
+    "section": "简答VQA",
+    "question": "图中文物所呈现的是哪种文字？",
+    "image_url": "data/mock/AnswerVQA/img/e2248281bc02be99f351b9d989c838b3d43fc874.jpeg",
+    "expected_answer": "甲骨文"
+  },
+  {
+    "index": 3000169,
+    "section": "简答VQA",
+    "question": "图中文物来自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/8dbd48664fd07f165e2749991221b1bcc0e57cd4.jpeg",
+    "expected_answer": "东汉"
+  },
+  {
+    "index": 3000171,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/012c49eff4a1a56c3dd8e78a4124f95f9a686db3.jpeg",
+    "expected_answer": "乾隆款金胎掐丝珐琅镶宝石高足盖碗"
+  },
+  {
+    "index": 3000179,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/6be42dd322e192f7d891e3dfcf8d7351ee9e66a0.jpeg",
+    "expected_answer": "三羊尊"
+  },
+  {
+    "index": 3000182,
+    "section": "简答VQA",
+    "question": "图中的陶马文物来自于哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/64461ee7057be47e213cb4727f59157ee097b8b1.jpeg",
+    "expected_answer": "秦朝"
+  },
+  {
+    "index": 3000183,
+    "section": "简答VQA",
+    "question": "图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/192b6ea5e4bb258f5d4c3909b9077c6de3daf237.jpeg",
+    "expected_answer": "德化窑白釉达摩像"
+  },
+  {
+    "index": 3000184,
+    "section": "简答VQA",
+    "question": "图中的文物是哪幅画的节选？",
+    "image_url": "data/mock/AnswerVQA/img/bcb4a7919a92e60e5f9cb9af43b9ffb7888f4dcf.jpeg",
+    "expected_answer": "清明上河图"
+  },
+  {
+    "index": 3000186,
+    "section": "简答VQA",
+    "question": "图中的文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/7b2d51c999f8af95e608aa0e08e33005e0e1dff2.jpeg",
+    "expected_answer": "玉玲珑琴"
+  },
+  {
+    "index": 3000194,
+    "section": "简答VQA",
+    "question": "图中文物来源于中国古代哪一个时期？",
+    "image_url": "data/mock/AnswerVQA/img/1ae67afae6c26f01f1bf802235e2d08f8a314f7f.jpeg",
+    "expected_answer": "明朝"
+  },
+  {
+    "index": 3000195,
+    "section": "简答VQA",
+    "question": "图中文物来源于明朝哪一个时期？",
+    "image_url": "data/mock/AnswerVQA/img/4d060606fefdce7c93bb218ab0ef3f3908a7c6d2.jpeg",
+    "expected_answer": "明朝宣德时期"
+  },
+  {
+    "index": 3000196,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/2de19408f1035454fd5473fb4b5b58c20aafa803.jpeg",
+    "expected_answer": "康熙款画珐琅莲花纹盖碗"
+  },
+  {
+    "index": 3000197,
+    "section": "简答VQA",
+    "question": "图中文物来源于中国哪一个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/25fd4aef96378dafaa7b181b81877c59c6fcd136.jpeg",
+    "expected_answer": "清朝"
+  },
+  {
+    "index": 3000198,
+    "section": "简答VQA",
+    "question": "图中文物来源于中国哪一个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/8d7ff108ad151bc7aee6086213f9245be9a1c482.jpeg",
+    "expected_answer": "明朝"
+  },
+  {
+    "index": 3000207,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/82eafca92b8c8e39e8c9621206f08b685480de9a.jpeg",
+    "expected_answer": "关羽"
+  },
+  {
+    "index": 3000208,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/0182dfafcfd165f0b987408e321b4080914804bc.jpeg",
+    "expected_answer": "朱温"
+  },
+  {
+    "index": 3000209,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/7fa6cd74ab0330983b4ad92b8e8318e690f61af4.jpeg",
+    "expected_answer": "周仓"
+  },
+  {
+    "index": 3000218,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/685e7fc9e578a60b8983ff53b1ecdd5f4f251944.jpeg",
+    "expected_answer": "陈九公"
+  },
+  {
+    "index": 3000221,
+    "section": "简答VQA",
+    "question": "图中所示的脸谱代表的人物是？",
+    "image_url": "data/mock/AnswerVQA/img/e277c38d54317a775781fab07e9ce21085a71f7a.jpeg",
+    "expected_answer": "郑伦"
+  },
+  {
+    "index": 3000292,
+    "section": "简答VQA",
+    "question": "图中的画作是在哪个朝代被创作的？",
+    "image_url": "data/mock/AnswerVQA/img/5674092a3851720c204dace8843b1bef02de3172.jpeg",
+    "expected_answer": "隋朝"
+  },
+  {
+    "index": 3000299,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅北宋时期的画作，请问该画作的作者是谁？",
+    "image_url": "data/mock/AnswerVQA/img/bb52d7b78ee8fdf8ef4ed3bf12366880fb4e8f40.jpeg",
+    "expected_answer": "张择端"
+  },
+  {
+    "index": 3000318,
+    "section": "简答VQA",
+    "question": "图中所展示的是一幅明代画，请问其作者是谁",
+    "image_url": "data/mock/AnswerVQA/img/176799ff5448adc7c230bd24019f558df51273d9.jpeg",
+    "expected_answer": "董其昌"
+  },
+  {
+    "index": 3000322,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/ce050f0082917279deea9030ea33e92bfef789d9.jpeg",
+    "expected_answer": "他提出了“青苗法”等一系列改革政策  C."
+  },
+  {
+    "index": 3000323,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/7071de963e4d1c6aaca6b0941df9c2e916aae3b8.jpeg",
+    "expected_answer": "他是著名的谋士和智者，他被称为“卧龙先生”  C."
+  },
+  {
+    "index": 3000324,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/4bc78ce7ec147ef0db2cad0161bdb305662636e8.jpeg",
+    "expected_answer": ""
+  },
+  {
+    "index": 3000325,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/7b537e8ed6b408a3502654acd5ce651249bb9615.jpeg",
+    "expected_answer": "他是中国航天科技集团公司体制机制改革的主要倡导者之一  C."
+  },
+  {
+    "index": 3000331,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/575073064dc5dca55d4eb6d3410c125948d28748.jpeg",
+    "expected_answer": "他是中国新文化运动的先驱，号召文化自觉和民主  C."
+  },
+  {
+    "index": 3000345,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/05339248f29cf6341ae732c3c0c61a805f306a5a.jpeg",
+    "expected_answer": "他在中国文化史上有重要的地位和影响力  C."
+  },
+  {
+    "index": 3000350,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/e155f050324666d90aa20aa7545a8110af9543d6.jpeg",
+    "expected_answer": ""
+  },
+  {
+    "index": 3000351,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/46930fa784698ab072d294e26b91508519828180.jpeg",
+    "expected_answer": "图中的人物在清朝时期有重要的政治影响力  C."
+  },
+  {
+    "index": 3000359,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/a163be93d1ce70e418e3c6b104ade81e35a80e8e.jpeg",
+    "expected_answer": "她在位期间实行了一系列改革和措施，为唐朝繁荣打下了基础。  C."
+  },
+  {
+    "index": 3000362,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/b85492b4425e4379e9b32eaef8cf76db066b1f3f.jpeg",
+    "expected_answer": ""
+  },
+  {
+    "index": 3000364,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/646601edf3bbc1d68a566ca879626d7104e9c5bd.jpeg",
+    "expected_answer": ""
+  },
+  {
+    "index": 3000366,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/626d90f3a055caa460a6c1003eef542e2a45ad09.jpeg",
+    "expected_answer": "他认为艺术应该表现真实生活、传达情感和思想，反对形式化的表现方式。  D. A.他是南宋时期的书法和绘画大师，有“文人四君子”之称。"
+  },
+  {
+    "index": 3000369,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/a1d48eec665f4f530af99b53ecca8964c12b7d64.jpeg",
+    "expected_answer": "他主张书画应该追求笔墨与精神相统一，强调艺术表现力和内在意境。  C."
+  },
+  {
+    "index": 3000370,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/1c68eae701c80ff7c87bcad5c94f796a4a042d3e.jpeg",
+    "expected_answer": "他主张书画应该融合技法和艺术表现力，追求笔墨与精神相统一。  C."
+  },
+  {
+    "index": 3000381,
+    "section": "简答VQA",
+    "question": "这是一道看图猜成语题目，请问图中画面对应的是哪个成语？",
+    "image_url": "data/mock/AnswerVQA/img/b05887d4ee11a729a05db813470d023f8584bebd.jpeg",
+    "expected_answer": "一石二鸟"
+  },
+  {
+    "index": 3000383,
+    "section": "简答VQA",
+    "question": "这是一道看图猜成语题目，请问图中画面对应的是哪个成语？",
+    "image_url": "data/mock/AnswerVQA/img/89cd8c101499daa2d4212b4a102ce91e64649f18.jpeg",
+    "expected_answer": "一叶障目"
+  },
+  {
+    "index": 3000386,
+    "section": "简答VQA",
+    "question": "这是一道看图猜成语题目，请问图中画面对应的是哪个成语？",
+    "image_url": "data/mock/AnswerVQA/img/471ba328941fb265cd92d85c8b11cbcdd77e243e.jpeg",
+    "expected_answer": "积少成多"
+  },
+  {
+    "index": 3000409,
+    "section": "简答VQA",
+    "question": "这是一道看图猜俗语题目，请问与图中画面对应的俗语是？",
+    "image_url": "data/mock/AnswerVQA/img/40b20595a0b19474cdf60b2632d5affa880ebb77.jpeg",
+    "expected_answer": "铁打的公鸡"
+  },
+  {
+    "index": 3000495,
+    "section": "简答VQA",
+    "question": "这是什么民族的服装?",
+    "image_url": "data/mock/AnswerVQA/img/0f6193be3bf0622fd32598e96c46babb3992a639.jpeg",
+    "expected_answer": "水族"
+  },
+  {
+    "index": 3000496,
+    "section": "简答VQA",
+    "question": "这是什么民族的服装?",
+    "image_url": "data/mock/AnswerVQA/img/af06d3c6f1aa5a905381cb5d82138ed2f1b3f071.jpeg",
+    "expected_answer": "塔吉克族"
+  },
+  {
+    "index": 3000497,
+    "section": "简答VQA",
+    "question": "这是什么民族的服装?",
+    "image_url": "data/mock/AnswerVQA/img/f49c1b493a869f97f5162711a32d78b26fe92561.jpeg",
+    "expected_answer": "塔塔尔族"
+  }
+]

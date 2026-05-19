@@ -1,0 +1,842 @@
+[
+  {
+    "index": 90000,
+    "section": "简答QA",
+    "question": "15. 明朝时期，哪位航海家七下西洋，传播中华文化？",
+    "image_url": "",
+    "expected_answer": "郑和。"
+  },
+  {
+    "index": 90001,
+    "section": "简答QA",
+    "question": "4. 世界上现存最早的兵书是哪一部？",
+    "image_url": "",
+    "expected_answer": "《孙子兵法》。"
+  },
+  {
+    "index": 90002,
+    "section": "简答QA",
+    "question": "36. “江南四大才子”中，哪位才子擅长书法？",
+    "image_url": "",
+    "expected_answer": "文征明。"
+  },
+  {
+    "index": 90003,
+    "section": "简答QA",
+    "question": "32. “五岳”分别指的是哪五座山？",
+    "image_url": "",
+    "expected_answer": "泰山、华山、衡山、嵩山、恒山。"
+  },
+  {
+    "index": 90004,
+    "section": "简答QA",
+    "question": "29. “二十四节气”中，表示春天来临的节气是哪一个？",
+    "image_url": "",
+    "expected_answer": "立春。"
+  },
+  {
+    "index": 90005,
+    "section": "简答QA",
+    "question": "18. 我国古代“三皇五帝”分别是谁？",
+    "image_url": "",
+    "expected_answer": "三皇：伏羲、神农、黄帝；五帝：黄帝、颛顼、帝喾、尧、舜。"
+  },
+  {
+    "index": 90006,
+    "section": "简答QA",
+    "question": "14. 北宋时期，哪位文学家被誉为“词中之龙”？",
+    "image_url": "",
+    "expected_answer": "苏轼。"
+  },
+  {
+    "index": 90007,
+    "section": "简答QA",
+    "question": "70. 《四库全书》是在哪位皇帝的命令下编纂的？",
+    "image_url": "",
+    "expected_answer": "乾隆帝"
+  },
+  {
+    "index": 90008,
+    "section": "简答QA",
+    "question": "12. “三顾茅庐”的故事中，刘备请的是哪位谋士？",
+    "image_url": "",
+    "expected_answer": "诸葛亮。"
+  },
+  {
+    "index": 90009,
+    "section": "简答QA",
+    "question": "55. “水浒传”中，宋江领导的梁山好汉最终被哪个朝代所招安？",
+    "image_url": "",
+    "expected_answer": "北宋。"
+  },
+  {
+    "index": 90010,
+    "section": "简答QA",
+    "question": "5. 唐朝时期，哪位皇帝开创了“贞观之治”？",
+    "image_url": "",
+    "expected_answer": "唐太宗李世民。"
+  },
+  {
+    "index": 90011,
+    "section": "简答QA",
+    "question": "79. 辛亥革命的指导思想是什么？",
+    "image_url": "",
+    "expected_answer": "三民主义"
+  },
+  {
+    "index": 90012,
+    "section": "简答QA",
+    "question": "72. 甲午战争的中日双方签订了什么条约？",
+    "image_url": "",
+    "expected_answer": "《马关条约》"
+  },
+  {
+    "index": 90013,
+    "section": "简答QA",
+    "question": "28. 我国古代“五行”指的是哪五种物质？",
+    "image_url": "",
+    "expected_answer": "金、木、水、火、土。"
+  },
+  {
+    "index": 90014,
+    "section": "简答QA",
+    "question": "30. 我国古代著名的“红楼梦”作者是谁？",
+    "image_url": "",
+    "expected_answer": "曹雪芹。"
+  },
+  {
+    "index": 90015,
+    "section": "简答QA",
+    "question": "65. 宋太祖赵匡胤是通过什么事件夺取政权的？",
+    "image_url": "",
+    "expected_answer": "陈桥兵变"
+  },
+  {
+    "index": 90016,
+    "section": "简答QA",
+    "question": "69. 清朝入关后的第一位皇帝是谁？",
+    "image_url": "",
+    "expected_answer": "顺治帝"
+  },
+  {
+    "index": 90017,
+    "section": "简答QA",
+    "question": "78. 《本草纲目》的作者？",
+    "image_url": "",
+    "expected_answer": "李时珍"
+  },
+  {
+    "index": 90018,
+    "section": "简答QA",
+    "question": "13. 唐朝时期，哪位文学家被誉为“诗仙”？",
+    "image_url": "",
+    "expected_answer": "李白。"
+  },
+  {
+    "index": 90019,
+    "section": "简答QA",
+    "question": "46. “白蛇传”故事中，白娘子与许仙的爱情故事发生在哪个城市？",
+    "image_url": "",
+    "expected_answer": "杭州。"
+  },
+  {
+    "index": 91000,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的玉器？",
+    "image_url": "data/mock/AnswerVQA/img/fa1f28ed51567bc1d130bb8c47cd4cb1bc7105b9.jpeg",
+    "expected_answer": "清代"
+  },
+  {
+    "index": 91001,
+    "section": "简答VQA",
+    "question": "图中文物来源于明朝哪一个时期？",
+    "image_url": "data/mock/AnswerVQA/img/4d060606fefdce7c93bb218ab0ef3f3908a7c6d2.jpeg",
+    "expected_answer": "明朝宣德时期"
+  },
+  {
+    "index": 91002,
+    "section": "简答VQA",
+    "question": "图中文物的材质是什么？",
+    "image_url": "data/mock/AnswerVQA/img/c16f8f7ccb61a8ae7bafed68cd1fe999fef27b73.jpeg",
+    "expected_answer": "翡翠"
+  },
+  {
+    "index": 91003,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/52e839150b304e60df8f18f65324ac6d2626409a.jpeg",
+    "expected_answer": "D.他是中国现代化的奠基人之一，他的思想对当时的新式教育、科学技术等领域产生了重大影响"
+  },
+  {
+    "index": 91004,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/ce050f0082917279deea9030ea33e92bfef789d9.jpeg",
+    "expected_answer": "他提出了“青苗法”等一系列改革政策  C."
+  },
+  {
+    "index": 91005,
+    "section": "简答VQA",
+    "question": "图中的画作是在哪个朝代被创作的？",
+    "image_url": "data/mock/AnswerVQA/img/5674092a3851720c204dace8843b1bef02de3172.jpeg",
+    "expected_answer": "隋朝"
+  },
+  {
+    "index": 91006,
+    "section": "简答VQA",
+    "question": "下列诗句与图中景观有关的是？",
+    "image_url": "data/mock/AnswerVQA/img/3d35c1eebd40fa0990afcd37a236cd7c2dd87ebb.jpeg",
+    "expected_answer": "姑苏城外寒山寺，夜半钟声到客船。"
+  },
+  {
+    "index": 91007,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/bee87835ed250ac3b5877f3256aadfb60eb07d43.jpeg",
+    "expected_answer": "A.他是唐朝时期的绘画大师，被誉为“骊山七友”之一。"
+  },
+  {
+    "index": 91008,
+    "section": "简答VQA",
+    "question": "图中文物来源于中国哪一个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/8d7ff108ad151bc7aee6086213f9245be9a1c482.jpeg",
+    "expected_answer": "明朝"
+  },
+  {
+    "index": 91009,
+    "section": "简答VQA",
+    "question": "图中建筑的设计师是？",
+    "image_url": "data/mock/AnswerVQA/img/36c2b503af743bc07df8e9b08eaf0ba9adecf2d2.jpeg",
+    "expected_answer": "贝聿铭"
+  },
+  {
+    "index": 91010,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/0a9a80612829433a8fa1d24bbb380d615f48e3a3.jpeg",
+    "expected_answer": "D.他主张艺术应该追求真实和客观，反对形式化的表现方式。"
+  },
+  {
+    "index": 91011,
+    "section": "简答VQA",
+    "question": "图中文物的名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/bcfb6c975004d9a9e6140feeca0d4c6de236b8de.jpeg",
+    "expected_answer": "王子午鼎"
+  },
+  {
+    "index": 91012,
+    "section": "简答VQA",
+    "question": "这是什么民族的服装?",
+    "image_url": "data/mock/AnswerVQA/img/af06d3c6f1aa5a905381cb5d82138ed2f1b3f071.jpeg",
+    "expected_answer": "塔吉克族"
+  },
+  {
+    "index": 91013,
+    "section": "简答VQA",
+    "question": "图中文物名称是什么？",
+    "image_url": "data/mock/AnswerVQA/img/70597848c8d41cd48b0dbd966062685bcc6c35b1.jpeg",
+    "expected_answer": "敦煌长史武班碑"
+  },
+  {
+    "index": 91014,
+    "section": "简答VQA",
+    "question": "图中所展示的是哪个朝代的玉器？",
+    "image_url": "data/mock/AnswerVQA/img/ecbe0d992bd24359b3b371d39fa7a287fed5c54c.jpeg",
+    "expected_answer": "明代"
+  },
+  {
+    "index": 91015,
+    "section": "简答VQA",
+    "question": "图中文物所处时代是什么？",
+    "image_url": "data/mock/AnswerVQA/img/5bba44ad0e8d7d21d4341bbb94f9b8ed01a167cb.jpeg",
+    "expected_answer": "商代"
+  },
+  {
+    "index": 91016,
+    "section": "简答VQA",
+    "question": "图中文物来自清朝哪个时期？",
+    "image_url": "data/mock/AnswerVQA/img/bf9b46c988cdc574a0745e72d004125851c809b2.jpeg",
+    "expected_answer": "雍正时期"
+  },
+  {
+    "index": 91017,
+    "section": "简答VQA",
+    "question": "请问图中的文物出自哪个朝代？",
+    "image_url": "data/mock/AnswerVQA/img/c199b2888925a4e0ad6fdc6c0f9c8fc1987d0446.jpeg",
+    "expected_answer": "秦朝"
+  },
+  {
+    "index": 91018,
+    "section": "简答VQA",
+    "question": "图中所示景观名称为？",
+    "image_url": "data/mock/AnswerVQA/img/6b2f139e602acf6e480190db86e1e75371391bb4.jpeg",
+    "expected_answer": "狮子林"
+  },
+  {
+    "index": 91019,
+    "section": "简答VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。",
+    "image_url": "data/mock/AnswerVQA/img/a163be93d1ce70e418e3c6b104ade81e35a80e8e.jpeg",
+    "expected_answer": "她在位期间实行了一系列改革和措施，为唐朝繁荣打下了基础。  C."
+  },
+  {
+    "index": 92000,
+    "section": "选择QA",
+    "question": "“不识国民之原理，不通世界之大势，不知政治之本原……而仅摭拾泰西皮毛，……遂乃自足。”上述言论应当是 A.顽固派对洋务派的批评 B.维新派对洋务派的批评 C.洋务派对顽固派的批评 D.洋务派对维新派的批评",
+    "image_url": "",
+    "expected_answer": "B"
+  },
+  {
+    "index": 92001,
+    "section": "选择QA",
+    "question": "有学者说，在中国古代的政治制度建设中，古人为我们留下了诸多的治国智慧和法则，但也留下了许多的无奈。它最大的局限在于是一个统治性政权，不是一个发展性政权，更不是一个为国民共享的服务性政权。可见中国古代所有制度设计都围绕的一个核心是 A.维护以“家天下”为核心的王权 B.维护儒家思想的正统地位 C.维护统一多民族国家主权 D.维护专制主义的中央集权制度",
+    "image_url": "",
+    "expected_answer": "A"
+  },
+  {
+    "index": 92002,
+    "section": "选择QA",
+    "question": "司马迁说：“居今之世，志古之道，所以自镜也，未必尽同。”下列选项中，与司马迁观点相符的是 A.历史不会重演，不能以史为鉴 B.历史可以重演，应当以史为鉴 C.历史事实情同而势异，不能照搬历史经验 D.一切历史都是当代史，无须学习古人",
+    "image_url": "",
+    "expected_answer": "C"
+  },
+  {
+    "index": 92003,
+    "section": "选择QA",
+    "question": "有学者认为，中国的瓷器(china)深受世界人民喜爱，所以，中国被称为China。更有学者指出，China是“秦”的音变(Qin→Chin－a)。解决这个问题的关键是 A.利用计算机等先进科技手段，进行广泛调查，得出科学结论 B.调查中外著名历史学家意见，用民主方式解决这一学术问题 C.在考古学上取得突破，找到有说服力的证据 D.弄清最早用China称呼中国者先获悉了“秦”还是“瓷”的信息",
+    "image_url": "",
+    "expected_answer": "D"
+  },
+  {
+    "index": 92004,
+    "section": "选择QA",
+    "question": "1948年10月底，中共中央要求各地通过党校、军校以及其他方式，对干部进行培训，在条件可能的情况下开办正规大学，尽快使干部熟悉政治、经济、文化各方面的管理和技术。这一做法的目的是 A.推动土地改革进一步深入 B.重视科学和文化以推进工业化建设 C.为工作重心的转移做准备 D.提高执政能力以发展社会主义生产",
+    "image_url": "",
+    "expected_answer": "C"
+  },
+  {
+    "index": 92005,
+    "section": "选择QA",
+    "question": "除四大发明外，从中国传到欧洲的东西还有很多，如船尾舵、马镫等器物，菊花、柠檬、柑橘等水果和植物。柑橘至今在荷兰和德国还被称为“中国苹果”。这些东西传到欧洲主要通过 A.阿拉伯人 B.马可·波罗等欧洲人 C.奥斯曼土耳其人 D.中国商人",
+    "image_url": "",
+    "expected_answer": "A"
+  },
+  {
+    "index": 92006,
+    "section": "选择QA",
+    "question": "自1962年世界上第一个机器人研制成功至今。机器人的发展经历丁三代。印操纵型机器人、自动型机器人和智能型机器人。机器人的使用 A.推动了经济全球化进程 B.体现了科学技术的综合运用 C.促进了经济持续繁荣 D.缓解了人口压力",
+    "image_url": "",
+    "expected_answer": "B"
+  },
+  {
+    "index": 92007,
+    "section": "选择QA",
+    "question": "在二战后非殖民化的浪潮中，亚非拉地区出现了一批新兴的民族国家。中国共产党认为这是对新中国“有利的局势”。基于此判断，新中国 A.倡导和平共处五项原则 B.提出“另起炉灶”方针 C.坚持“打扫干净屋子再请客”方针 D.放弃“一边倒”政策",
+    "image_url": "",
+    "expected_answer": "A"
+  },
+  {
+    "index": 92008,
+    "section": "选择QA",
+    "question": "1921年成都警察厅发布通令:“近日妇女每多剪发齐眉，并梳拿破仑、华盛顿等头式(流行的男式发型)，实属有伤风俗，应予以禁止，以挽颓风……如敢固违，定以妇女坐法并处罚家长。”对此解读正确的是 A.剪发齐眉成为妇女的普遍选择 B.处罚措施体现民国法治精神 C.新潮女性的行为冲击传统习俗 D.男女平等思想逐渐深入人心",
+    "image_url": "",
+    "expected_answer": "C"
+  },
+  {
+    "index": 92009,
+    "section": "选择QA",
+    "question": "诗歌创作往往受到时代思想的影响。“半亩方塘一鉴开，天光云影共徘徊；问渠那得清如许，为有源头活水来”，这首说理诗最有可能受哪种思想影响？ A.孔孟思想 B.宋明理学 C.两汉经学 D.黄老学说",
+    "image_url": "",
+    "expected_answer": "B"
+  },
+  {
+    "index": 92010,
+    "section": "选择QA",
+    "question": "据《左传》记载：鲁僖公五年春季的正月，“公既视朔，遂登观台以望而书，礼也。”据此判断下列说法正确的是 A.中国古代天文学带有政治性 B.天文观测场所始建于春秋时期 C.春秋时期有了专门的天文官 D.鲁国的天文学取得了重大成就",
+    "image_url": "",
+    "expected_answer": "A"
+  },
+  {
+    "index": 92011,
+    "section": "选择QA",
+    "question": "“明设官，开国数年一再更定，内外无偏重，大小监制，缓急繁减，咸克互济，可为尽善。独是罢丞相而尊尚书，事难画一，缓急不辨，以此得，亦以此失，势有然也。”材料主要反映明朝废丞相后 A.权力过于分散 B.中央集权加强 C.行政效率提高 D.君权空前强化",
+    "image_url": "",
+    "expected_answer": "A"
+  },
+  {
+    "index": 92012,
+    "section": "选择QA",
+    "question": "1987年，台湾民众发起返乡运动，印发《我们已沉默了四十年》的传单30万份。传单写道：“难道我们没有父母？而我们的父母是生是死不得而知，我们只要求：‘生’则让我们回去奉上一杯茶；‘死’则让我们回去献上一炷香。”这一潮流促成了 A.“和平统一”口号的提出 B.两岸隔绝状态的打破 C.海峡两岸“三通”的开展 D.“九二共识”的达成",
+    "image_url": "",
+    "expected_answer": "B"
+  },
+  {
+    "index": 92013,
+    "section": "选择QA",
+    "question": "甲午战后，梁启超提出“诗界革命”，曾赋诗“泱泱哉我中华……物产腴沃甲大地，天府雄国言非夸。君不见英日区区三岛尚崛起，况乃堂矞吾中华！”这反映出“诗界革命” A.倡导民主革命的思想 B.成为改良思想的开端 C.推动了白话文运动 D.适应了救亡图存的需要",
+    "image_url": "",
+    "expected_answer": "D"
+  },
+  {
+    "index": 92014,
+    "section": "选择QA",
+    "question": "1879年，上海租界管理当局为严守男女之大防，规定一辆人力车只能载客一名，如不遵行，便要罚钱。这一规定 A.为汽车拉客提供方便 B.严重违背了社情民意 C.顺应了历史发展趋势 D.体现新旧杂陈的现实",
+    "image_url": "",
+    "expected_answer": "D"
+  },
+  {
+    "index": 92015,
+    "section": "选择QA",
+    "question": "明洪武二十八年规定，凡洪武二十七年以后新垦的田地，“不论多寡，俱不起科”，“若有司增科扰害者罪之”。这些措施 A.可以促进农产品的商品化 B.能鼓励垦荒 C.降低赋税，减轻农民负担 D.能有效抑制土地兼并",
+    "image_url": "",
+    "expected_answer": "B"
+  },
+  {
+    "index": 92016,
+    "section": "选择QA",
+    "question": "甲午中日战争爆发前夕，有些西方人士认为中国拥有一定的军备优势，“毫无疑问的是日本必然最后被彻底粉碎”，他们做出上述判断的主要依据应是，中国 A.已完成对军队的西式改革 B.集权制度有利于作战指挥 C.能获得更广泛的外部援助 D.近代化努力收到较大成效",
+    "image_url": "",
+    "expected_answer": "D"
+  },
+  {
+    "index": 92017,
+    "section": "选择QA",
+    "question": "《明太祖实录》有一段圣旨：“今天下已定，而民数未核实，其命户部籍天下户口，每户给以户贴。”而中国第一历史档案馆藏明代户贴原件所录圣旨为：“说与户部官知道，如今天下天平了也，止是户口不明白哩。教中书（省）置天下户口的勘合文簿、户贴，你每（们）户部家出榜，去教那有司官将他所管的应有百姓，都教入官，附名字，写着他家人口多少。写得真，着与那百姓一个户贴。”这说明 A.第二则材料是实物史料，更能反映历史的原貌 B.官方原始记录与口述史料，需仔细甄别使用 C.《实录》与《户贴》，都是第二手史料 D.第一则材料是文献史料，更具有历史的实录感",
+    "image_url": "",
+    "expected_answer": "A"
+  },
+  {
+    "index": 92018,
+    "section": "选择QA",
+    "question": "杨宁一在《历史学习新视野新知识》中提出：“1895年甲午战争失败，民族危机迫在眉睫。朝野士大夫不得不放弃洋务制器兴国的迷梦，开始了更深层次的思考。”这次“思考”的“层次”变化是 A.从制度到文化 B.从器物到制度 C.从技术到器物 D.从制度到思想",
+    "image_url": "",
+    "expected_answer": "B"
+  },
+  {
+    "index": 92019,
+    "section": "选择QA",
+    "question": "20世纪20年代，上海成为中国电影的制作中心，当时在上海放映的各种影片中，外国片与国产片比例约为2∶1；而在北京和天津，这一比例高达5∶1甚至6∶1。上海与京津放映中外电影比例不同，能够说明这一现象的应是 A.上海民众的社会心态更为开放 B.外国电影的制作水平较高 C.中国电影拷贝流通税费重 D.京津民众对外来事物更具热情",
+    "image_url": "",
+    "expected_answer": "C"
+  },
+  {
+    "index": 93000,
+    "section": "选择VQA",
+    "question": "请问图中的文物名称是什么？ A. 虎形足器座  B. 龙虎纹尊  C. 楚王鼎  D. 作册般鼋",
+    "image_url": "data/mock/SelectVQA/img/524dfe7b8213074c4f214401c8387bb39e9a7f8b.jpeg",
+    "expected_answer": "B"
+  },
+  {
+    "index": 93001,
+    "section": "选择VQA",
+    "question": "图中的文物名称是什么？ A. “金钟”琴  B. “飞泉”琴  C. 玉玲珑琴  D. “九霄环佩”琴",
+    "image_url": "data/mock/SelectVQA/img/7b2d51c999f8af95e608aa0e08e33005e0e1dff2.jpeg",
+    "expected_answer": "C"
+  },
+  {
+    "index": 93002,
+    "section": "选择VQA",
+    "question": "图中的文物名称是什么？ A. “九霄环佩”琴  B. “金钟”琴  C. “飞泉”琴  D. 玉玲珑琴",
+    "image_url": "data/mock/SelectVQA/img/7b2d51c999f8af95e608aa0e08e33005e0e1dff2.jpeg",
+    "expected_answer": "D"
+  },
+  {
+    "index": 93003,
+    "section": "选择VQA",
+    "question": "图中文物来自清朝哪个时期？ A. 康熙时期  B. 乾隆时期  C. 嘉庆时期  D. 雍正时期",
+    "image_url": "data/mock/SelectVQA/img/bf9b46c988cdc574a0745e72d004125851c809b2.jpeg",
+    "expected_answer": "D"
+  },
+  {
+    "index": 93004,
+    "section": "选择VQA",
+    "question": "图中所示建筑最常见于下列哪一地点？ A. 贵州  B. 陕西  C. 云南  D. 西藏",
+    "image_url": "data/mock/SelectVQA/img/5a21153c268d2106bf4332f8b7725523240cff33.jpeg",
+    "expected_answer": "B"
+  },
+  {
+    "index": 93005,
+    "section": "选择VQA",
+    "question": "这是什么民族的服装? A. 畲族  B. 普米族  C. 塔吉克族  D. 塔塔尔族",
+    "image_url": "data/mock/SelectVQA/img/f49c1b493a869f97f5162711a32d78b26fe92561.jpeg",
+    "expected_answer": "D"
+  },
+  {
+    "index": 93006,
+    "section": "选择VQA",
+    "question": "图中的文物名称是什么？ A. 海昏侯墓铜鎏金编钟  B. 曾侯乙编钟  C. 大晟编钟  D. 汉代青铜编钟",
+    "image_url": "data/mock/SelectVQA/img/44710a0e117f095d4a79c4eae6732f587f40b8fd.jpeg",
+    "expected_answer": "B"
+  },
+  {
+    "index": 93007,
+    "section": "选择VQA",
+    "question": "下列名著与图中景观有关的是？ A. 《西游记》  B. 《水浒传》  C. 《三国演义》  D. 《红楼梦》",
+    "image_url": "data/mock/SelectVQA/img/3bf257a089b60bc6d057313ab0a2b9a1be5e5ffd.jpeg",
+    "expected_answer": "A"
+  },
+  {
+    "index": 93008,
+    "section": "选择VQA",
+    "question": "图中文物所刻画的人物所处时代是什么？ A. 清代  B. 唐代  C. 元代  D. 宋代",
+    "image_url": "data/mock/SelectVQA/img/38c2aa26770c884b926b84193129e7255a0b140b.jpeg",
+    "expected_answer": "B"
+  },
+  {
+    "index": 93009,
+    "section": "选择VQA",
+    "question": "图中的画作是在哪个朝代被创作的？ A. 唐朝  B. 北宋  C. 元朝  D. 隋朝",
+    "image_url": "data/mock/SelectVQA/img/1e53a7c73759930b1f1376591c5254378e574ba7.jpeg",
+    "expected_answer": "B"
+  },
+  {
+    "index": 93010,
+    "section": "选择VQA",
+    "question": "图中所展示的是哪个朝代的玉器？ A. 清代  B. 西周  C. 汉代  D. 明代",
+    "image_url": "data/mock/SelectVQA/img/fa1f28ed51567bc1d130bb8c47cd4cb1bc7105b9.jpeg",
+    "expected_answer": "A"
+  },
+  {
+    "index": 93011,
+    "section": "选择VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。 A. B.他是唐代的文学家、政治家  B. C.他是中国北宋时期的宰相  C. D.他的作品体现了他对社会不公的关注和对民众苦难的同情  D. A.他被尊称为\"诗圣\"",
+    "image_url": "data/mock/SelectVQA/img/f8d015602d8b87b865bee1a250eb16c1e90d7f0c.jpeg",
+    "expected_answer": "B"
+  },
+  {
+    "index": 93012,
+    "section": "选择VQA",
+    "question": "图中所展示的是一幅明代画，请问其名称是什么？ A. 秋兴八景图册  B. 南山积翠图  C. 仿三赵山水图  D. 山中秋景图",
+    "image_url": "data/mock/SelectVQA/img/75c33f6db1a8633793e9febbcdbea5dee8fdd0d6.jpeg",
+    "expected_answer": "A"
+  },
+  {
+    "index": 93013,
+    "section": "选择VQA",
+    "question": "图中的瓦当文物表现出来的是哪一个神兽？ A. 朱雀  B. 玄武  C. 白虎  D. 青龙",
+    "image_url": "data/mock/SelectVQA/img/90f6ae5a476fc7534a2bc55205020a9200f34223.jpeg",
+    "expected_answer": "C"
+  },
+  {
+    "index": 93014,
+    "section": "选择VQA",
+    "question": "图中文物来自哪个朝代？ A. 清朝  B. 宋朝  C. 唐朝  D. 元朝",
+    "image_url": "data/mock/SelectVQA/img/63c7f64f9376325d9ca16f4c1a2be55b8d89eb60.jpeg",
+    "expected_answer": "A"
+  },
+  {
+    "index": 93015,
+    "section": "选择VQA",
+    "question": "图中文物的材质是什么？ A. 玛瑙  B. 青金石  C. 陶瓷  D. 翡翠",
+    "image_url": "data/mock/SelectVQA/img/0d45d6aed786379be7cb341c14d3f98b38ef8cc8.jpeg",
+    "expected_answer": "B"
+  },
+  {
+    "index": 93016,
+    "section": "选择VQA",
+    "question": "图中所示景观名称为？ A. 黄帝陵  B. 秦始皇陵  C. 成吉思汗陵  D. 中山陵",
+    "image_url": "data/mock/SelectVQA/img/55d26f76b4f4abb4b3a724e46b323d92a036e7ae.jpeg",
+    "expected_answer": "C"
+  },
+  {
+    "index": 93017,
+    "section": "选择VQA",
+    "question": "这是一道看图猜成语题目，请问图中画面对应的是哪个成语？ A. 一石二鸟  B. 叶公好龙  C. 一清二白  D. 一叶障目",
+    "image_url": "data/mock/SelectVQA/img/89cd8c101499daa2d4212b4a102ce91e64649f18.jpeg",
+    "expected_answer": "D"
+  },
+  {
+    "index": 93018,
+    "section": "选择VQA",
+    "question": "这是什么民族的服装? A. 水族  B. 塔吉克族  C. 塔塔尔族  D. 畲族",
+    "image_url": "data/mock/SelectVQA/img/620fd73288ca782db3837324ac9929494bbe6a8c.jpeg",
+    "expected_answer": "D"
+  },
+  {
+    "index": 93019,
+    "section": "选择VQA",
+    "question": "图中文物的名称是什么？ A. 噩侯壶  B. 噩伯鼎  C. 噩侯鬲  D. 噩姜鬲",
+    "image_url": "data/mock/SelectVQA/img/a7957ebe053c42561fa3ad94f00a34cba3fcf734.jpeg",
+    "expected_answer": "D"
+  },
+  {
+    "index": 94000,
+    "section": "判断QA",
+    "question": "十月革命后，孙中山一面强调“以俄为师”，一面强调“不可学俄人之焦头烂额也”。据此可知孙中山主张 该问题的答案是：“发展私人资本，预防国家资本垄断”。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 94001,
+    "section": "判断QA",
+    "question": "“吾国纱厂事业，自欧战起后，获利甚厚，国人鉴于利之所在，均争相投资，设厂增锭，大有风起云涌之势。迨欧战告终，本纱之输出杜绝，外纱复纷至沓来，遂致连年市价，一蹶不振”。据此判断，第一次世界大战后中国棉纺织业“一蹶不振”的原因有：a世界棉纺织业渐趋萎缩；b西方列强经济侵略；c官僚资本挤压民族企业；d商人投资规模过度 该问题的答案是：“bd”。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 94002,
+    "section": "判断QA",
+    "question": "毛泽东在谈及学生时代喜爱阅读的一份出版物时说：“我很欣赏胡适和陈独秀写的文章，他们一度成为我效仿的榜样，取代了我已不再崇拜的梁启超和康有为。”这份出版物应该是 该问题的答案是：“《时务报》”。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 94003,
+    "section": "判断QA",
+    "question": "某学者评价启蒙运动说:“‘进步’实际上已经成为哲学家的一种意识形态，他们坚信自然科学将会让人类更有力地支配整个世界，而人类理性则引领每个人走向自由，并建立起一个繁荣、公正、平等的社会。”引文所想表达的深层含义是 该问题的答案是：“哲学意识支配世界繁荣”。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 94004,
+    "section": "判断QA",
+    "question": "1921年成都警察厅发布通令:“近日妇女每多剪发齐眉，并梳拿破仑、华盛顿等头式(流行的男式发型)，实属有伤风俗，应予以禁止，以挽颓风……如敢固违，定以妇女坐法并处罚家长。”对此解读正确的是 该问题的答案是：“处罚措施体现民国法治精神”。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 94005,
+    "section": "判断QA",
+    "question": "20世纪五六十年代，经济全球化进入新的发展阶段，但有学者认为此时的全球化只是“半球化”，只有到八九十年代的经济全球化浪潮才真正具有全球性。导致“半球化”的主要原因是 该问题的答案是：“两极对峙格局的存在”。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 94006,
+    "section": "判断QA",
+    "question": "汉初，官方禁止商人“衣丝乘车”，但后来一些商人“假二千石(官员级别)舆服导从作倡乐，奢侈日甚”。这反映出 该问题的答案是：“原有规制受到商业发展的挑战”。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 94007,
+    "section": "判断QA",
+    "question": "有学者认为，宋代到清代的历史进程中有过三次商业革命，第一次是宋代商业革命，第二次是明清(前期)商业革命。其中第二次“商业革命”比第一次突出的是 该问题的答案是：“出现了世界最早的纸币”。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 94008,
+    "section": "判断QA",
+    "question": "汉武帝时张骞出使西域，远至今中亚阿姆河流域，受到渴望与汉通使往来的大宛等国的欢迎。其间，汉设置河西四郡，打通了与西域的直接交通。张骞在出使过程中所获得的信息对打开丝绸之路和建立中国与西方的联系起到了关键作用。据此可知，张骞出使西域的功绩是 该问题的答案是：“确立了汉朝对西域的管辖权”。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 94009,
+    "section": "判断QA",
+    "question": "“不识国民之原理，不通世界之大势，不知政治之本原……而仅摭拾泰西皮毛，……遂乃自足。”上述言论应当是 该问题的答案是：“顽固派对洋务派的批评”。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 94010,
+    "section": "判断QA",
+    "question": "费正清在《伟大的中国革命》中认为，“大家都认为鸦片战争是一次典型的非正义战争，是鸦片染成的战争……其实，根本是北京愿不愿意和英国订立平等国家关系的问题。”对此理解不正确的是 该问题的答案是：“体现了公平公正的国际关系准则”。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 94011,
+    "section": "判断QA",
+    "question": "苏轼曾说：“民庶之家，置庄田，招佃客，本望租课，非行仁义，然犹至水旱之岁，必须放免欠负、贷借种粮者，其心诚恐客散而田荒，后日之失必倍于今故也。”这句话反映出的主要问题是 该问题的答案是：“宋代佃户租地有较大的选择权和自由度”。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 94012,
+    "section": "判断QA",
+    "question": "北京大学教授袁刚说：“思想市场指的是思想有自由表达的环境。”在我国历史上曾出现过“思想市场”的时期有：a春秋战国时代；b秦汉时期；c明清时期；d民国初年五四时期 该问题的答案是：“ad”。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 94013,
+    "section": "判断QA",
+    "question": "唐文宗太和六年（832年），宰相王涯上奏：“商人乘马，前代所禁。近日得以恣其乘骑，雕鞍银镫，装饰焕烂，从以童骑，骋以康庄，此最为僭越。伏请切令禁断。”以下对当时商人地位的判断，错误的是 该问题的答案是：“实际上没有自由民的平等地位”。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 94014,
+    "section": "判断QA",
+    "question": "长征期间，国内外形势发生重大变化，民族矛盾加剧，中国共产党的方针政策进行重大调整。这一调整是指 该问题的答案是：“召开遵义会议，纠正“左”倾错误路线”。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 94015,
+    "section": "判断QA",
+    "question": "古代中西思想既有差异，也有相当接近的地方。如“注重人的全面发展、培养人的道德自觉”和“有益于人类、培养善人”的思想即属于后者。下列学派中接近上述思想的是：a儒家学派；b墨家学派；c斯多亚学派；d智者学派 该问题的答案是：“ac”。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 94016,
+    "section": "判断QA",
+    "question": "1979年7月，中共中央做出决定，要求广东和福建两省“发挥优越条件．抓紧当前有利的国际形势，先走一步”。其直接结果是 该问题的答案是：“设立经济特区”。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 94017,
+    "section": "判断QA",
+    "question": "近代一有识之士曾说：“一国所得，诸国安然而享之；一国所求，诸国群起而助之，是不啻驱西洋诸国，使之协以谋我。”上述言论针对的是 该问题的答案是：“片面最惠国待遇”。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 94018,
+    "section": "判断QA",
+    "question": "“高产卫星”是“大跃进”时期常用词。有人以《人民日报》为例做统计，“高产卫星”一词1957年未有文章使用，1958年共85篇，1959年共15篇，而1960年只有1篇，并且还是“陕西长安县的一个学习组说1958年种的‘三亩六分高产卫星田’不尊重‘庄稼生长的规律’了”，下列对“大跃进”的准确认识有：a “大跃进”只在农业领域展开；b “高产卫星”折射“大跃进”浮夸盛行；c 1958年“大跃进”快速推进；d 1960年基层队“大跃进”有所反思 该问题的答案是：“bcd”。",
+    "image_url": "",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 94019,
+    "section": "判断QA",
+    "question": "“民本”语出《尚书·夏书·五子之歌》：“民惟邦本，本固邦宁。”意谓人民是国家的根本，根本巩固，国家才能安宁。“民主”一词，最早见于古希腊历史学家希罗多德的《历史》一书，它由“人民”和“权利”两个词组合而成，其字面意思就是“人民的权利”、“人民主权”和“多数人的统治”。下列关于“民本”与“民主”的表述，正确的是 该问题的答案是：“两者都鼓励百姓为实现自己的追求而奋斗”。",
+    "image_url": "",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 95000,
+    "section": "判断VQA",
+    "question": "请问图中的文物是什么？ 该问题的答案是：“腰排”。",
+    "image_url": "data/mock/TF_VQA/img/23b395034abd4903917b2afcf8f41d06399f2746.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 95001,
+    "section": "判断VQA",
+    "question": "图中所展示的是哪个朝代的历史文物？ 该问题的答案是：“明朝”。",
+    "image_url": "data/mock/TF_VQA/img/617e6b482ce7baf78b549f9e7d6aa46023440197.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 95002,
+    "section": "判断VQA",
+    "question": "图中文物来源于中国古代清朝中的哪一个时期？ 该问题的答案是：“清朝康乾时期”。",
+    "image_url": "data/mock/TF_VQA/img/fd4c66b6a542b5ad4a160f260759da6208d2da16.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 95003,
+    "section": "判断VQA",
+    "question": "图中景观所在地点为？ 该问题的答案是：“沈阳”。",
+    "image_url": "data/mock/TF_VQA/img/46ac2a7d17af3bb84b70c525752bd63b8b734143.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 95004,
+    "section": "判断VQA",
+    "question": "以下对这位历史人物的描述中哪一项是错误的。 该问题的答案是：“C.他在宋朝时期有卓越的贡献”。",
+    "image_url": "data/mock/TF_VQA/img/eb976595835e130228af60f87077e255aac6e2d7.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 95005,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“拉祜族”。",
+    "image_url": "data/mock/TF_VQA/img/6aff55e0208ca33ed0ba4027034962fdd427669f.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 95006,
+    "section": "判断VQA",
+    "question": "图中所示是中国哪个传统节日？ 该问题的答案是：“妈祖祭典”。",
+    "image_url": "data/mock/TF_VQA/img/e41b0a673a19d126bb8ff8cf3dbaef1c30dfb248.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 95007,
+    "section": "判断VQA",
+    "question": "请问图中文物的名称是什么？ 该问题的答案是：“青铜雁鱼灯”。",
+    "image_url": "data/mock/TF_VQA/img/5577af698bf5665286bba6ec89a37c1186c1ddaa.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 95008,
+    "section": "判断VQA",
+    "question": "图中所示是中国哪个传统节日？ 该问题的答案是：“中秋节”。",
+    "image_url": "data/mock/TF_VQA/img/4293071390ec1a6c22a2eca975bfeb6ee423066a.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 95009,
+    "section": "判断VQA",
+    "question": "图中画作所描绘的动物是什么？ 该问题的答案是：“蝴蝶”。",
+    "image_url": "data/mock/TF_VQA/img/16ca27cf6052da9a960303c7174b5d61ef7d8867.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 95010,
+    "section": "判断VQA",
+    "question": "图中所示传统舞蹈表演为？ 该问题的答案是：“象脚鼓舞”。",
+    "image_url": "data/mock/TF_VQA/img/79d472facd7801ed32c8d4713dd08dea01c1efcf.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 95011,
+    "section": "判断VQA",
+    "question": "图上的美食叫什么名字 该问题的答案是：“松鼠桂鱼”。",
+    "image_url": "data/mock/TF_VQA/img/45c7c48f151c3ed6cce42bacada7f99acfdfa983.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 95012,
+    "section": "判断VQA",
+    "question": "图中文物的名称是什么？ 该问题的答案是：“猪首形陶器盖”。",
+    "image_url": "data/mock/TF_VQA/img/2c5a402799b6a65dc92b3929d4eac3e882006078.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 95013,
+    "section": "判断VQA",
+    "question": "这是一道看图猜成语题目，请问图中画面对应的是哪个成语？ 该问题的答案是：“狼狈为奸”。",
+    "image_url": "data/mock/TF_VQA/img/ea7d67c89b2822ec15e5acfd617376190c64aa10.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 95014,
+    "section": "判断VQA",
+    "question": "图中画作所描绘的动物是什么？ 该问题的答案是：“鸭”。",
+    "image_url": "data/mock/TF_VQA/img/c32bf710cb3d5837b5b0d9a030410a563e694988.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 95015,
+    "section": "判断VQA",
+    "question": "图中的文物出土于哪里？ 该问题的答案是：“殷墟”。",
+    "image_url": "data/mock/TF_VQA/img/35eb48a5dd5d8b0770472a49adcdce823834a84b.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 95016,
+    "section": "判断VQA",
+    "question": "图上的美食叫什么名字 该问题的答案是：“松鼠桂鱼”。",
+    "image_url": "data/mock/TF_VQA/img/b0b730e5957052d14fe4e4a62085aff43b7e8b6e.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 95017,
+    "section": "判断VQA",
+    "question": "图中是春秋战国时期的一件兵器，这件兵器的名称是什么？ 该问题的答案是：“青铜剑”。",
+    "image_url": "data/mock/TF_VQA/img/82864cce05bee3f84cfccb974fb359235254e527.jpeg",
+    "expected_answer": "正确"
+  },
+  {
+    "index": 95018,
+    "section": "判断VQA",
+    "question": "这是什么民族的服装? 该问题的答案是：“苗族”。",
+    "image_url": "data/mock/TF_VQA/img/2106a2d3b81da9ae2b7bb7b0444095933e8ad060.jpeg",
+    "expected_answer": "错误"
+  },
+  {
+    "index": 95019,
+    "section": "判断VQA",
+    "question": "图中文物的名称是什么？ 该问题的答案是：“兽面纹鼎”。",
+    "image_url": "data/mock/TF_VQA/img/f8ebd7d095e9eef2f218fc54fab5e9d4d4e5bd63.jpeg",
+    "expected_answer": "正确"
+  }
+]
