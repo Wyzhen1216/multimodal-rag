@@ -114,7 +114,9 @@ def main() -> int:
     )
     env.setdefault("DASHVECTOR_COLLECTION", "ccv_cb_student_20260508")
     env.setdefault("DASHVECTOR_VECTOR_FIELD", "text")
-    # DashScope embedding（与 QWEN_API_KEY 同一把 key）
+    # 本地 GME 模型路径（评测环境同款；3584 维与 collection 匹配）
+    env.setdefault("GME_MODEL_PATH", "/autodl-fs/data/gme-Qwen2-VL-7B-Instruct")
+    # DashScope embedding 兜底（GME 加载失败时才用）
     env.setdefault("DASHSCOPE_API_KEY", env["QWEN_API_KEY"])
     env.setdefault("DASHSCOPE_EMBED_MODEL", "multimodal-embedding-v1")
 

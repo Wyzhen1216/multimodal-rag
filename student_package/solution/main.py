@@ -34,6 +34,10 @@ from .normalization import normalize_answer  # noqa: E402
 
 from .llm_client import build_client, resolve_local_image  # noqa: E402
 from .prompts import (  # noqa: E402
+    SYS_DETECT_MULTI,
+    SYS_IMAGE_DESC,
+    SYS_OPTION_AS_JUDGE,
+    SYS_OPTION_AS_JUDGE_VQA,
     build_user_message,
     fallback_answer,
     fewshot_block,
@@ -202,6 +206,187 @@ def option_aware_contexts(retriever, client, question: str, section: str, topk: 
     return merged[:topk + 4]   # 给模型多点上下文
 
 
+# ============================================================================
+# 选择题 → 4 个判断题（核心改动）
+# ============================================================================
+
+_MULTI_KW = ("哪些", "包括", "有哪些", "哪几", "哪几种", "哪几个", "哪几位", "都有")
+_SINGLE_KW = ("哪一", "哪个", "哪种", "是什么", "是哪", "最有可能", "最可能", "主要是", "主要的", "属于哪")
+
+
+def detect_multi_select(question: str, client) -> bool:
+    """判定单/多选。先用关键字（高置信），再用 LLM 兜底。"""
+    q = question or ""
+    # 1) 强多选关键字（先判定，且要排除"哪一"包含"哪"的情况）
+    if any(k in q for k in _MULTI_KW):
+        return True
+    # 2) 强单选关键字
+    if any(k in q for k in _SINGLE_KW):
+        return False
+    # 3) LLM 兜底
+    try:
+        r = client.generate(SYS_DETECT_MULTI, f"题目：{q}\n输出 single 或 multi：",
+                            temperature=0.0, max_tokens=8)
+        return "multi" in (r or "").lower()
+    except Exception:
+        return False  # 默认单选，避免多选幻觉
+
+
+def _judge_one_option(
+    retriever, client, question_stem: str, letter: str, opt_text: str,
+    image_path, is_vqa: bool, topk: int,
+) -> str:
+    """对单个选项做一次 RAG + 判断；返回 '正确' / '错误' / ''。"""
+    # 检索：把题干主题 + 选项内容拼接做 query；VQA 题也允许 image
+    query = f"{question_stem[:50]} {opt_text}".strip()
+    contexts = []
+    try:
+        contexts = retriever.search(
+            text=query,
+            image_path=str(image_path) if image_path else None,
+            topk=topk,
+        )
+    except Exception:
+        contexts = []
+
+    ctx_block = ""
+    if contexts:
+        lines = [f"[资料{i+1}] {c[:300]}" for i, c in enumerate(contexts[:topk])]
+        ctx_block = "以下是检索到的相关资料：\n" + "\n".join(lines) + "\n\n"
+
+    user = (
+        f"{ctx_block}"
+        f"[题干] {question_stem}\n"
+        f"[待判选项] {letter}. {opt_text}\n\n"
+        f"请判断 '{letter}. {opt_text}' 是否是题干所问的正确答案。仅输出 '正确' 或 '错误'："
+    )
+    sys_p = SYS_OPTION_AS_JUDGE_VQA if is_vqa else SYS_OPTION_AS_JUDGE
+    try:
+        raw = client.generate(sys_p, user, image_path, temperature=0.0, max_tokens=8)
+    except Exception:
+        return ""
+    from .normalization import normalize_judgment_answer
+    return normalize_judgment_answer(raw)
+
+
+def choice_as_judge(
+    retriever, client, question: str, section: str,
+    image_path, topk: int,
+) -> tuple[str, list]:
+    """
+    把选择题拆成 N 个判断题（每个选项独立判定）：
+      - 单选：取所有 '正确' 中第一个，若全 '错误' 则退回常规推理
+      - 多选：取所有 '正确' 字母连写
+    返回 (answer_letters, all_retrieved_contexts)
+    """
+    options = parse_choice_options(question)
+    if not options:
+        return "", []
+
+    # 题干去掉选项部分
+    stem = build_query(question, section=section)
+    is_vqa = "VQA" in section
+    is_multi = detect_multi_select(question, client)
+
+    correct_letters: list = []
+    all_ctx: list = []
+    for letter, opt_text in options:
+        verdict = _judge_one_option(
+            retriever, client, stem, letter, opt_text,
+            image_path, is_vqa, topk,
+        )
+        print(f"  [option {letter}] {opt_text[:20]} -> {verdict}", flush=True)
+        if verdict == "正确":
+            correct_letters.append(letter)
+
+    # 全部判定为 '错误' → 回退到常规选择题推理（让模型直接看题选）
+    if not correct_letters:
+        fallback = _fallback_choice_pick(client, question, image_path, is_vqa)
+        if fallback:
+            return fallback, all_ctx
+        return "", all_ctx
+
+    if is_multi:
+        return "".join(sorted(correct_letters)), all_ctx
+    # 单选：如果模型判定多个为"正确"，让模型在这些里挑一个
+    if len(correct_letters) == 1:
+        return correct_letters[0], all_ctx
+    # 多个候选 → 让模型二次裁决
+    cand_str = ", ".join(f"{l}. {dict(options)[l]}" for l in correct_letters)
+    user = (
+        f"[题干] {question}\n\n"
+        f"上一步初筛后剩下候选：{cand_str}\n"
+        f"请从候选中选出最贴切的【唯一】答案，仅输出字母："
+    )
+    try:
+        from .prompts import SYS_CHOICE_DIRECT
+        raw = client.generate(SYS_CHOICE_DIRECT, user, image_path,
+                              temperature=0.0, max_tokens=8)
+        ans = normalize_answer(section, raw)
+        if ans and ans[0] in correct_letters:
+            return ans[0], all_ctx
+    except Exception:
+        pass
+    return correct_letters[0], all_ctx
+
+
+def _fallback_choice_pick(client, question: str, image_path, is_vqa: bool) -> str:
+    """逐选项判断全失败时的兜底：让模型用自身知识直接选一个（无 RAG）。"""
+    from .prompts import SYS_CHOICE_DIRECT, SYS_CHOICE_VQA
+    sys_p = SYS_CHOICE_VQA if is_vqa else SYS_CHOICE_DIRECT
+    user = (
+        f"[题目] {question}\n\n"
+        "请直接输出选项字母（单选 1 个，多选连写多个，无分隔符）："
+    )
+    try:
+        raw = client.generate(sys_p, user, image_path, temperature=0.0, max_tokens=16)
+        from .normalization import normalize_choice_answer
+        return normalize_choice_answer(raw)
+    except Exception:
+        return ""
+
+
+# ============================================================================
+# VQA 图像描述 → 文本检索对齐
+# ============================================================================
+
+def describe_image(client, image_path, question: str) -> str:
+    """让 LLM 看图给出 1-2 句描述，用于辅助文本检索；失败时返回 ''。"""
+    if image_path is None:
+        return ""
+    user = f"题目：{question}\n请描述图中关键内容（≤50字，不要前缀）："
+    try:
+        r = client.generate(SYS_IMAGE_DESC, user, image_path,
+                            temperature=0.0, max_tokens=80)
+        return (r or "").strip().splitlines()[0].strip()[:120]
+    except Exception:
+        return ""
+
+
+# ============================================================================
+# 简答 QA: 多 query 发散检索
+# ============================================================================
+
+_DIVERGE_SYS = "你是考古学信息检索助手。"
+_DIVERGE_TMPL = (
+    '为以下简答题生成 3 个不同的【陈述句】检索query，覆盖不同表达方式 / 相关实体。'
+    '每行一个，不超过 35 字，不要编号、不要前缀。\n'
+    '题目：{q}\n'
+    '3 条 query：'
+)
+
+
+def diverge_queries(client, question: str) -> list[str]:
+    """简答题发散：让 LLM 生成多个 query 变体，失败时只返回原始题干。"""
+    try:
+        r = client.generate(_DIVERGE_SYS, _DIVERGE_TMPL.format(q=question),
+                            temperature=0.5, max_tokens=120)
+        lines = [l.strip(' \t-•0123456789.、，。') for l in r.splitlines() if l.strip()]
+        return [l for l in lines if 5 <= len(l) <= 60][:3]
+    except Exception:
+        return []
+
+
 def majority_vote(answers: List[str], section: str) -> str:
     """对多次采样做归一化后投票，取多数票；票数相同时取第一个非空。"""
     normed = [normalize_answer(section, a) for a in answers]
@@ -269,41 +454,96 @@ def run(args: argparse.Namespace) -> None:
             image_path = resolve_local_image(image_url) if image_url else None
 
             is_short_vqa = section == "简答VQA"
-            # 跳过检索的条件：
+            # 跳过常规检索的条件：
             #   简答VQA - 纯视觉题，看图即可
-            #   选择VQA - 召回率仅 11%，文字检索是噪声
-            skip_retrieval = is_short_vqa or section == "选择VQA"
+            #   选择题（QA/VQA）- 走 choice_as_judge 分支，内部自带检索
+            is_choice = "选择" in section
+            skip_retrieval = is_short_vqa or is_choice
             # 选择题：解析题目中实际存在的选项，防止模型幻想 E/F/G
-            valid_options = extract_valid_options(question) if "选择" in section else None
+            valid_options = extract_valid_options(question) if is_choice else None
 
+            # ---- 分支 1: 选择题 → 拆分为 N 个判断题 ----
+            if is_choice:
+                t0 = time.perf_counter()
+                contexts: List[str] = []
+                raw = ""
+                try:
+                    answer, contexts = choice_as_judge(
+                        retriever, client, question, section, image_path,
+                        topk=args.topk,
+                    )
+                    if valid_options and answer:
+                        filtered = "".join(c for c in answer if c in valid_options)
+                        if filtered:
+                            answer = filtered
+                    if not answer:
+                        answer = fallback_answer(section)
+                    raw = answer
+                except Exception as e:
+                    print(f"[idx={idx}] choice_as_judge error: {e}", flush=True)
+                    answer = fallback_answer(section)
+                infer_cost = time.perf_counter() - t0
+                retrieval_cost = 0.0
+
+                fout.write(json.dumps(
+                    {"index": idx, "answer": answer, "raw_answer": raw},
+                    ensure_ascii=False,
+                ) + "\n")
+                fout.flush()
+                ftime.write(json.dumps(
+                    {"index": idx,
+                     "retrieval_cost": round(retrieval_cost, 4),
+                     "infer_cost": round(infer_cost, 4)},
+                    ensure_ascii=False,
+                ) + "\n")
+                ftime.flush()
+                print(
+                    f"[{i}/{len(items)}] idx={idx} sec={section} "
+                    f"ans={answer!r} t_inf={infer_cost:.2f}s (choice-as-judge)",
+                    flush=True,
+                )
+                continue
+
+            # ---- 分支 2: 判断 / 简答 走常规检索 + 推理 ----
             # ---- 检索 ----
             t0 = time.perf_counter()
-            contexts: List[str] = []
+            contexts = []
             if not skip_retrieval:
                 try:
-                    if section == "选择QA":
-                        # 选择QA: 选项感知检索（主query + 每个选项各取少量证据）
-                        contexts = option_aware_contexts(
-                            retriever, client, question, section, topk=args.topk
-                        )
-                        print(f"[idx={idx}] option-aware retrieval, ctx={len(contexts)}", flush=True)
-                    elif section == "判断QA":
-                        # 判断QA: 题干本身就是陈述句，直接用作 query，不再 LLM 重写
+                    if section == "判断QA":
+                        # 判断QA: 题干本身就是陈述句，直接用作 query
                         query = build_query(question, section=section)
-                        contexts = retriever.search(
-                            text=query, topk=10,
-                        )
+                        contexts = retriever.search(text=query, topk=10)
                         print(f"[idx={idx}] direct query={query[:60]} ctx={len(contexts)}", flush=True)
+                    elif section == "简答QA":
+                        # 简答QA: 发散检索（主 query + 多个改写 query）合并去重
+                        base_q = rewrite_query(client, question, section=section)
+                        variants = diverge_queries(client, question)
+                        queries = [base_q] + [v for v in variants if v and v != base_q]
+                        seen = set()
+                        merged = []
+                        for q in queries[:4]:
+                            try:
+                                docs = retriever.search(text=q, topk=6)
+                            except Exception:
+                                docs = []
+                            for d in docs:
+                                if d not in seen:
+                                    seen.add(d)
+                                    merged.append(d)
+                        contexts = merged[:12]
+                        print(f"[idx={idx}] diverged {len(queries)} queries, ctx={len(contexts)}", flush=True)
                     else:
-                        # 简答QA / 判断VQA：LLM 重写后检索
-                        query = rewrite_query(client, question, section=section)
-                        topk = 10 if section == "简答QA" else args.topk
+                        # 判断VQA: 图像描述 + 题干 拼成 text query 做向量检索
+                        base_q = build_query(question, section=section)
+                        img_desc = describe_image(client, image_path, question) if image_path else ""
+                        query = f"{base_q} {img_desc}".strip() if img_desc else base_q
                         contexts = retriever.search(
                             text=query,
                             image_path=str(image_path) if image_path else None,
-                            topk=topk,
+                            topk=args.topk,
                         )
-                        print(f"[idx={idx}] rewritten query={query[:60]} ctx={len(contexts)}", flush=True)
+                        print(f"[idx={idx}] VQA query={query[:80]} ctx={len(contexts)}", flush=True)
                 except Exception as e:
                     print(f"[idx={idx}] retrieval error: {e}", flush=True)
                     contexts = []
@@ -330,17 +570,6 @@ def run(args: argparse.Namespace) -> None:
                     voted = majority_vote(samples, section)
                     raw = samples[0]
                     answer = voted or pick_answer(samples[0], section)
-                elif "选择" in section and args.choice_samples > 1:
-                    # 选择题: CoT + 多次采样投票 (sampling 必须 temp>0)
-                    samples = client.generate_n(
-                        system, user, image_path,
-                        n=args.choice_samples,
-                        temperature=0.5,
-                        max_tokens=320,
-                    )
-                    voted = majority_vote(samples, section)
-                    raw = samples[0]
-                    answer = voted or pick_answer(samples[0], section, valid_options=valid_options)
                 elif "判断" in section and args.judge_samples > 1:
                     # 判断题: 多次采样投票
                     samples = client.generate_n(
@@ -353,10 +582,8 @@ def run(args: argparse.Namespace) -> None:
                     raw = samples[0]
                     answer = voted or pick_answer(samples[0], section)
                 else:
-                    # 单次贪心 -- 选择题 CoT 给 320 tokens, 判断题直答只需 16
-                    if "选择" in section:
-                        max_tok = 320
-                    elif "判断" in section:
+                    # 单次贪心
+                    if "判断" in section:
                         max_tok = 16
                     else:
                         max_tok = 64
