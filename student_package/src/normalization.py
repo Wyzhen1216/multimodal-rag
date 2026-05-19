@@ -60,7 +60,8 @@ def normalize_short_answer(text: str) -> str:
     first_line = re.sub(r"\s+", "", first_line)
     first_line = re.sub(r"^(?:答案|最终答案|答)(?:是|为)?[:：]?", "", first_line)
     first_line = first_line.strip(" \t\r\n\"'“”‘’《》<>（）()[]【】{}")
-    return first_line.rstrip(".,;:!?，。；：！？")
+    first_line = first_line.rstrip(".,;:!?，。；：！？")
+    return first_line
 
 
 def normalize_choice_letters(text: str) -> str:

@@ -88,13 +88,19 @@ class ApiQwenVL(BaseQwenVL):
         image_dir: Optional[Path] = None,
         retries: int = 2,
     ):
-        self.api_key = api_key or os.environ.get("QWEN_API_KEY", "")
+        self.api_key = (
+            api_key
+            or os.environ.get("QWEN_API_KEY")
+            or os.environ.get("DASHSCOPE_API_KEY")
+            or os.environ.get("DASHVECTOR_API_KEY")
+            or ""
+        )
         self.base_url = base_url or os.environ.get("QWEN_BASE_URL", DEFAULT_API_BASE)
         self.model = model or os.environ.get("QWEN_MODEL_NAME", DEFAULT_API_MODEL)
         self.image_dir = Path(image_dir) if image_dir else _DEFAULT_IMG_DIR
         self.retries = retries
         if not self.api_key:
-            raise RuntimeError("ApiQwenVL: QWEN_API_KEY is not set")
+            raise RuntimeError("ApiQwenVL: QWEN_API_KEY / DASHSCOPE_API_KEY is not set")
         self._client = None
 
     def _ensure(self):
@@ -246,7 +252,12 @@ def build_client(prefer: Optional[str] = None) -> BaseQwenVL:
     if prefer == "local":
         return LocalQwenVL()
 
-    if os.environ.get("QWEN_API_KEY"):
+    # 有任意一个 API key → 走 API 做生成；GME 模型只用于 embedding（retriever.py）
+    if (
+        os.environ.get("QWEN_API_KEY")
+        or os.environ.get("DASHSCOPE_API_KEY")
+        or os.environ.get("DASHVECTOR_API_KEY")
+    ):
         try:
             return ApiQwenVL()
         except Exception as e:

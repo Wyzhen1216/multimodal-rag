@@ -24,16 +24,20 @@ INPUT_FILE="${1:-$ROOT_DIR/data/public_examples.full.json}"
 GOLD_FILE="${GOLD_FILE:-$ROOT_DIR/data/public_examples.full.json}"
 
 # ---- model & vector-db config ----------------------------------------------
-# 默认路径已改为本机 /root/autodl-fs/model/ 下；
-# 如果在其他环境跑，外部 export 同名变量即可覆盖
+# 文本生成：走 DashScope API（QWEN_API_KEY 优先，回退到 DASHVECTOR_API_KEY 同账号 key）
+# 嵌入/检索：GME_MODEL_PATH 指向本地 gme-Qwen2-VL-7B-Instruct
+# QWEN_MODEL_PATH 只在有本地生成模型时才需要设置；若路径不存在会自动回退到 API
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 export QWEN_MODEL_PATH="${QWEN_MODEL_PATH:-/root/autodl-fs/model/qwen2.5-VL-7B-Instruct}"
-export GME_MODEL_PATH="${GME_MODEL_PATH:-/root/autodl-fs/model/gme-Qwen2-VL-7B-Instruct}"
+export GME_MODEL_PATH="${GME_MODEL_PATH:-/autodl-fs/data/gme-Qwen2-VL-7B-Instruct}"
 export DASHVECTOR_ENDPOINT="${DASHVECTOR_ENDPOINT:-vrs-cn-71j49hani00061.dashvector.cn-hangzhou.aliyuncs.com}"
 export DASHVECTOR_API_KEY="${DASHVECTOR_API_KEY:-sk-REPLACE-WITH-YOUR-OWN-VECTOR-KEY}"
 export DASHVECTOR_COLLECTION="${DASHVECTOR_COLLECTION:-ccv_cb_student_20260508}"
 export AGENT_MODE="${AGENT_MODE:-real}"
+# DashScope 模型服务 key（与 DashVector key 不同，需单独设置）
+export DASHSCOPE_API_KEY="${DASHSCOPE_API_KEY:-sk-REPLACE-WITH-YOUR-OWN-QWEN-KEY}"
+export QWEN_API_KEY="${QWEN_API_KEY:-${DASHSCOPE_API_KEY}}"
 
 # ---- python / venv ---------------------------------------------------------
 if [[ -z "${PYTHON_BIN:-}" ]]; then

@@ -235,11 +235,10 @@ class _LocalGMEEmbedder:
 
     def __init__(self, model_path: str, device: Optional[str] = None):
         import torch
-        from transformers import AutoModel, AutoProcessor
+        from transformers import AutoModel
 
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.torch = torch
-        self.processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
         self.model = AutoModel.from_pretrained(
             model_path,
             trust_remote_code=True,
@@ -247,37 +246,19 @@ class _LocalGMEEmbedder:
         ).to(self.device).eval()
 
     def encode(self, text: str, image_path: Optional[str] = None) -> list:
-        import torch
         from PIL import Image
 
-        images = None
+        pil_image = None
         if image_path and Path(image_path).exists():
             try:
-                images = [Image.open(image_path).convert("RGB")]
+                pil_image = Image.open(image_path).convert("RGB")
             except Exception:
-                images = None
+                pil_image = None
 
-        # 优先走模型自带的 encode（GME 通常提供）
-        if hasattr(self.model, "encode"):
-            try:
-                vec = self.model.encode(text=[text], images=images)
-                return _to_list(vec)
-            except Exception:
-                pass
-
-        # 通用路径
-        if images is not None:
-            inputs = self.processor(text=text, images=images, return_tensors="pt").to(self.device)
-        else:
-            inputs = self.processor(text=text, return_tensors="pt").to(self.device)
-        with torch.no_grad():
-            out = self.model(**inputs)
-        if hasattr(out, "last_hidden_state"):
-            vec = out.last_hidden_state.mean(dim=1)
-        elif hasattr(out, "pooler_output"):
-            vec = out.pooler_output
-        else:
-            vec = out[0] if isinstance(out, tuple) else out
+        # 必须用模型自带的 embed()，它会在 prompt 里插入图像占位符
+        # 直接调 model(**inputs) 会因缺少 <|vision_start|> 等 token 而报 shape mismatch
+        with self.torch.inference_mode():
+            vec = self.model.embed(texts=[text], images=[pil_image])
         return _to_list(vec)
 
 
