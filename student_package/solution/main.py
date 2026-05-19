@@ -825,7 +825,8 @@ def describe_image(client, image_path, question: str) -> str:
 _DIVERGE_SYS = "你是考古学信息检索助手。"
 _DIVERGE_TMPL = (
     '为以下简答题生成 3 个不同的【陈述句】检索query，覆盖不同表达方式 / 相关实体。'
-    '每行一个，不超过 35 字，不要编号、不要前缀。\n'
+    '每行一个，不超过 35 字，不要编号、不要前缀。'
+    '【重要】：不要生成含 A/B/C/D 选项格式的句子，不要生成问句，只输出陈述句。\n'
     '题目：{q}\n'
     '3 条 query：'
 )
@@ -837,7 +838,17 @@ def diverge_queries(client, question: str) -> list[str]:
         r = client.generate(_DIVERGE_SYS, _DIVERGE_TMPL.format(q=question),
                             temperature=0.5, max_tokens=120)
         lines = [l.strip(' \t-•0123456789.、，。') for l in r.splitlines() if l.strip()]
-        return [l for l in lines if 5 <= len(l) <= 60][:3]
+        # 过滤掉选择题格式（含 A. B. C. D.）和问句
+        import re as _re
+        def _is_valid_query(s: str) -> bool:
+            if not (5 <= len(s) <= 60):
+                return False
+            if _re.search(r'[A-D][.．、：]', s):  # 含选项格式
+                return False
+            if s.endswith('？') or s.endswith('?'):  # 问句
+                return False
+            return True
+        return [l for l in lines if _is_valid_query(l)][:3]
     except Exception:
         return []
 
