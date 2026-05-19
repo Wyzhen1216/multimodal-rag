@@ -71,6 +71,7 @@ class DashVectorRetriever:
         self._collection_dim: Optional[int] = None
         self._embedder = None
         self._disabled = False
+        self._init_lock = threading.Lock()  # 防止懒初始化竞争
 
         if os.environ.get("DISABLE_RETRIEVAL") == "1":
             self._disabled = True
@@ -80,24 +81,26 @@ class DashVectorRetriever:
     def _ensure_collection(self) -> None:
         if self._collection is not None or self._disabled:
             return
-        if not (self.endpoint and self.api_key and self.collection_name):
-            print("[retriever] DashVector env not set, disabling retrieval", flush=True)
-            self._disabled = True
-            return
-        try:
-            import dashvector
-            client = dashvector.Client(api_key=self.api_key, endpoint=self.endpoint)
-            self._collection = client.get(self.collection_name)
-            # 探测集合的向量字段 schema
-            self._collection_dim = self._probe_collection_dim()
-            print(
-                f"[retriever] DashVector connected: {self.collection_name}, "
-                f"vector_field={self.vector_field}, dim={self._collection_dim}",
-                flush=True,
-            )
-        except Exception as e:
-            print(f"[retriever] DashVector connect failed: {e}; disabling retrieval", flush=True)
-            self._disabled = True
+        with self._init_lock:
+            if self._collection is not None or self._disabled:
+                return
+            if not (self.endpoint and self.api_key and self.collection_name):
+                print("[retriever] DashVector env not set, disabling retrieval", flush=True)
+                self._disabled = True
+                return
+            try:
+                import dashvector
+                client = dashvector.Client(api_key=self.api_key, endpoint=self.endpoint)
+                self._collection = client.get(self.collection_name)
+                self._collection_dim = self._probe_collection_dim()
+                print(
+                    f"[retriever] DashVector connected: {self.collection_name}, "
+                    f"vector_field={self.vector_field}, dim={self._collection_dim}",
+                    flush=True,
+                )
+            except Exception as e:
+                print(f"[retriever] DashVector connect failed: {e}; disabling retrieval", flush=True)
+                self._disabled = True
 
     def _probe_collection_dim(self) -> Optional[int]:
         """从集合描述中读出指定 vector field 的维度。"""
@@ -122,33 +125,35 @@ class DashVectorRetriever:
     def _ensure_embedder(self) -> None:
         if self._embedder is not None or self._disabled:
             return
-
-        # 优先级 1：本地 GME（评测环境）
-        if self.embed_model_path and Path(self.embed_model_path).exists():
-            try:
-                self._embedder = _LocalGMEEmbedder(self.embed_model_path)
-                print(f"[retriever] embedder=LocalGMEEmbedder({self.embed_model_path})", flush=True)
-                self._check_dim_compat("LocalGMEEmbedder")
+        with self._init_lock:
+            if self._embedder is not None or self._disabled:
                 return
-            except Exception as e:
-                print(f"[retriever] LocalGMEEmbedder failed: {e}", flush=True)
+            # 优先级 1：本地 GME（评测环境）
+            if self.embed_model_path and Path(self.embed_model_path).exists():
+                try:
+                    self._embedder = _LocalGMEEmbedder(self.embed_model_path)
+                    print(f"[retriever] embedder=LocalGMEEmbedder({self.embed_model_path})", flush=True)
+                    self._check_dim_compat("LocalGMEEmbedder")
+                    return
+                except Exception as e:
+                    print(f"[retriever] LocalGMEEmbedder failed: {e}", flush=True)
 
-        # 优先级 2：DashScope API
-        ds_key = os.environ.get("DASHSCOPE_API_KEY") or os.environ.get("QWEN_API_KEY")
-        if ds_key:
-            try:
-                self._embedder = _DashScopeApiEmbedder(api_key=ds_key)
-                print(
-                    f"[retriever] embedder=DashScopeApiEmbedder(model={self._embedder.model})",
-                    flush=True,
-                )
-                self._check_dim_compat("DashScopeApiEmbedder")
-                return
-            except Exception as e:
-                print(f"[retriever] DashScopeApiEmbedder failed: {e}", flush=True)
+            # 优先级 2：DashScope API
+            ds_key = os.environ.get("DASHSCOPE_API_KEY") or os.environ.get("QWEN_API_KEY")
+            if ds_key:
+                try:
+                    self._embedder = _DashScopeApiEmbedder(api_key=ds_key)
+                    print(
+                        f"[retriever] embedder=DashScopeApiEmbedder(model={self._embedder.model})",
+                        flush=True,
+                    )
+                    self._check_dim_compat("DashScopeApiEmbedder")
+                    return
+                except Exception as e:
+                    print(f"[retriever] DashScopeApiEmbedder failed: {e}", flush=True)
 
-        print("[retriever] no embedder available, disabling retrieval", flush=True)
-        self._disabled = True
+            print("[retriever] no embedder available, disabling retrieval", flush=True)
+            self._disabled = True
 
     def _check_dim_compat(self, embedder_name: str) -> None:
         """探测一次 embed dim，与 collection dim 比对；不匹配 → 自动降级。"""

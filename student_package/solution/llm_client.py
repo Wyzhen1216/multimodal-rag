@@ -18,6 +18,7 @@ import hashlib
 import os
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -98,6 +99,18 @@ class BaseQwenVL:
         max_tokens: int = 512,
     ) -> str:
         raise NotImplementedError
+
+    def generate_batch(
+        self,
+        requests: List[Tuple[str, str, Optional[Path]]],
+        temperature: float = 0.0,
+        max_tokens: int = 512,
+    ) -> List[str]:
+        """批量推理：[(system, user_text, image_path), ...]  -> [str, ...]
+        默认实现：串行调 generate（子类可覆写为真正的 batch forward）。
+        """
+        return [self.generate(s, u, p, temperature=temperature, max_tokens=max_tokens)
+                for s, u, p in requests]
 
     def generate_n(
         self,
@@ -195,6 +208,50 @@ class ApiQwenVL(BaseQwenVL):
                     time.sleep(1.0 * (attempt + 1))
         raise last_err  # type: ignore[misc]
 
+    def generate_batch(
+        self,
+        requests: List[Tuple[str, str, Optional[Path]]],
+        temperature: float = 0.0,
+        max_tokens: int = 512,
+    ) -> List[str]:
+        """并发发送多个独立请求，保序返回。"""
+        if not requests:
+            return []
+        if len(requests) == 1:
+            s, u, p = requests[0]
+            return [self.generate(s, u, p, temperature=temperature, max_tokens=max_tokens)]
+        results = [""] * len(requests)
+        with ThreadPoolExecutor(max_workers=len(requests)) as pool:
+            futures = {
+                pool.submit(self.generate, s, u, p, temperature=temperature, max_tokens=max_tokens): i
+                for i, (s, u, p) in enumerate(requests)
+            }
+            for fut in as_completed(futures):
+                idx = futures[fut]
+                try:
+                    results[idx] = fut.result()
+                except Exception as e:
+                    results[idx] = ""
+        return results
+
+    def generate_n(
+        self,
+        system: str,
+        user_text: str,
+        image_path: Optional[Path] = None,
+        n: int = 1,
+        temperature: float = 0.7,
+        max_tokens: int = 512,
+    ) -> List[str]:
+        """n 个请求并发发送。"""
+        if n == 1:
+            return [self.generate(system, user_text, image_path, temperature=temperature, max_tokens=max_tokens)]
+        return self.generate_batch(
+            [(system, user_text, image_path)] * n,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+
 
 # ============================================================================
 # 本地模式 —— transformers + Qwen2.5-VL
@@ -243,6 +300,77 @@ class LocalQwenVL(BaseQwenVL):
         temperature: float = 0.0,
         max_tokens: int = 512,
     ) -> str:
+        results = self.generate_batch(
+            [(system, user_text, image_path)],
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+        return results[0] if results else ""
+
+    def generate_batch(
+        self,
+        requests: List[Tuple[str, str, Optional[Path]]],
+        temperature: float = 0.0,
+        max_tokens: int = 512,
+    ) -> List[str]:
+        """真 batch forward：多条 prompt 一次 model.generate，GPU 利用率最高。"""
+        import torch
+        from qwen_vl_utils import process_vision_info
+
+        if not requests:
+            return []
+
+        texts = []
+        all_image_inputs = []
+        all_video_inputs = []
+        for system, user_text, image_path in requests:
+            messages = self._build_messages(system, user_text, image_path)
+            t = self.processor.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+            img_in, vid_in = process_vision_info(messages)
+            texts.append(t)
+            all_image_inputs.extend(img_in or [])
+            all_video_inputs.extend(vid_in or [])
+
+        inputs = self.processor(
+            text=texts,
+            images=all_image_inputs if all_image_inputs else None,
+            videos=all_video_inputs if all_video_inputs else None,
+            padding=True,
+            return_tensors="pt",
+        ).to(self.device)
+
+        do_sample = temperature > 0.0
+        gen_kwargs: dict = dict(max_new_tokens=max_tokens, do_sample=do_sample)
+        if do_sample:
+            gen_kwargs["temperature"] = float(temperature)
+            gen_kwargs["top_p"] = 0.9
+
+        with torch.no_grad():
+            generated = self.model.generate(**inputs, **gen_kwargs)
+        trimmed = [out[len(inp):] for inp, out in zip(inputs.input_ids, generated)]
+        text_out = self.processor.batch_decode(
+            trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+        )
+        return [t.strip() for t in text_out]
+
+    def generate_n(
+        self,
+        system: str,
+        user_text: str,
+        image_path: Optional[Path] = None,
+        n: int = 1,
+        temperature: float = 0.7,
+        max_tokens: int = 512,
+    ) -> List[str]:
+        """num_return_sequences=n 一次 forward 返回 n 个采样。"""
+        if n == 1:
+            return self.generate_batch(
+                [(system, user_text, image_path)],
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
         import torch
         from qwen_vl_utils import process_vision_info
 
@@ -250,32 +378,30 @@ class LocalQwenVL(BaseQwenVL):
         text = self.processor.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
         )
-        image_inputs, video_inputs = process_vision_info(messages)
+        img_in, vid_in = process_vision_info(messages)
         inputs = self.processor(
             text=[text],
-            images=image_inputs,
-            videos=video_inputs,
+            images=img_in if img_in else None,
+            videos=vid_in if vid_in else None,
             padding=True,
             return_tensors="pt",
         ).to(self.device)
 
-        do_sample = temperature > 0.0
-        gen_kwargs = dict(
-            max_new_tokens=max_tokens,
-            do_sample=do_sample,
-        )
-        if do_sample:
-            gen_kwargs["temperature"] = float(temperature)
-            gen_kwargs["top_p"] = 0.9
-
         with torch.no_grad():
-            generated = self.model.generate(**inputs, **gen_kwargs)
-        # 截掉输入部分
-        trimmed = [out[len(inp):] for inp, out in zip(inputs.input_ids, generated)]
+            generated = self.model.generate(
+                **inputs,
+                max_new_tokens=max_tokens,
+                do_sample=True,
+                temperature=float(temperature),
+                top_p=0.9,
+                num_return_sequences=n,
+            )
+        inp_len = inputs.input_ids.shape[1]
+        trimmed = [seq[inp_len:] for seq in generated]
         text_out = self.processor.batch_decode(
             trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
         )
-        return (text_out[0] if text_out else "").strip()
+        return [t.strip() for t in text_out]
 
 
 # ============================================================================

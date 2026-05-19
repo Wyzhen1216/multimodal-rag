@@ -367,7 +367,11 @@ def detect_multi_select(question: str, client) -> bool:
     # 2) 强单选关键字
     if any(k in q for k in _SINGLE_KW):
         return False
-    # 3) LLM 兜底
+    # 3) 选项数 >= 5 → 通常是多选
+    opts = parse_choice_options(q)
+    if len(opts) >= 5:
+        return True
+    # 4) LLM 兜底
     try:
         r = client.generate(SYS_DETECT_MULTI, f"题目：{q}\n输出 single 或 multi：",
                             temperature=0.0, max_tokens=8)
@@ -668,11 +672,29 @@ def choice_as_judge(
     correct_letters: list = []
     wrong_letters: list = []
     ctx_per_letter: dict = {}
-    for letter, opt_text in options:
-        verdict, ctxs = _judge_one_option(
-            retriever, client, stem, letter, opt_text,
-            image_path, is_vqa, topk,
-        )
+
+    # 4 选项并行判定（_judge_one_option 内部 retriever+LLM 均线程安全）
+    with ThreadPoolExecutor(max_workers=len(options)) as pool:
+        future_map = {
+            pool.submit(
+                _judge_one_option,
+                retriever, client, stem, letter, opt_text,
+                image_path, is_vqa, topk,
+            ): (letter, opt_text)
+            for letter, opt_text in options
+        }
+        results_map: dict = {}
+        for fut in as_completed(future_map):
+            letter, opt_text = future_map[fut]
+            try:
+                verdict, ctxs = fut.result()
+            except Exception as e:
+                print(f"  [option {letter}] error: {e}", flush=True)
+                verdict, ctxs = "", []
+            results_map[letter] = (verdict, ctxs)
+
+    for letter, opt_text in options:  # 按原顺序输出
+        verdict, ctxs = results_map[letter]
         ctx_per_letter[letter] = ctxs
         print(f"  [option {letter}] {opt_text[:20]} -> {verdict} ctx={len(ctxs)}", flush=True)
         if verdict == "正确":
