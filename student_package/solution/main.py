@@ -4,13 +4,14 @@ solution.main —— 多模态历史 RAG Agent 主入口。
 流程：
   1. 加载输入 (data/public_examples.full.json)
   2. 一次性初始化 LLM 客户端 + DashVector retriever
-  3. 按题逐条处理：
-       a. 题型路由：简答VQA 跳过检索
-       b. 构造检索 query（题干 + 选项）
+  3. 按题逐条处理（所有题型均做 RAG 检索，满足赛题要求）：
+       a. 题型路由：选择题走 choice_as_judge（每选项独立检索 + 判断）；
+          其余题型走外层检索一次
+       b. 构造检索 query（题干 + 选项 / 题干 + 图像描述）
        c. DashVector 检索 top-k 文献片段 (retrieval_cost 计时)
        d. 按题型分支构造 prompt
        e. Qwen2.5-VL 推理 (infer_cost 计时)
-       f. 简答VQA：多次采样投票
+       f. 简答VQA：图像优先，RAG 仅作辅助；视觉直读题不注入 ctx
        g. 答案归一化 + 兜底
        h. append 写入 predictions.jsonl + time_cost.jsonl
 """
@@ -402,14 +403,18 @@ def detect_multi_select(question: str, client) -> bool:
 def _judge_one_option(
     retriever, client, question_stem: str, letter: str, opt_text: str,
     image_path, is_vqa: bool, topk: int,
-) -> tuple[str, list]:
-    """对单个选项做一次 RAG + 判断；返回 (verdict, contexts)。
+) -> tuple[str, list, float]:
+    """对单个选项做一次 RAG + 判断；返回 (verdict, contexts, retrieval_cost)。
 
     T1/T3: 扩大召回 topk * 3 → 噪声过滤 → 合并反向 query 检索 → 取 topk。
+    retrieval_cost 累计本选项所有 retriever.search 耗时（供选择题 time_cost 上报）。
     """
+    ret_cost = 0.0
+
     # 正向 query：题干前缀 + 选项内容
     fwd_query = f"{question_stem[:50]} {opt_text}".strip()
     fwd_docs: list = []
+    _t = time.perf_counter()
     try:
         fwd_docs = retriever.search(
             text=fwd_query,
@@ -418,11 +423,13 @@ def _judge_one_option(
         )
     except Exception:
         fwd_docs = []
+    ret_cost += time.perf_counter() - _t
 
     # 反向 query（T3）：让 LLM 生成"假设此选项成立时资料应有的陈述"
     rev_docs: list = []
     rev_q = make_reverse_query(client, question_stem, opt_text)
     if rev_q:
+        _t = time.perf_counter()
         try:
             rev_docs = retriever.search(
                 text=rev_q,
@@ -431,6 +438,7 @@ def _judge_one_option(
             )
         except Exception:
             rev_docs = []
+        ret_cost += time.perf_counter() - _t
 
     # 合并 → 噪声过滤 → 去重 → 取 topk
     seen = set()
@@ -457,9 +465,9 @@ def _judge_one_option(
     try:
         raw = client.generate(sys_p, user, image_path, temperature=0.0, max_tokens=8)
     except Exception:
-        return "", contexts
+        return "", contexts, ret_cost
     from .normalization import normalize_judgment_answer
-    return normalize_judgment_answer(raw), contexts
+    return normalize_judgment_answer(raw), contexts, ret_cost
 
 
 def _recheck_option_lenient(
@@ -673,16 +681,19 @@ def _reflect_answer(
 def choice_as_judge(
     retriever, client, question: str, section: str,
     image_path, topk: int,
-) -> tuple[str, list]:
+) -> tuple[str, list, float]:
     """
     把选择题拆成 N 个判断题（每个选项独立判定）：
       - 单选：取所有 '正确' 中第一个，多个候选时带 RAG 对比裁决
       - 多选：取所有 '正确' 字母连写；对 '错误' 选项做宽松复查（漏判修复）
       - 最终答案做一次反思；反思为 '错误' 时单选触发兜底
+
+    返回 (answer, contexts_for_log, retrieval_cost)。retrieval_cost 累加所有
+    选项检索耗时（并行执行下为各线程耗时之和，反映 RAG 实际开销）。
     """
     options = parse_choice_options(question)
     if not options:
-        return "", []
+        return "", [], 0.0
 
     stem = build_query(question, section=section)
     is_vqa = "VQA" in section
@@ -691,6 +702,7 @@ def choice_as_judge(
     correct_letters: list = []
     wrong_letters: list = []
     ctx_per_letter: dict = {}
+    ret_cost_total: float = 0.0
 
     # 4 选项并行判定（_judge_one_option 内部 retriever+LLM 均线程安全）
     with ThreadPoolExecutor(max_workers=len(options)) as pool:
@@ -706,11 +718,12 @@ def choice_as_judge(
         for fut in as_completed(future_map):
             letter, opt_text = future_map[fut]
             try:
-                verdict, ctxs = fut.result()
+                verdict, ctxs, ret_cost = fut.result()
             except Exception as e:
                 print(f"  [option {letter}] error: {e}", flush=True)
-                verdict, ctxs = "", []
+                verdict, ctxs, ret_cost = "", [], 0.0
             results_map[letter] = (verdict, ctxs)
+            ret_cost_total += ret_cost
 
     for letter, opt_text in options:  # 按原顺序输出
         verdict, ctxs = results_map[letter]
