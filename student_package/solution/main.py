@@ -315,6 +315,51 @@ def _recheck_option_lenient(
     return normalize_judgment_answer(raw)
 
 
+def _recheck_when_only_one(
+    retriever, client, question_stem: str, letter: str, opt_text: str,
+    only_correct_letter: str, only_correct_text: str, options: list,
+    image_path, is_vqa: bool, topk: int,
+) -> str:
+    """多选题仅 1 个正确选项时的二次激进复查。
+
+    多选题极少只有一个答案；用更强的暗示让模型重新评估剩余选项，
+    并显式要求"不确定时倾向于'正确'"以对抗首轮过保守判定。
+    """
+    query = f"{question_stem[:50]} {opt_text}"
+    contexts: list = []
+    try:
+        contexts = retriever.search(
+            text=query,
+            image_path=str(image_path) if image_path else None,
+            topk=topk,
+        )
+    except Exception:
+        pass
+
+    ctx_block = ""
+    if contexts:
+        lines = [f"[资料{i+1}] {c[:300]}" for i, c in enumerate(contexts[:topk])]
+        ctx_block = "以下是检索到的资料：\n" + "\n".join(lines) + "\n\n"
+
+    user = (
+        f"{ctx_block}"
+        f"[题干] {question_stem}\n"
+        f"该题为【多选题】，但首轮判定后【仅 1 个】选项被认为正确："
+        f"{only_correct_letter}. {only_correct_text}。\n"
+        f"多选题极少只有 1 个答案，可能存在漏选。\n"
+        f"[再次复查] {letter}. {opt_text}\n\n"
+        f"请认真重新评估：'{letter}. {opt_text}' 是否也属于题干所问的答案之一？\n"
+        f"原则：不确定时倾向 '正确'，仅在明显反例时输出 '错误'。仅输出 '正确' 或 '错误'："
+    )
+    sys_p = SYS_OPTION_AS_JUDGE_VQA if is_vqa else SYS_OPTION_AS_JUDGE
+    try:
+        raw = client.generate(sys_p, user, image_path, temperature=0.0, max_tokens=8)
+    except Exception:
+        return ""
+    from .normalization import normalize_judgment_answer
+    return normalize_judgment_answer(raw)
+
+
 def _single_contrast_pick(
     client, question: str, candidates: list, ctx_per_letter: dict,
     image_path, is_vqa: bool,
@@ -430,6 +475,21 @@ def choice_as_judge(
             )
             print(f"  [recheck {letter}] {opt_text[:20]} -> {recheck}", flush=True)
             if recheck == "正确":
+                correct_letters.append(letter)
+                wrong_letters.remove(letter)
+
+    # 多选题但仅 1 个正确 → 二次激进复查（多选极少只有 1 个答案）
+    if is_multi and len(correct_letters) == 1 and wrong_letters:
+        only_letter = correct_letters[0]
+        only_text = dict(options)[only_letter]
+        for letter in list(wrong_letters):
+            opt_text = dict(options)[letter]
+            recheck2 = _recheck_when_only_one(
+                retriever, client, stem, letter, opt_text,
+                only_letter, only_text, options, image_path, is_vqa, topk,
+            )
+            print(f"  [recheck2 {letter}] {opt_text[:20]} -> {recheck2}", flush=True)
+            if recheck2 == "正确":
                 correct_letters.append(letter)
                 wrong_letters.remove(letter)
 
