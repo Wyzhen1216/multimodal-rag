@@ -30,6 +30,7 @@ embedder 三档自动选择（按可用性）：
 from __future__ import annotations
 
 import os
+import threading
 from pathlib import Path
 from typing import List, Optional
 
@@ -244,6 +245,7 @@ class _LocalGMEEmbedder:
             trust_remote_code=True,
             torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
         ).to(self.device).eval()
+        self._lock = threading.Lock()  # 串行化 GPU 推理，支持多线程调用
 
     def encode(self, text: str, image_path: Optional[str] = None) -> list:
         from PIL import Image
@@ -255,10 +257,9 @@ class _LocalGMEEmbedder:
             except Exception:
                 pil_image = None
 
-        # 必须用模型自带的 embed()，它会在 prompt 里插入图像占位符
-        # 直接调 model(**inputs) 会因缺少 <|vision_start|> 等 token 而报 shape mismatch
-        with self.torch.inference_mode():
-            vec = self.model.embed(texts=[text], images=[pil_image])
+        with self._lock:
+            with self.torch.inference_mode():
+                vec = self.model.embed(texts=[text], images=[pil_image])
         return _to_list(vec)
 
 

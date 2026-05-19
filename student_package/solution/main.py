@@ -20,8 +20,10 @@ import argparse
 import json
 import os
 import sys
+import threading
 import time
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import List, Optional
 
@@ -88,6 +90,12 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
         help="若 predictions.jsonl 已存在，跳过已完成的 index",
     )
     p.add_argument("--llm", choices=("auto", "api", "local"), default="auto")
+    p.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="并发线程数（>1 启用 ThreadPoolExecutor；GPU embed 会自动串行化）",
+    )
     return p.parse_args(argv)
 
 
@@ -843,6 +851,213 @@ def pick_answer(raw: str, section: str, fallback_if_empty: bool = True,
 # 主循环
 # ============================================================================
 
+def _process_one_item(
+    i: int,
+    item: dict,
+    n_total: int,
+    retriever,
+    client,
+    args,
+    fout,
+    ftime,
+    write_lock: threading.Lock,
+    done: set,
+) -> None:
+    idx = item.get("index")
+    if idx in done:
+        return
+    section = str(item.get("section") or "")
+    question = str(item.get("question") or "")
+    image_url = str(item.get("image_url") or "")
+    image_path = resolve_local_image(image_url) if image_url else None
+
+    is_short_vqa = section == "简答VQA"
+    is_choice = "选择" in section
+    skip_retrieval = is_short_vqa or is_choice
+    valid_options = extract_valid_options(question) if is_choice else None
+
+    # ---- 分支 1: 选择题 ----
+    if is_choice:
+        t0 = time.perf_counter()
+        contexts: List[str] = []
+        raw = ""
+        try:
+            answer, contexts = choice_as_judge(
+                retriever, client, question, section, image_path,
+                topk=args.topk,
+            )
+            if valid_options and answer:
+                filtered = "".join(c for c in answer if c in valid_options)
+                if filtered:
+                    answer = filtered
+            if not answer:
+                answer = fallback_answer(section)
+            raw = answer
+        except Exception as e:
+            print(f"[idx={idx}] choice_as_judge error: {e}", flush=True)
+            answer = fallback_answer(section)
+        infer_cost = time.perf_counter() - t0
+        retrieval_cost = 0.0
+        with write_lock:
+            fout.write(json.dumps(
+                {"index": idx, "answer": answer, "raw_answer": raw},
+                ensure_ascii=False,
+            ) + "\n")
+            fout.flush()
+            ftime.write(json.dumps(
+                {"index": idx,
+                 "retrieval_cost": round(retrieval_cost, 4),
+                 "infer_cost": round(infer_cost, 4)},
+                ensure_ascii=False,
+            ) + "\n")
+            ftime.flush()
+        print(
+            f"[{i}/{n_total}] idx={idx} sec={section} "
+            f"ans={answer!r} t_inf={infer_cost:.2f}s (choice-as-judge)",
+            flush=True,
+        )
+        return
+
+    # ---- 分支 2: 判断 / 简答 ----
+    if section == "简答QA":
+        short_circuit_ans = extract_answer_from_question(client, question)
+        if short_circuit_ans:
+            t0 = time.perf_counter()
+            answer = pick_answer(short_circuit_ans, section)
+            infer_cost = time.perf_counter() - t0
+            with write_lock:
+                fout.write(json.dumps(
+                    {"index": idx, "answer": answer, "raw_answer": short_circuit_ans},
+                    ensure_ascii=False,
+                ) + "\n")
+                fout.flush()
+                ftime.write(json.dumps(
+                    {"index": idx, "retrieval_cost": 0.0,
+                     "infer_cost": round(infer_cost, 4)},
+                    ensure_ascii=False,
+                ) + "\n")
+                ftime.flush()
+            print(
+                f"[{i}/{n_total}] idx={idx} sec={section} "
+                f"ans={answer!r} (T2 short-circuit: 题干自含答案)",
+                flush=True,
+            )
+            return
+
+    # ---- 检索 ----
+    t0 = time.perf_counter()
+    contexts = []
+    if not skip_retrieval:
+        try:
+            if section == "判断QA":
+                query = build_query(question, section=section)
+                contexts = retriever.search(text=query, topk=10)
+                print(f"[idx={idx}] direct query={query[:60]} ctx={len(contexts)}", flush=True)
+            elif section == "简答QA":
+                base_q = rewrite_query(client, question, section=section)
+                variants = diverge_queries(client, question)
+                queries = [base_q] + [v for v in variants if v and v != base_q]
+                seen: set = set()
+                merged: List[str] = []
+                for q in queries[:4]:
+                    try:
+                        docs = retriever.search(text=q, topk=8)
+                    except Exception:
+                        docs = []
+                    for d in docs:
+                        if d not in seen:
+                            seen.add(d)
+                            merged.append(d)
+                merged = _filter_noise(merged, keep_min=4)
+                contexts = merged[:12]
+                print(f"[idx={idx}] diverged {len(queries)} queries, ctx={len(contexts)} (filtered)", flush=True)
+            else:
+                base_q = build_query(question, section=section)
+                img_desc = describe_image(client, image_path, question) if image_path else ""
+                query = f"{base_q} {img_desc}".strip() if img_desc else base_q
+                contexts = retriever.search(
+                    text=query,
+                    image_path=str(image_path) if image_path else None,
+                    topk=args.topk,
+                )
+                print(f"[idx={idx}] VQA query={query[:80]} ctx={len(contexts)}", flush=True)
+        except Exception as e:
+            print(f"[idx={idx}] retrieval error: {e}", flush=True)
+            contexts = []
+    retrieval_cost = time.perf_counter() - t0
+
+    # ---- Prompt ----
+    system = system_prompt_for(section)
+    user = build_user_message(section, question, contexts)
+    if not args.no_fewshot:
+        if is_short_vqa and _is_inscription_char_recognition(question):
+            pass
+        else:
+            user = fewshot_block(section) + user
+
+    # ---- 推理 ----
+    t1 = time.perf_counter()
+    raw = ""
+    try:
+        if is_short_vqa and args.vqa_samples > 1:
+            samples = client.generate_n(
+                system, user, image_path,
+                n=args.vqa_samples,
+                temperature=0.7,
+                max_tokens=64,
+            )
+            voted = majority_vote(samples, section)
+            raw = samples[0]
+            answer = voted or pick_answer(samples[0], section)
+        elif "判断" in section and args.judge_samples > 1:
+            samples = client.generate_n(
+                system, user, image_path,
+                n=args.judge_samples,
+                temperature=0.5,
+                max_tokens=200,
+            )
+            voted = majority_vote(samples, section)
+            raw = samples[0]
+            answer = voted or pick_answer(samples[0], section)
+        else:
+            max_tok = 16 if "判断" in section else 64
+            raw = client.generate(
+                system, user, image_path,
+                temperature=0.0,
+                max_tokens=max_tok,
+            )
+            answer = pick_answer(raw, section, valid_options=valid_options)
+    except Exception as e:
+        print(f"[idx={idx}] infer error: {e}", flush=True)
+        answer = fallback_answer(section)
+        raw = ""
+    infer_cost = time.perf_counter() - t1
+
+    # ---- 落盘 ----
+    with write_lock:
+        fout.write(json.dumps(
+            {"index": idx, "answer": answer, "raw_answer": raw},
+            ensure_ascii=False,
+        ) + "\n")
+        fout.flush()
+        ftime.write(json.dumps(
+            {
+                "index": idx,
+                "retrieval_cost": round(retrieval_cost, 4),
+                "infer_cost": round(infer_cost, 4),
+            },
+            ensure_ascii=False,
+        ) + "\n")
+        ftime.flush()
+
+    print(
+        f"[{i}/{n_total}] idx={idx} sec={section} "
+        f"ans={answer!r} t_ret={retrieval_cost:.2f}s t_inf={infer_cost:.2f}s "
+        f"ctx={len(contexts)}",
+        flush=True,
+    )
+
+
 def run(args: argparse.Namespace) -> None:
     in_path = Path(args.input)
     out_path = Path(args.output)
@@ -867,217 +1082,30 @@ def run(args: argparse.Namespace) -> None:
     open_mode = "a" if args.resume and out_path.exists() else "w"
     fout = out_path.open(open_mode, encoding="utf-8")
     ftime = time_path.open(open_mode, encoding="utf-8")
+    write_lock = threading.Lock()
 
     try:
-        for i, item in enumerate(items, 1):
-            idx = item.get("index")
-            if idx in done:
-                continue
-            section = str(item.get("section") or "")
-            question = str(item.get("question") or "")
-            image_url = str(item.get("image_url") or "")
-            image_path = resolve_local_image(image_url) if image_url else None
-
-            is_short_vqa = section == "简答VQA"
-            # 跳过常规检索的条件：
-            #   简答VQA - 纯视觉题，看图即可
-            #   选择题（QA/VQA）- 走 choice_as_judge 分支，内部自带检索
-            is_choice = "选择" in section
-            skip_retrieval = is_short_vqa or is_choice
-            # 选择题：解析题目中实际存在的选项，防止模型幻想 E/F/G
-            valid_options = extract_valid_options(question) if is_choice else None
-
-            # ---- 分支 1: 选择题 → 拆分为 N 个判断题 ----
-            if is_choice:
-                t0 = time.perf_counter()
-                contexts: List[str] = []
-                raw = ""
-                try:
-                    answer, contexts = choice_as_judge(
-                        retriever, client, question, section, image_path,
-                        topk=args.topk,
-                    )
-                    if valid_options and answer:
-                        filtered = "".join(c for c in answer if c in valid_options)
-                        if filtered:
-                            answer = filtered
-                    if not answer:
-                        answer = fallback_answer(section)
-                    raw = answer
-                except Exception as e:
-                    print(f"[idx={idx}] choice_as_judge error: {e}", flush=True)
-                    answer = fallback_answer(section)
-                infer_cost = time.perf_counter() - t0
-                retrieval_cost = 0.0
-
-                fout.write(json.dumps(
-                    {"index": idx, "answer": answer, "raw_answer": raw},
-                    ensure_ascii=False,
-                ) + "\n")
-                fout.flush()
-                ftime.write(json.dumps(
-                    {"index": idx,
-                     "retrieval_cost": round(retrieval_cost, 4),
-                     "infer_cost": round(infer_cost, 4)},
-                    ensure_ascii=False,
-                ) + "\n")
-                ftime.flush()
-                print(
-                    f"[{i}/{len(items)}] idx={idx} sec={section} "
-                    f"ans={answer!r} t_inf={infer_cost:.2f}s (choice-as-judge)",
-                    flush=True,
-                )
-                continue
-
-            # ---- 分支 2: 判断 / 简答 走常规检索 + 推理 ----
-            # T2: 简答QA 前置短路——题干本身已含答案则直接返回
-            short_circuit_ans = ""
-            if section == "简答QA":
-                short_circuit_ans = extract_answer_from_question(client, question)
-                if short_circuit_ans:
-                    t0 = time.perf_counter()
-                    answer = pick_answer(short_circuit_ans, section)
-                    infer_cost = time.perf_counter() - t0
-                    fout.write(json.dumps(
-                        {"index": idx, "answer": answer, "raw_answer": short_circuit_ans},
-                        ensure_ascii=False,
-                    ) + "\n")
-                    fout.flush()
-                    ftime.write(json.dumps(
-                        {"index": idx, "retrieval_cost": 0.0,
-                         "infer_cost": round(infer_cost, 4)},
-                        ensure_ascii=False,
-                    ) + "\n")
-                    ftime.flush()
-                    print(
-                        f"[{i}/{len(items)}] idx={idx} sec={section} "
-                        f"ans={answer!r} (T2 short-circuit: 题干自含答案)",
-                        flush=True,
-                    )
-                    continue
-
-            # ---- 检索 ----
-            t0 = time.perf_counter()
-            contexts = []
-            if not skip_retrieval:
-                try:
-                    if section == "判断QA":
-                        # 判断QA: 题干本身就是陈述句，直接用作 query
-                        query = build_query(question, section=section)
-                        contexts = retriever.search(text=query, topk=10)
-                        print(f"[idx={idx}] direct query={query[:60]} ctx={len(contexts)}", flush=True)
-                    elif section == "简答QA":
-                        # 简答QA: 发散检索（主 query + 多个改写 query）合并去重 + 噪声过滤
-                        base_q = rewrite_query(client, question, section=section)
-                        variants = diverge_queries(client, question)
-                        queries = [base_q] + [v for v in variants if v and v != base_q]
-                        seen = set()
-                        merged = []
-                        for q in queries[:4]:
-                            try:
-                                docs = retriever.search(text=q, topk=8)
-                            except Exception:
-                                docs = []
-                            for d in docs:
-                                if d not in seen:
-                                    seen.add(d)
-                                    merged.append(d)
-                        # T1: 过滤噪声 chunk（摘要/图说/章节标题）
-                        merged = _filter_noise(merged, keep_min=4)
-                        contexts = merged[:12]
-                        print(f"[idx={idx}] diverged {len(queries)} queries, ctx={len(contexts)} (filtered)", flush=True)
-                    else:
-                        # 判断VQA: 图像描述 + 题干 拼成 text query 做向量检索
-                        base_q = build_query(question, section=section)
-                        img_desc = describe_image(client, image_path, question) if image_path else ""
-                        query = f"{base_q} {img_desc}".strip() if img_desc else base_q
-                        contexts = retriever.search(
-                            text=query,
-                            image_path=str(image_path) if image_path else None,
-                            topk=args.topk,
-                        )
-                        print(f"[idx={idx}] VQA query={query[:80]} ctx={len(contexts)}", flush=True)
-                except Exception as e:
-                    print(f"[idx={idx}] retrieval error: {e}", flush=True)
-                    contexts = []
-            retrieval_cost = time.perf_counter() - t0
-
-            # ---- Prompt ----
-            system = system_prompt_for(section)
-            user = build_user_message(section, question, contexts)
-            if not args.no_fewshot:
-                # 简答VQA 铭文字识别题：fewshot 会带偏视觉判断 → 跳过
-                if is_short_vqa and _is_inscription_char_recognition(question):
-                    pass
-                else:
-                    user = fewshot_block(section) + user
-
-            # ---- 推理 ----
-            t1 = time.perf_counter()
-            raw = ""
-            try:
-                if is_short_vqa and args.vqa_samples > 1:
-                    # 简答VQA: 多次采样投票
-                    samples = client.generate_n(
-                        system, user, image_path,
-                        n=args.vqa_samples,
-                        temperature=0.7,
-                        max_tokens=64,
-                    )
-                    voted = majority_vote(samples, section)
-                    raw = samples[0]
-                    answer = voted or pick_answer(samples[0], section)
-                elif "判断" in section and args.judge_samples > 1:
-                    # 判断题: 多次采样投票
-                    samples = client.generate_n(
-                        system, user, image_path,
-                        n=args.judge_samples,
-                        temperature=0.5,
-                        max_tokens=200,
-                    )
-                    voted = majority_vote(samples, section)
-                    raw = samples[0]
-                    answer = voted or pick_answer(samples[0], section)
-                else:
-                    # 单次贪心
-                    if "判断" in section:
-                        max_tok = 16
-                    else:
-                        max_tok = 64
-                    raw = client.generate(
-                        system, user, image_path,
-                        temperature=0.0,
-                        max_tokens=max_tok,
-                    )
-                    answer = pick_answer(raw, section, valid_options=valid_options)
-            except Exception as e:
-                print(f"[idx={idx}] infer error: {e}", flush=True)
-                answer = fallback_answer(section)
-                raw = ""
-            infer_cost = time.perf_counter() - t1
-
-            # ---- 落盘 ----
-            fout.write(json.dumps(
-                {"index": idx, "answer": answer, "raw_answer": raw},
-                ensure_ascii=False,
-            ) + "\n")
-            fout.flush()
-            ftime.write(json.dumps(
-                {
-                    "index": idx,
-                    "retrieval_cost": round(retrieval_cost, 4),
-                    "infer_cost": round(infer_cost, 4),
-                },
-                ensure_ascii=False,
-            ) + "\n")
-            ftime.flush()
-
-            print(
-                f"[{i}/{len(items)}] idx={idx} sec={section} "
-                f"ans={answer!r} t_ret={retrieval_cost:.2f}s t_inf={infer_cost:.2f}s "
-                f"ctx={len(contexts)}",
-                flush=True,
-            )
+        n_total = len(items)
+        workers = max(1, getattr(args, "workers", 1))
+        if workers == 1:
+            for i, item in enumerate(items, 1):
+                _process_one_item(i, item, n_total, retriever, client, args,
+                                  fout, ftime, write_lock, done)
+        else:
+            print(f"[main] 并发模式: workers={workers}", flush=True)
+            with ThreadPoolExecutor(max_workers=workers) as pool:
+                futures = {
+                    pool.submit(
+                        _process_one_item,
+                        i, item, n_total, retriever, client, args,
+                        fout, ftime, write_lock, done,
+                    ): i
+                    for i, item in enumerate(items, 1)
+                }
+                for fut in as_completed(futures):
+                    exc = fut.exception()
+                    if exc:
+                        print(f"[main] worker error: {exc}", flush=True)
     finally:
         fout.close()
         ftime.close()

@@ -14,25 +14,67 @@ LLM 客户端 —— 本地 transformers + DashScope API 双模式。
 from __future__ import annotations
 
 import base64
+import hashlib
 import os
+import re
 import time
 from pathlib import Path
 from typing import List, Optional, Tuple
 
 
-_DEFAULT_IMG_DIR = Path(__file__).resolve().parent.parent / "data" / "images"
+_PKG_DIR = Path(__file__).resolve().parent.parent
+_DEFAULT_IMG_DIR = _PKG_DIR / "data" / "images"
+_DATA_URI_CACHE_DIR = _PKG_DIR / "data" / "images_cache"
 
 DEFAULT_API_BASE = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 DEFAULT_API_MODEL = "qwen2.5-vl-7b-instruct"
 
+_DATA_URI_RE = re.compile(r"^data:image/([a-zA-Z0-9.+-]+);base64,(.+)$", re.DOTALL)
+
 
 # ============================================================================
-# 工具：URL 末尾的 basename → 本地路径
+# 工具：URL / base64 data URI → 本地路径
 # ============================================================================
+
+def _materialize_data_uri(image_url: str, cache_dir: Path = _DATA_URI_CACHE_DIR) -> Optional[Path]:
+    """把 data:image/<fmt>;base64,<payload> 解码落盘，返回缓存路径。
+
+    用 payload 的 sha1 命名，幂等：同一图片重复出现不会重复写。
+    解码失败返回 None。
+    """
+    m = _DATA_URI_RE.match(image_url)
+    if not m:
+        return None
+    fmt, payload = m.group(1).lower(), m.group(2)
+    if fmt == "jpg":
+        fmt = "jpeg"
+    try:
+        raw = base64.b64decode(payload, validate=False)
+    except Exception:
+        return None
+    if not raw:
+        return None
+    digest = hashlib.sha1(payload.encode("ascii", errors="ignore")).hexdigest()
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    out = cache_dir / f"{digest}.{fmt}"
+    if not out.exists():
+        out.write_bytes(raw)
+    return out
+
 
 def resolve_local_image(image_url: str, image_dir: Path = _DEFAULT_IMG_DIR) -> Optional[Path]:
     if not image_url:
         return None
+    if image_url.startswith("data:image/"):
+        return _materialize_data_uri(image_url)
+    p = Path(image_url)
+    if p.is_absolute():
+        return p if p.exists() else None
+    # 包根相对路径（e.g. data/mock/SelectVQA/img/<sha1>.jpeg）
+    pkg_rel = _PKG_DIR / p
+    if pkg_rel.exists():
+        return pkg_rel
+    # 兜底：只取文件名，在 image_dir 里找
     fname = image_url.rstrip("/").split("/")[-1]
     local = image_dir / fname
     return local if local.exists() else None
