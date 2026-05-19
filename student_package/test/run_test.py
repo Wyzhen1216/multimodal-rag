@@ -57,7 +57,7 @@ def _build_cmd(args: argparse.Namespace, pred_path: Path) -> list[str]:
         "--input", args.input,
         "--output", str(pred_path),
         "--topk", str(args.topk),
-        "--llm", "api",  # 本地 dev 强制走 API
+        "--llm", "local",  # 官测环境强制本地模型
     ]
     if args.mode == "baseline":
         cmd += ["--no-fewshot", "--vqa-samples", "1"]
