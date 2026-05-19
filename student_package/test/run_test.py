@@ -51,9 +51,19 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
+def _resolve_python() -> str:
+    """优先用 .venv-student_package_solution 的 python（与官测环境同栈：
+    transformers>=4.49 + torch>=2.4），避免 base python 的 torch 2.1 触发
+    transformers 关闭 PyTorch 后端的问题。"""
+    venv_py = PKG_DIR / ".venv-student_package_solution" / "bin" / "python"
+    if venv_py.exists():
+        return str(venv_py)
+    return sys.executable
+
+
 def _build_cmd(args: argparse.Namespace, pred_path: Path) -> list[str]:
     cmd = [
-        sys.executable, "-u", "-m", "solution.main",
+        _resolve_python(), "-u", "-m", "solution.main",
         "--input", args.input,
         "--output", str(pred_path),
         "--topk", str(args.topk),
@@ -103,6 +113,8 @@ def main() -> int:
     env.setdefault("PYTHONUNBUFFERED", "1")
     env.setdefault("QWEN_API_KEY", "sk-REPLACE-WITH-YOUR-OWN-QWEN-KEY")
     env.setdefault("QWEN_MODEL_NAME", "qwen2.5-vl-7b-instruct")
+    # 本地 Qwen2.5-VL chat 模型（与官测环境同款；--llm local 必需）
+    env.setdefault("QWEN_MODEL_PATH", "/root/autodl-fs/model/Qwen2.5-VL-7B-Instruct")
     # DashVector 凭证（评测环境同款），本地连得上但因没有本地 GME 会自动降级
     env.setdefault(
         "DASHVECTOR_ENDPOINT",

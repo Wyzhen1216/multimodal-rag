@@ -29,7 +29,7 @@ GOLD_FILE="${GOLD_FILE:-$ROOT_DIR/data/public_examples.full.json}"
 # QWEN_MODEL_PATH 只在有本地生成模型时才需要设置；若路径不存在会自动回退到 API
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
-export QWEN_MODEL_PATH="${QWEN_MODEL_PATH:-/root/autodl-fs/model/qwen2.5-VL-7B-Instruct}"
+export QWEN_MODEL_PATH="${QWEN_MODEL_PATH:-/root/autodl-fs/model/Qwen2.5-VL-7B-Instruct}"
 export GME_MODEL_PATH="${GME_MODEL_PATH:-/autodl-fs/data/gme-Qwen2-VL-7B-Instruct}"
 export DASHVECTOR_ENDPOINT="${DASHVECTOR_ENDPOINT:-vrs-cn-71j49hani00061.dashvector.cn-hangzhou.aliyuncs.com}"
 export DASHVECTOR_API_KEY="${DASHVECTOR_API_KEY:-sk-REPLACE-WITH-YOUR-OWN-VECTOR-KEY}"

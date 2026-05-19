@@ -256,34 +256,49 @@ class ApiQwenVL(BaseQwenVL):
 
 
 # ============================================================================
-# 本地模式 —— transformers + Qwen2.5-VL
+# 本地模式 —— transformers + Qwen-VL 系列
+#
+# 设计：基类 LocalQwenVLBase 持有共享推理逻辑（messages / batch / generate_n），
+#       子类 LocalQwen2VL / LocalQwen2_5VL 各自只声明自己的 model + processor 类，
+#       互不耦合。factory `LocalQwenVL()` 按 config.json 的 model_type 派发。
 # ============================================================================
 
-class LocalQwenVL(BaseQwenVL):
+class LocalQwenVLBase(BaseQwenVL):
+    """Qwen-VL 系列本地客户端的共享基类。
+
+    子类需在 `_load_classes()` 里返回 (ModelCls, ProcessorCls)。
+    """
     name = "local"
 
     def __init__(self, model_path: Optional[str] = None, image_dir: Optional[Path] = None):
         self.model_path = model_path or os.environ.get("QWEN_MODEL_PATH", "")
         if not self.model_path or not Path(self.model_path).exists():
             raise RuntimeError(
-                f"LocalQwenVL: QWEN_MODEL_PATH invalid: {self.model_path!r}"
+                f"{type(self).__name__}: QWEN_MODEL_PATH invalid: {self.model_path!r}"
             )
         self.image_dir = Path(image_dir) if image_dir else _DEFAULT_IMG_DIR
 
         import torch
-        from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
-
         self.torch = torch
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"[local-vl] loading {self.model_path} on {self.device} ...", flush=True)
-        self.processor = AutoProcessor.from_pretrained(self.model_path, trust_remote_code=True)
-        self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+        print(f"[local-vl] loading {self.model_path} on {self.device} "
+              f"via {type(self).__name__} ...", flush=True)
+
+        ModelCls, ProcessorCls = self._load_classes()
+        self.processor = ProcessorCls.from_pretrained(self.model_path, trust_remote_code=True)
+        self.model = ModelCls.from_pretrained(
             self.model_path,
             torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
             trust_remote_code=True,
         ).to(self.device).eval()
-        print(f"[local-vl] ready.", flush=True)
+        print(f"[local-vl] ready ({type(self).__name__}).", flush=True)
 
+    # ---- 子类必须实现 ----
+    def _load_classes(self):
+        """返回 (ModelCls, ProcessorCls)，子类各自 import 自己的类。"""
+        raise NotImplementedError
+
+    # ---- 共享推理逻辑 ----
     def _build_messages(self, system: str, user_text: str, image_path: Optional[Path]) -> list:
         user_content: list = []
         if image_path is not None and image_path.exists():
@@ -404,6 +419,59 @@ class LocalQwenVL(BaseQwenVL):
             trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
         )
         return [t.strip() for t in text_out]
+
+
+class LocalQwen2VL(LocalQwenVLBase):
+    """Qwen2-VL 7B / GME-Qwen2-VL（model_type=qwen2_vl）。"""
+
+    def _load_classes(self):
+        from transformers import Qwen2VLForConditionalGeneration, Qwen2VLProcessor
+        return Qwen2VLForConditionalGeneration, Qwen2VLProcessor
+
+
+class LocalQwen2_5VL(LocalQwenVLBase):
+    """Qwen2.5-VL 7B（model_type=qwen2_5_vl）。"""
+
+    def _load_classes(self):
+        from transformers import (
+            Qwen2_5_VLForConditionalGeneration,
+            Qwen2_5_VLProcessor,
+        )
+        return Qwen2_5_VLForConditionalGeneration, Qwen2_5_VLProcessor
+
+
+def _read_model_type(model_path: str) -> str:
+    """读 config.json 的 model_type；失败返回空串。"""
+    import json
+    try:
+        with open(Path(model_path) / "config.json", "r", encoding="utf-8") as f:
+            return (json.load(f).get("model_type") or "").lower()
+    except Exception as e:
+        print(f"[local-vl] warn: read config.json failed: {e}", flush=True)
+        return ""
+
+
+def LocalQwenVL(
+    model_path: Optional[str] = None,
+    image_dir: Optional[Path] = None,
+) -> BaseQwenVL:
+    """Factory：按 config.json 的 model_type 选具体的本地客户端类。
+
+    保留旧名 `LocalQwenVL` 用作工厂函数，兼容 `LocalQwenVL()` 调用方式。
+    """
+    path = model_path or os.environ.get("QWEN_MODEL_PATH", "")
+    if not path or not Path(path).exists():
+        raise RuntimeError(f"LocalQwenVL: QWEN_MODEL_PATH invalid: {path!r}")
+
+    mt = _read_model_type(path)
+    if mt == "qwen2_5_vl":
+        return LocalQwen2_5VL(model_path=path, image_dir=image_dir)
+    if mt == "qwen2_vl":
+        return LocalQwen2VL(model_path=path, image_dir=image_dir)
+
+    print(f"[local-vl] warn: unknown model_type={mt!r}, "
+          f"fallback to LocalQwen2VL", flush=True)
+    return LocalQwen2VL(model_path=path, image_dir=image_dir)
 
 
 # ============================================================================
