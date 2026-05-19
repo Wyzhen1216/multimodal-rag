@@ -294,17 +294,4 @@ def build_retriever() -> object:
     if os.environ.get("DISABLE_RETRIEVAL") == "1":
         print("[retriever] DISABLE_RETRIEVAL=1, using NullRetriever", flush=True)
         return NullRetriever()
-    vec = DashVectorRetriever()
-    # BM25 默认关闭：120 题 / 50 题 A/B 显示 hybrid 净增益在采样噪声内（+2.5pp / -2pp），
-    # 不值得引入 ~10MB 索引文件。需要 A/B 时设 ENABLE_BM25=1 临时启用。
-    if os.environ.get("ENABLE_BM25") != "1":
-        return vec
-    try:
-        from .bm25_retriever import BM25Retriever
-        from .hybrid_retriever import HybridRetriever
-        bm25 = BM25Retriever()
-        print("[retriever] ENABLE_BM25=1 → HybridRetriever = DashVector + BM25 (RRF k=60)", flush=True)
-        return HybridRetriever(vec, bm25)
-    except Exception as e:
-        print(f"[retriever] hybrid init failed: {e}; vector-only", flush=True)
-        return vec
+    return DashVectorRetriever()

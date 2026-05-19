@@ -1160,16 +1160,6 @@ def run(args: argparse.Namespace) -> None:
     # 一次性初始化
     retriever = build_retriever()
     client = build_client(prefer=None if args.llm == "auto" else args.llm)
-    # 可选：HyDE 包装（ENABLE_HYDE=1）— 在 retriever 外加一层 LLM 假设答案拼 query
-    if os.environ.get("ENABLE_HYDE") == "1":
-        from .hyde_retriever import HyDERetriever
-        retriever = HyDERetriever(retriever, client)
-        print(f"[main] ENABLE_HYDE=1 → wrapped {type(retriever.inner).__name__} with HyDERetriever", flush=True)
-    # 可选：Reranker 包装（ENABLE_RERANK=1）— 检索结果用 cross-encoder 重排
-    if os.environ.get("ENABLE_RERANK") == "1":
-        from .rerank_retriever import RerankRetriever
-        retriever = RerankRetriever(retriever)
-        print(f"[main] ENABLE_RERANK=1 → wrapped with RerankRetriever", flush=True)
     print(f"[main] llm={client.name}  retriever={type(retriever).__name__}", flush=True)
 
     # 启动自检：验证 LLM / 检索 / 归一化在正式跑题前均可用
