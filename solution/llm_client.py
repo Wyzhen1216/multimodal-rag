@@ -469,6 +469,14 @@ def LocalQwenVL(
     if mt == "qwen2_vl":
         return LocalQwen2VL(model_path=path, image_dir=image_dir)
 
+    # config.json 读取失败或 model_type 未知时，从路径名启发式推断
+    # 防止 Qwen2.5-VL 被误用 Qwen2VLForConditionalGeneration（hidden_size 不匹配会崩溃）
+    path_lower = Path(path).name.lower()
+    if "2.5" in path_lower or "2_5" in path_lower or "qwen2-5" in path_lower:
+        print(f"[local-vl] warn: unknown model_type={mt!r}, "
+              f"path heuristic → Qwen2.5-VL", flush=True)
+        return LocalQwen2_5VL(model_path=path, image_dir=image_dir)
+
     print(f"[local-vl] warn: unknown model_type={mt!r}, "
           f"fallback to LocalQwen2VL", flush=True)
     return LocalQwen2VL(model_path=path, image_dir=image_dir)
