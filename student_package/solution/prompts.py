@@ -69,6 +69,22 @@ SYS_JUDGE_VQA = SYS_JUDGE + (
     "  - 仍旧：不确定时倾向于'正确'"
 )
 
+# 判断题软化 RAG 版本：RAG 结果仅作参考，以模型自身历史知识为主判断依据
+SYS_JUDGE_SOFT = (
+    "你是一名多模态问答助手，擅长中国考古学与历史知识。\n"
+    "请判断给定陈述是否符合史实。\n"
+    "【重要判断原则】\n"
+    "  - 你的历史知识是主要判断依据\n"
+    "  - 检索参考资料仅供辅助，只在与你的判断方向一致时才采纳\n"
+    "  - 若参考资料与你的历史知识矛盾，忽略参考资料，以你的知识为准\n"
+    "  - 不确定时，倾向于判断陈述为'正确'\n"
+    "输出格式硬性要求：\n"
+    "  1. 仅输出 '正确' 或 '错误' 两字之一\n"
+    "  2. 整段输出中不能同时出现 '正确' 和 '错误' 两个词\n"
+    "  3. 不要输出任何前缀、解释或标点"
+)
+SYS_JUDGE_SOFT_VQA = SYS_JUDGE_SOFT + "\n（注意：题目附有图片，请结合图中细节判断。）"
+
 SYS_SHORT = (
     "你是一名多模态问答助手。请输出最简短的答案。\n"
     "输出格式硬性要求：\n"
@@ -317,3 +333,38 @@ def fallback_answer(section: str) -> str:
     if "判断" in section:
         return "正确"
     return "无"
+
+
+def _format_contexts_soft(contexts: List[str], max_chars_each: int = 400) -> str:
+    """软化版 ctx 格式化：措辞改为'参考资料'，明确说明以模型知识为主。"""
+    if not contexts:
+        return ""
+    blocks = []
+    for i, ctx in enumerate(contexts, 1):
+        text = (ctx or "").strip()
+        if not text:
+            continue
+        if len(text) > max_chars_each:
+            text = text[:max_chars_each] + "…"
+        blocks.append(f"[参考{i}] {text}")
+    if not blocks:
+        return ""
+    header = (
+        "以下是检索到的参考资料（仅供辅助参考，请以你的历史知识为主要判断依据）：\n"
+    )
+    return header + "\n".join(blocks) + "\n\n"
+
+
+def build_judge_user_soft(
+    section: str,
+    question: str,
+    contexts: Optional[List[str]] = None,
+) -> str:
+    """判断题软化 RAG 版 user message。
+
+    无 ctx 时不注入资料块；有 ctx 时使用弱化措辞，不给模型"资料优先"的暗示。
+    """
+    contexts = contexts or []
+    ctx_block = _format_contexts_soft(contexts)
+    tail = "请根据你的历史知识直接输出 '正确' 或 '错误'："
+    return f"{ctx_block}[题目] {question.strip()}\n\n{tail}"

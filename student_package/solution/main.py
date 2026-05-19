@@ -42,17 +42,21 @@ from .prompts import (  # noqa: E402
     SYS_EXTRACT_ANSWER_IN_Q,
     SYS_IMAGE_AS_QUERY,
     SYS_IMAGE_DESC,
+    SYS_JUDGE_SOFT,
+    SYS_JUDGE_SOFT_VQA,
     SYS_OPTION_AS_JUDGE,
     SYS_OPTION_AS_JUDGE_VQA,
     SYS_PREDICT_COUNT,
     SYS_REVERSE_QUERY,
     SYS_SINGLE_CONTRAST,
+    build_judge_user_soft,
     build_user_message,
     fallback_answer,
     fewshot_block,
     system_prompt_for,
 )
 from .retriever import build_retriever  # noqa: E402
+from .startup_check import run_startup_checks  # noqa: E402
 
 
 # ============================================================================
@@ -89,7 +93,7 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
         action="store_true",
         help="若 predictions.jsonl 已存在，跳过已完成的 index",
     )
-    p.add_argument("--llm", choices=("auto", "api", "local"), default="auto")
+    p.add_argument("--llm", choices=("auto", "api", "local"), default="local")
     p.add_argument(
         "--workers",
         type=int,
@@ -1020,8 +1024,13 @@ def _process_one_item(
     retrieval_cost = time.perf_counter() - t0
 
     # ---- Prompt ----
-    system = system_prompt_for(section)
-    user = build_user_message(section, question, contexts)
+    # 判断题：使用软化 RAG（RAG 结果仅作参考，模型自身知识为主）
+    if "判断" in section:
+        system = SYS_JUDGE_SOFT_VQA if "VQA" in section else SYS_JUDGE_SOFT
+        user = build_judge_user_soft(section, question, contexts)
+    else:
+        system = system_prompt_for(section)
+        user = build_user_message(section, question, contexts)
     if not args.no_fewshot:
         if is_short_vqa and _is_inscription_char_recognition(question):
             pass
@@ -1047,7 +1056,7 @@ def _process_one_item(
                 system, user, image_path,
                 n=args.judge_samples,
                 temperature=0.5,
-                max_tokens=200,
+                max_tokens=16,
             )
             voted = majority_vote(samples, section)
             raw = samples[0]
@@ -1109,6 +1118,10 @@ def run(args: argparse.Namespace) -> None:
     retriever = build_retriever()
     client = build_client(prefer=None if args.llm == "auto" else args.llm)
     print(f"[main] llm={client.name}  retriever={type(retriever).__name__}", flush=True)
+
+    # 启动自检：验证 LLM / 检索 / 归一化在正式跑题前均可用
+    run_startup_checks(client, retriever)
+
     print(f"[main] total items: {len(items)}", flush=True)
 
     # 文件以 append 打开，支持续跑

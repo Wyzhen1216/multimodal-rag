@@ -147,7 +147,6 @@ class ApiQwenVL(BaseQwenVL):
             api_key
             or os.environ.get("QWEN_API_KEY")
             or os.environ.get("DASHSCOPE_API_KEY")
-            or os.environ.get("DASHVECTOR_API_KEY")
             or ""
         )
         self.base_url = base_url or os.environ.get("QWEN_BASE_URL", DEFAULT_API_BASE)
@@ -424,7 +423,6 @@ def build_client(prefer: Optional[str] = None) -> BaseQwenVL:
     if (
         os.environ.get("QWEN_API_KEY")
         or os.environ.get("DASHSCOPE_API_KEY")
-        or os.environ.get("DASHVECTOR_API_KEY")
     ):
         try:
             return ApiQwenVL()
