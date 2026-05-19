@@ -98,19 +98,6 @@ SYS_SHORT = (
     "  8. 不要回答'不知道'/'无'/'未知' —— 不确定时给出最有可能的猜测\n"
     "  9. 若检索资料中有明确答案，必须直接引用资料中的原文表述，不要改写"
 )
-
-# ---------- 简答QA 两阶段提取（文献提取而非知识生成）----------
-# 思路：检索完成后，任务从"回答问题"切换为"从文献中定位原文术语"
-# 避免模型将"流放刑"压缩为"流放"等截断行为，强制以原文为准
-SYS_SHORT_EXTRACT = (
-    "你是一名考古学文献检索助手。请从【检索资料】中定位并提取对【问题】的准确答案术语。\n"
-    "提取规则（严格遵守）：\n"
-    "  1. 从资料原文中找到最匹配的术语/词组，直接引用，不要改写或简化\n"
-    "     例：资料说'此为流放之刑'，答案应为'流放之刑'，不得简化为'流放'\n"
-    "  2. 答案不超过 10 个汉字\n"
-    "  3. 只输出答案本身，不要前缀、不要解释、不要标点\n"
-    "  4. 若资料中有明确原文，必须引用；若无，给出最可能的猜测（不要'不知道'）"
-)
 SYS_SHORT_VQA = (
     SYS_SHORT
     + "\n（注意：本题为视觉简答题，绝大多数答案直接从图中观察得出 ——"
@@ -487,15 +474,12 @@ def build_short_vqa_user(
     question: str,
     contexts: Optional[List[str]] = None,
 ) -> str:
-    """简答VQA user message：图像优先，RAG 仅辅助。
-
-    有 ctx 时用弱化措辞，明确以图像观察为主，资料仅供背景参考。
-    """
+    """简答VQA user message：图像优先，RAG 仅辅助。"""
     contexts = contexts or []
     ctx_block = ""
     if contexts:
         blocks = []
-        for i, ctx in enumerate(contexts[:3], 1):  # 最多3条，不干扰视觉判断
+        for i, ctx in enumerate(contexts[:3], 1):
             text = (ctx or "").strip()
             if not text:
                 continue
@@ -512,18 +496,5 @@ def build_short_vqa_user(
         "请优先根据图像直接观察，再参考背景资料（如有），"
         "输出最简短答案（≤8字、无前缀、无标点）。"
         "禁止 '基于以上资料' / '根据图片' / '答案是' / '为' 等开场白："
-    )
-    return f"{ctx_block}[题目] {question.strip()}\n\n{tail}"
-
-
-def build_extract_user_message(
-    question: str,
-    contexts: Optional[List[str]] = None,
-) -> str:
-    """简答QA 提取模式 user message：强调从资料原文中定位答案，而非凭空生成。"""
-    contexts = contexts or []
-    ctx_block = _format_contexts(contexts)
-    tail = (
-        "请从以上资料中定位并提取对该问题的准确原文术语（不要改写，不要截断）："
     )
     return f"{ctx_block}[题目] {question.strip()}\n\n{tail}"

@@ -52,9 +52,7 @@ from .prompts import (  # noqa: E402
     SYS_OPTION_AS_JUDGE_VQA,
     SYS_PREDICT_COUNT,
     SYS_REVERSE_QUERY,
-    SYS_SHORT_EXTRACT,
     SYS_SINGLE_CONTRAST,
-    build_extract_user_message,
     build_judge_user_soft,
     build_short_vqa_user,
     build_user_message,
@@ -184,7 +182,6 @@ def _generate_hyde_answer(client, question: str) -> str:
     """HyDE（Hypothetical Document Embedding）：生成假设答案作为额外检索 query。
 
     假设答案与目标文档在语义空间中更接近，能召回正式 query 覆盖不到的证据文献。
-    失败时返回空串，不影响主流程。
     """
     try:
         r = client.generate(
@@ -193,30 +190,6 @@ def _generate_hyde_answer(client, question: str) -> str:
         )
         s = (r or "").strip().splitlines()[0].strip()
         if s and 3 <= len(s) <= 60:
-            return s
-    except Exception:
-        pass
-    return ""
-
-
-def _generate_hyde_answer_with_context(client, question: str, context_str: str) -> str:
-    """HyDE 第二轮：借助第一轮检索上下文，生成更精确的假设答案 query。
-
-    第一轮粗检索后，用已找到的文献片段精化假设答案，
-    使其更贴近目标文献的原文表述，从而命中更精确的文档。
-    """
-    user = (
-        f"参考资料：\n{context_str}\n\n"
-        f"问题：{question}\n"
-        f"请根据以上资料给出更准确的答案（不超过15字，直接输出答案本身，不要前缀）："
-    )
-    try:
-        r = client.generate(
-            _HYDE_SYS, user,
-            temperature=0.1, max_tokens=30,
-        )
-        s = (r or "").strip().splitlines()[0].strip()
-        if s and 3 <= len(s) <= 30:
             return s
     except Exception:
         pass
@@ -1249,14 +1222,14 @@ def _process_one_item(
             elif section == "简答QA":
                 base_q = rewrite_query(client, question, section=section)
                 variants = diverge_queries(client, question)
-                # HyDE Round 1：生成初始假设答案，扩展检索覆盖面
-                hyde_q1 = _generate_hyde_answer(client, question)
-                queries_r1 = [base_q] + [v for v in variants if v and v != base_q]
-                if hyde_q1 and hyde_q1 not in queries_r1:
-                    queries_r1.append(hyde_q1)
+                # HyDE：生成假设答案作为额外检索 query，召回答案相关文献
+                hyde_q = _generate_hyde_answer(client, question)
+                queries = [base_q] + [v for v in variants if v and v != base_q]
+                if hyde_q and hyde_q not in queries:
+                    queries.append(hyde_q)
                 seen: set = set()
                 merged: List[str] = []
-                for q in queries_r1[:5]:
+                for q in queries[:5]:
                     try:
                         docs = retriever.search(text=q, topk=8)
                     except Exception:
@@ -1265,25 +1238,10 @@ def _process_one_item(
                         if d not in seen:
                             seen.add(d)
                             merged.append(d)
-                # HyDE Round 2：借助第一轮结果精化假设答案，命中更精确的文献
-                ctx_r1 = _filter_noise(merged, keep_min=4)[:6]
-                if ctx_r1:
-                    ctx_preview = "\n".join(
-                        f"[资料{i+1}] {c[:200]}" for i, c in enumerate(ctx_r1[:4])
-                    )
-                    hyde_q2 = _generate_hyde_answer_with_context(client, question, ctx_preview)
-                    if hyde_q2 and hyde_q2 not in seen:
-                        try:
-                            for d in retriever.search(text=hyde_q2, topk=8):
-                                if d not in seen:
-                                    seen.add(d)
-                                    merged.append(d)
-                        except Exception:
-                            pass
                 merged = _filter_noise(merged, keep_min=4)
                 merged = llm_rerank_contexts(client, question, merged, max_rerank=4)
                 contexts = merged[:12]
-                print(f"[idx={idx}] 简答QA iter-HyDE {len(queries_r1)}+1 queries, ctx={len(contexts)}", flush=True)
+                print(f"[idx={idx}] 简答QA HyDE {len(queries)} queries, ctx={len(contexts)}", flush=True)
             elif is_short_vqa:
                 # 简答VQA：视觉直读题（铭文/数数/方向）走轻量检索；其余走 DMQR
                 if _is_visual_direct_read(question):
@@ -1342,10 +1300,6 @@ def _process_one_item(
         vqa_ctx = [] if _is_visual_direct_read(question) else contexts
         system = system_prompt_for(section)
         user = build_short_vqa_user(question, vqa_ctx)
-    elif section == "简答QA":
-        # 简答QA：两阶段提取模式 —— 从文献中定位原文术语，而非凭空生成
-        system = SYS_SHORT_EXTRACT
-        user = build_extract_user_message(question, contexts)
     else:
         system = system_prompt_for(section)
         user = build_user_message(section, question, contexts)
