@@ -105,7 +105,8 @@ SYS_SHORT_VQA = (
     + "\n额外规则：\n"
     "  10. 地点/城市题：只输出城市/省份名，不要加景区/建筑名（如只输出'北京'，不要'北京故宫'）\n"
     "  11. 朝代题：只输出标准朝代名，'汉代'='汉朝'请统一用'汉朝'；不要加'早期/晚期/中期'\n"
-    "  12. 民族题：只输出民族名（如'汉族'），不要加建筑/服饰名称"
+    "  12. 民族题：只输出民族名（如'汉族'），不要加建筑/服饰名称\n"
+    "  13. 数量/计数题（穿孔数、竹简数、人数等）：只输出阿拉伯数字，例如 '2' 而非 '两个'/'两处'/'2个'"
 )
 
 
@@ -367,4 +368,33 @@ def build_judge_user_soft(
     contexts = contexts or []
     ctx_block = _format_contexts_soft(contexts)
     tail = "请根据你的历史知识直接输出 '正确' 或 '错误'："
+    return f"{ctx_block}[题目] {question.strip()}\n\n{tail}"
+
+
+def build_short_vqa_user(
+    question: str,
+    contexts: Optional[List[str]] = None,
+) -> str:
+    """简答VQA user message：图像优先，RAG 仅辅助。
+
+    有 ctx 时用弱化措辞，明确以图像观察为主，资料仅供背景参考。
+    """
+    contexts = contexts or []
+    ctx_block = ""
+    if contexts:
+        blocks = []
+        for i, ctx in enumerate(contexts[:3], 1):  # 最多3条，不干扰视觉判断
+            text = (ctx or "").strip()
+            if not text:
+                continue
+            if len(text) > 200:
+                text = text[:200] + "…"
+            blocks.append(f"[背景参考{i}] {text}")
+        if blocks:
+            ctx_block = (
+                "以下是辅助背景资料（仅供参考，答案应优先从图中直接观察）：\n"
+                + "\n".join(blocks)
+                + "\n\n"
+            )
+    tail = "请根据图像直接观察，输出最简短答案（≤8字、无前缀、无标点）："
     return f"{ctx_block}[题目] {question.strip()}\n\n{tail}"

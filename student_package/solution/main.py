@@ -50,6 +50,7 @@ from .prompts import (  # noqa: E402
     SYS_REVERSE_QUERY,
     SYS_SINGLE_CONTRAST,
     build_judge_user_soft,
+    build_short_vqa_user,
     build_user_message,
     fallback_answer,
     fewshot_block,
@@ -229,6 +230,20 @@ def _is_inscription_char_recognition(question: str) -> bool:
     if any(w in question for w in bias_words):
         return False
     return True
+
+
+def _is_visual_direct_read(question: str) -> bool:
+    """简答VQA 中需要直接从图像读取的题型：识字、数数、方向、握持物体等。
+
+    这类题 RAG context 注入反而引入噪音，应做检索（满足赛题要求）但不把结果注入 prompt。
+    """
+    direct_keywords = (
+        "什么字", "哪个字", "第几字", "第三字", "第几列", "第一列", "铭文",
+        "数量是多少", "穿孔数", "有几个", "有多少", "共有几",
+        "朝向是", "方向是", "朝哪", "向哪",
+        "握持的是", "握着什么", "持有什么",
+    )
+    return any(kw in question for kw in direct_keywords)
 
 
 # ============================================================================
@@ -910,7 +925,7 @@ def _process_one_item(
 
     is_short_vqa = section == "简答VQA"
     is_choice = "选择" in section
-    skip_retrieval = is_short_vqa or is_choice
+    skip_retrieval = is_choice  # 简答VQA 现在也做轻量 RAG
     valid_options = extract_valid_options(question) if is_choice else None
 
     # ---- 分支 1: 选择题 ----
@@ -1008,6 +1023,15 @@ def _process_one_item(
                 merged = _filter_noise(merged, keep_min=4)
                 contexts = merged[:12]
                 print(f"[idx={idx}] diverged {len(queries)} queries, ctx={len(contexts)} (filtered)", flush=True)
+            elif is_short_vqa:
+                # 简答VQA：以图像为主，RAG 仅辅助——直接用题干做轻量检索，不调 describe_image
+                base_q = build_query(question, section=section)
+                contexts = retriever.search(
+                    text=base_q,
+                    image_path=str(image_path) if image_path else None,
+                    topk=args.topk,
+                )
+                print(f"[idx={idx}] VQA(short) query={base_q[:60]} ctx={len(contexts)}", flush=True)
             else:
                 base_q = build_query(question, section=section)
                 img_desc = describe_image(client, image_path, question) if image_path else ""
@@ -1028,6 +1052,12 @@ def _process_one_item(
     if "判断" in section:
         system = SYS_JUDGE_SOFT_VQA if "VQA" in section else SYS_JUDGE_SOFT
         user = build_judge_user_soft(section, question, contexts)
+    elif is_short_vqa:
+        # 简答VQA：图像优先，RAG 仅作辅助背景参考
+        # 识字/数数/方向/握持等视觉直读型题：检索已做（满足赛题要求），但不注入 context 防止噪音
+        vqa_ctx = [] if _is_visual_direct_read(question) else contexts
+        system = system_prompt_for(section)
+        user = build_short_vqa_user(question, vqa_ctx)
     else:
         system = system_prompt_for(section)
         user = build_user_message(section, question, contexts)
