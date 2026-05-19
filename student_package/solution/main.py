@@ -37,10 +37,13 @@ from .prompts import (  # noqa: E402
     SYS_ANSWER_REFLECT,
     SYS_CTX_RERANK,
     SYS_DETECT_MULTI,
+    SYS_EXTRACT_ANSWER_IN_Q,
     SYS_IMAGE_AS_QUERY,
     SYS_IMAGE_DESC,
     SYS_OPTION_AS_JUDGE,
     SYS_OPTION_AS_JUDGE_VQA,
+    SYS_PREDICT_COUNT,
+    SYS_REVERSE_QUERY,
     SYS_SINGLE_CONTRAST,
     build_user_message,
     fallback_answer,
@@ -171,6 +174,123 @@ def parse_choice_options(question: str) -> list:
     return [(letter, text.strip(' \t\n、。，,.')) for letter, text in matches if text.strip()]
 
 
+# ============================================================================
+# 噪声 chunk 过滤（T1）：过滤图说/摘要/章节标题等无信息量短文本
+# ============================================================================
+
+_NOISE_PREFIXES = (
+    "图", "表", "Fig", "Table", "[", "（图", "(图",
+    "摘要", "Abstract", "ABSTRACT",
+    "前言", "目录", "参考文献", "致谢", "Key words", "关键词",
+)
+
+
+def _is_noise_chunk(text: str) -> bool:
+    """判定 chunk 是否为噪声：过短 / 元数据 / 章节标题 / 图表说明等。"""
+    if not text:
+        return True
+    t = text.strip()
+    if len(t) < 50:
+        return True
+    if any(t.startswith(p) for p in _NOISE_PREFIXES):
+        return True
+    return False
+
+
+def _filter_noise(contexts: list, keep_min: int = 2) -> list:
+    """过滤噪声 chunk；全空时保留前 keep_min 条以免后续无 ctx。"""
+    if not contexts:
+        return []
+    filtered = [c for c in contexts if not _is_noise_chunk(c)]
+    if not filtered:
+        return contexts[:keep_min]
+    return filtered
+
+
+# ============================================================================
+# 题干自含答案抽取（T2）：简答 QA 前置短路
+# ============================================================================
+
+def extract_answer_from_question(client, question: str) -> str:
+    """检测题干本身是否已含答案；命中返回答案，否则返回 ''。
+
+    例：'江西收集的西汉铜钾的器物名称是什么？' → '铜钾'
+    """
+    if not question:
+        return ""
+    try:
+        r = client.generate(
+            SYS_EXTRACT_ANSWER_IN_Q, question,
+            temperature=0.0, max_tokens=24,
+        )
+    except Exception:
+        return ""
+    s = (r or "").strip().splitlines()[0].strip(" \t、。，,.；;:'\"`")
+    if not s:
+        return ""
+    if s.upper() == "NO" or "NO" == s.upper().strip():
+        return ""
+    if len(s) > 16:
+        return ""
+    if s not in question:
+        return ""
+    return s
+
+
+# ============================================================================
+# 反向 query 生成（T3）：针对每个选项的"假设成立时资料应有的陈述"
+# ============================================================================
+
+def make_reverse_query(client, question_stem: str, opt_text: str) -> str:
+    """对单个选项生成反向陈述 query。失败返回 ''。"""
+    if not opt_text:
+        return ""
+    user = (
+        f"[题干] {question_stem}\n"
+        f"[选项] {opt_text}\n"
+        f"输出陈述 query："
+    )
+    try:
+        r = client.generate(
+            SYS_REVERSE_QUERY, user,
+            temperature=0.0, max_tokens=60,
+        )
+    except Exception:
+        return ""
+    s = (r or "").strip().splitlines()[0].strip(" \t、。，,.;:'\"`")
+    if not s or len(s) < 5 or len(s) > 80:
+        return ""
+    # 反向 query 不能等于选项本身或题干本身
+    if s == opt_text or s == question_stem:
+        return ""
+    return s
+
+
+# ============================================================================
+# 多选答案数量预测（T5）：用作"数量不足时再次复查"的软提示
+# ============================================================================
+
+def predict_answer_count(client, question: str, options: list) -> int:
+    """预测多选题答案个数；失败返回 0（视作未预测）。"""
+    if not options:
+        return 0
+    opts_str = " ".join(f"{l}.{t}" for l, t in options)
+    try:
+        r = client.generate(
+            SYS_PREDICT_COUNT,
+            f"[题目] {question}\n[选项] {opts_str}\n预测答案个数：",
+            temperature=0.0, max_tokens=8,
+        )
+    except Exception:
+        return 0
+    s = (r or "").strip()
+    for ch in s:
+        if ch in "1234":
+            n = int(ch)
+            return n if 1 <= n <= len(options) else 0
+    return 0
+
+
 def option_aware_contexts(retriever, client, question: str, section: str, topk: int) -> list:
     """
     选择题的选项感知检索：
@@ -240,17 +360,44 @@ def _judge_one_option(
     retriever, client, question_stem: str, letter: str, opt_text: str,
     image_path, is_vqa: bool, topk: int,
 ) -> tuple[str, list]:
-    """对单个选项做一次 RAG + 判断；返回 (verdict, contexts)。"""
-    query = f"{question_stem[:50]} {opt_text}".strip()
-    contexts: list = []
+    """对单个选项做一次 RAG + 判断；返回 (verdict, contexts)。
+
+    T1/T3: 扩大召回 topk * 3 → 噪声过滤 → 合并反向 query 检索 → 取 topk。
+    """
+    # 正向 query：题干前缀 + 选项内容
+    fwd_query = f"{question_stem[:50]} {opt_text}".strip()
+    fwd_docs: list = []
     try:
-        contexts = retriever.search(
-            text=query,
+        fwd_docs = retriever.search(
+            text=fwd_query,
             image_path=str(image_path) if image_path else None,
-            topk=topk,
+            topk=topk * 3,
         )
     except Exception:
-        contexts = []
+        fwd_docs = []
+
+    # 反向 query（T3）：让 LLM 生成"假设此选项成立时资料应有的陈述"
+    rev_docs: list = []
+    rev_q = make_reverse_query(client, question_stem, opt_text)
+    if rev_q:
+        try:
+            rev_docs = retriever.search(
+                text=rev_q,
+                image_path=str(image_path) if image_path else None,
+                topk=topk,
+            )
+        except Exception:
+            rev_docs = []
+
+    # 合并 → 噪声过滤 → 去重 → 取 topk
+    seen = set()
+    merged: list = []
+    for d in fwd_docs + rev_docs:
+        if d in seen:
+            continue
+        seen.add(d)
+        merged.append(d)
+    contexts = _filter_noise(merged)[:topk]
 
     ctx_block = ""
     if contexts:
@@ -350,6 +497,54 @@ def _recheck_when_only_one(
         f"[再次复查] {letter}. {opt_text}\n\n"
         f"请认真重新评估：'{letter}. {opt_text}' 是否也属于题干所问的答案之一？\n"
         f"原则：不确定时倾向 '正确'，仅在明显反例时输出 '错误'。仅输出 '正确' 或 '错误'："
+    )
+    sys_p = SYS_OPTION_AS_JUDGE_VQA if is_vqa else SYS_OPTION_AS_JUDGE
+    try:
+        raw = client.generate(sys_p, user, image_path, temperature=0.0, max_tokens=8)
+    except Exception:
+        return ""
+    from .normalization import normalize_judgment_answer
+    return normalize_judgment_answer(raw)
+
+
+def _recheck_count_mismatch(
+    retriever, client, question_stem: str, letter: str, opt_text: str,
+    current_correct: list, expected_count: int, options: list,
+    image_path, is_vqa: bool, topk: int,
+) -> str:
+    """多选题"数量不足"复查（T5）：预测有 N 个答案，目前仅判出 M < N 个。
+
+    与 _recheck_when_only_one 的区别：用预测数量作为软约束 hint。
+    """
+    query = f"{question_stem[:50]} {opt_text}"
+    contexts: list = []
+    try:
+        contexts = retriever.search(
+            text=query,
+            image_path=str(image_path) if image_path else None,
+            topk=topk,
+        )
+    except Exception:
+        pass
+
+    ctx_block = ""
+    if contexts:
+        lines = [f"[资料{i+1}] {c[:300]}" for i, c in enumerate(contexts[:topk])]
+        ctx_block = "以下是检索到的资料：\n" + "\n".join(lines) + "\n\n"
+
+    opts_map = dict(options)
+    cur_str = ", ".join(f"{l}.{opts_map.get(l,'')}" for l in current_correct)
+    cur_n = len(current_correct)
+    user = (
+        f"{ctx_block}"
+        f"[题干] {question_stem}\n"
+        f"该题为【多选题】，预估约有 {expected_count} 个正确答案，"
+        f"目前仅判出 {cur_n} 个：[{cur_str}]。\n"
+        f"数量不足，可能存在漏选。\n"
+        f"[再次复查] {letter}. {opt_text}\n\n"
+        f"请仔细评估：'{letter}. {opt_text}' 是否也属于题干所问的答案之一？\n"
+        f"原则：在资料不明确反驳时倾向 '正确'，仅在明显矛盾时输出 '错误'。"
+        f"仅输出 '正确' 或 '错误'："
     )
     sys_p = SYS_OPTION_AS_JUDGE_VQA if is_vqa else SYS_OPTION_AS_JUDGE
     try:
@@ -492,6 +687,29 @@ def choice_as_judge(
             if recheck2 == "正确":
                 correct_letters.append(letter)
                 wrong_letters.remove(letter)
+
+    # 数量不足复查（T5）：多选题预测有 N 个答案，目前仅判出 M<N 个
+    # 当前正确数 <= 2 时一律触发（多选答案数均值 2.5-3，过短大概率漏选）
+    if is_multi and wrong_letters and 1 <= len(correct_letters) <= 2:
+        expected = predict_answer_count(client, question, options)
+        # floor: current<=2 时至少认为有 3 个答案
+        threshold = max(expected, 3)
+        if threshold > len(correct_letters):
+            print(
+                f"  [count_predict] predicted={expected} threshold={threshold} "
+                f"current={len(correct_letters)} → recheck",
+                flush=True,
+            )
+            for letter in list(wrong_letters):
+                opt_text = dict(options)[letter]
+                v3 = _recheck_count_mismatch(
+                    retriever, client, stem, letter, opt_text,
+                    correct_letters, threshold, options, image_path, is_vqa, topk,
+                )
+                print(f"  [recheck3 {letter}] {opt_text[:20]} -> {v3}", flush=True)
+                if v3 == "正确":
+                    correct_letters.append(letter)
+                    wrong_letters.remove(letter)
 
     # 全部判错 → 回退常规推理
     if not correct_letters:
@@ -700,6 +918,32 @@ def run(args: argparse.Namespace) -> None:
                 continue
 
             # ---- 分支 2: 判断 / 简答 走常规检索 + 推理 ----
+            # T2: 简答QA 前置短路——题干本身已含答案则直接返回
+            short_circuit_ans = ""
+            if section == "简答QA":
+                short_circuit_ans = extract_answer_from_question(client, question)
+                if short_circuit_ans:
+                    t0 = time.perf_counter()
+                    answer = pick_answer(short_circuit_ans, section)
+                    infer_cost = time.perf_counter() - t0
+                    fout.write(json.dumps(
+                        {"index": idx, "answer": answer, "raw_answer": short_circuit_ans},
+                        ensure_ascii=False,
+                    ) + "\n")
+                    fout.flush()
+                    ftime.write(json.dumps(
+                        {"index": idx, "retrieval_cost": 0.0,
+                         "infer_cost": round(infer_cost, 4)},
+                        ensure_ascii=False,
+                    ) + "\n")
+                    ftime.flush()
+                    print(
+                        f"[{i}/{len(items)}] idx={idx} sec={section} "
+                        f"ans={answer!r} (T2 short-circuit: 题干自含答案)",
+                        flush=True,
+                    )
+                    continue
+
             # ---- 检索 ----
             t0 = time.perf_counter()
             contexts = []
@@ -711,7 +955,7 @@ def run(args: argparse.Namespace) -> None:
                         contexts = retriever.search(text=query, topk=10)
                         print(f"[idx={idx}] direct query={query[:60]} ctx={len(contexts)}", flush=True)
                     elif section == "简答QA":
-                        # 简答QA: 发散检索（主 query + 多个改写 query）合并去重
+                        # 简答QA: 发散检索（主 query + 多个改写 query）合并去重 + 噪声过滤
                         base_q = rewrite_query(client, question, section=section)
                         variants = diverge_queries(client, question)
                         queries = [base_q] + [v for v in variants if v and v != base_q]
@@ -719,15 +963,17 @@ def run(args: argparse.Namespace) -> None:
                         merged = []
                         for q in queries[:4]:
                             try:
-                                docs = retriever.search(text=q, topk=6)
+                                docs = retriever.search(text=q, topk=8)
                             except Exception:
                                 docs = []
                             for d in docs:
                                 if d not in seen:
                                     seen.add(d)
                                     merged.append(d)
+                        # T1: 过滤噪声 chunk（摘要/图说/章节标题）
+                        merged = _filter_noise(merged, keep_min=4)
                         contexts = merged[:12]
-                        print(f"[idx={idx}] diverged {len(queries)} queries, ctx={len(contexts)}", flush=True)
+                        print(f"[idx={idx}] diverged {len(queries)} queries, ctx={len(contexts)} (filtered)", flush=True)
                     else:
                         # 判断VQA: 图像描述 + 题干 拼成 text query 做向量检索
                         base_q = build_query(question, section=section)
