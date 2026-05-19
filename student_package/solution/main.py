@@ -34,10 +34,14 @@ from .normalization import normalize_answer  # noqa: E402
 
 from .llm_client import build_client, resolve_local_image  # noqa: E402
 from .prompts import (  # noqa: E402
+    SYS_ANSWER_REFLECT,
+    SYS_CTX_RERANK,
     SYS_DETECT_MULTI,
+    SYS_IMAGE_AS_QUERY,
     SYS_IMAGE_DESC,
     SYS_OPTION_AS_JUDGE,
     SYS_OPTION_AS_JUDGE_VQA,
+    SYS_SINGLE_CONTRAST,
     build_user_message,
     fallback_answer,
     fewshot_block,
@@ -235,11 +239,10 @@ def detect_multi_select(question: str, client) -> bool:
 def _judge_one_option(
     retriever, client, question_stem: str, letter: str, opt_text: str,
     image_path, is_vqa: bool, topk: int,
-) -> str:
-    """对单个选项做一次 RAG + 判断；返回 '正确' / '错误' / ''。"""
-    # 检索：把题干主题 + 选项内容拼接做 query；VQA 题也允许 image
+) -> tuple[str, list]:
+    """对单个选项做一次 RAG + 判断；返回 (verdict, contexts)。"""
     query = f"{question_stem[:50]} {opt_text}".strip()
-    contexts = []
+    contexts: list = []
     try:
         contexts = retriever.search(
             text=query,
@@ -264,9 +267,124 @@ def _judge_one_option(
     try:
         raw = client.generate(sys_p, user, image_path, temperature=0.0, max_tokens=8)
     except Exception:
+        return "", contexts
+    from .normalization import normalize_judgment_answer
+    return normalize_judgment_answer(raw), contexts
+
+
+def _recheck_option_lenient(
+    retriever, client, question_stem: str, letter: str, opt_text: str,
+    already_correct_letters: list, options: list,
+    image_path, is_vqa: bool, topk: int,
+) -> str:
+    """对'错误'选项做更宽松的复查：是否也可能是题干所问的【一个】答案。
+
+    多选漏判修复——首轮太保守的选项给一次复活机会。
+    """
+    sibling_str = ", ".join(f"{l}.{dict(options)[l]}" for l in already_correct_letters)
+    query = f"{question_stem[:50]} {opt_text}"
+    contexts: list = []
+    try:
+        contexts = retriever.search(
+            text=query,
+            image_path=str(image_path) if image_path else None,
+            topk=topk,
+        )
+    except Exception:
+        pass
+
+    ctx_block = ""
+    if contexts:
+        lines = [f"[资料{i+1}] {c[:300]}" for i, c in enumerate(contexts[:topk])]
+        ctx_block = "以下是检索到的资料：\n" + "\n".join(lines) + "\n\n"
+
+    user = (
+        f"{ctx_block}"
+        f"[题干] {question_stem}\n"
+        f"该题为多选题，已确定 [{sibling_str}] 属于答案。\n"
+        f"[复查选项] {letter}. {opt_text}\n\n"
+        f"请判断 '{letter}. {opt_text}' 是否也属于题干所问的【一个】答案（多选可能漏选）。"
+        f"仅输出 '正确' 或 '错误'："
+    )
+    sys_p = SYS_OPTION_AS_JUDGE_VQA if is_vqa else SYS_OPTION_AS_JUDGE
+    try:
+        raw = client.generate(sys_p, user, image_path, temperature=0.0, max_tokens=8)
+    except Exception:
         return ""
     from .normalization import normalize_judgment_answer
     return normalize_judgment_answer(raw)
+
+
+def _single_contrast_pick(
+    client, question: str, candidates: list, ctx_per_letter: dict,
+    image_path, is_vqa: bool,
+) -> str:
+    """单选多候选 → 带 RAG 证据的对比裁决，输出一个字母。"""
+    blocks = []
+    opts_map = dict(candidates)
+    for letter, opt_text in candidates:
+        ctxs = ctx_per_letter.get(letter, [])
+        ctx_text = "\n".join(f"  - {c[:200]}" for c in ctxs[:3]) or "  (无证据)"
+        blocks.append(f"[候选 {letter}. {opt_text}]\n{ctx_text}")
+    body = "\n\n".join(blocks)
+
+    user = (
+        f"[题目] {question}\n\n"
+        f"以下是每个候选的资料证据：\n\n{body}\n\n"
+        f"请综合证据从这些候选里选出【唯一】最贴切的答案，仅输出字母："
+    )
+    try:
+        raw = client.generate(SYS_SINGLE_CONTRAST, user, image_path,
+                              temperature=0.0, max_tokens=8)
+        from .normalization import normalize_choice_answer
+        ans = normalize_choice_answer(raw)
+        cand_letters = [l for l, _ in candidates]
+        if ans and ans[0] in cand_letters:
+            return ans[0]
+    except Exception:
+        pass
+    return candidates[0][0] if candidates else ""
+
+
+def _reflect_answer(
+    retriever, client, question: str, section: str, answer: str,
+    options: list, image_path, is_vqa: bool, topk: int,
+) -> bool:
+    """对最终答案做一次反思判定：写成判断题，仅 '正确'/'错误'。"""
+    if not answer or not options:
+        return True
+    opt_map = dict(options)
+    chosen_text = " + ".join(f"{l}.{opt_map.get(l,'')}" for l in answer if l in opt_map)
+    if not chosen_text:
+        return True
+    query = f"{question[:60]} {chosen_text}"
+    contexts: list = []
+    try:
+        contexts = retriever.search(
+            text=query,
+            image_path=str(image_path) if image_path else None,
+            topk=topk,
+        )
+    except Exception:
+        pass
+    ctx_block = ""
+    if contexts:
+        lines = [f"[资料{i+1}] {c[:300]}" for i, c in enumerate(contexts[:topk])]
+        ctx_block = "以下是相关资料：\n" + "\n".join(lines) + "\n\n"
+
+    user = (
+        f"{ctx_block}"
+        f"[题目] {question}\n"
+        f"[拟定答案] {answer}（{chosen_text}）\n\n"
+        f"请判断该答案是否正确：仅输出 '正确' 或 '错误'。"
+    )
+    try:
+        raw = client.generate(SYS_ANSWER_REFLECT, user, image_path,
+                              temperature=0.0, max_tokens=8)
+        from .normalization import normalize_judgment_answer
+        return normalize_judgment_answer(raw) != "错误"
+    except Exception:
+        return True
 
 
 def choice_as_judge(
@@ -275,59 +393,76 @@ def choice_as_judge(
 ) -> tuple[str, list]:
     """
     把选择题拆成 N 个判断题（每个选项独立判定）：
-      - 单选：取所有 '正确' 中第一个，若全 '错误' 则退回常规推理
-      - 多选：取所有 '正确' 字母连写
-    返回 (answer_letters, all_retrieved_contexts)
+      - 单选：取所有 '正确' 中第一个，多个候选时带 RAG 对比裁决
+      - 多选：取所有 '正确' 字母连写；对 '错误' 选项做宽松复查（漏判修复）
+      - 最终答案做一次反思；反思为 '错误' 时单选触发兜底
     """
     options = parse_choice_options(question)
     if not options:
         return "", []
 
-    # 题干去掉选项部分
     stem = build_query(question, section=section)
     is_vqa = "VQA" in section
     is_multi = detect_multi_select(question, client)
 
     correct_letters: list = []
-    all_ctx: list = []
+    wrong_letters: list = []
+    ctx_per_letter: dict = {}
     for letter, opt_text in options:
-        verdict = _judge_one_option(
+        verdict, ctxs = _judge_one_option(
             retriever, client, stem, letter, opt_text,
             image_path, is_vqa, topk,
         )
-        print(f"  [option {letter}] {opt_text[:20]} -> {verdict}", flush=True)
+        ctx_per_letter[letter] = ctxs
+        print(f"  [option {letter}] {opt_text[:20]} -> {verdict} ctx={len(ctxs)}", flush=True)
         if verdict == "正确":
             correct_letters.append(letter)
+        else:
+            wrong_letters.append(letter)
 
-    # 全部判定为 '错误' → 回退到常规选择题推理（让模型直接看题选）
+    # 多选漏判修复：对每个被判'错误'的选项做一次宽松复查
+    if is_multi and correct_letters and wrong_letters:
+        for letter in list(wrong_letters):
+            opt_text = dict(options)[letter]
+            recheck = _recheck_option_lenient(
+                retriever, client, stem, letter, opt_text,
+                correct_letters, options, image_path, is_vqa, topk,
+            )
+            print(f"  [recheck {letter}] {opt_text[:20]} -> {recheck}", flush=True)
+            if recheck == "正确":
+                correct_letters.append(letter)
+                wrong_letters.remove(letter)
+
+    # 全部判错 → 回退常规推理
     if not correct_letters:
         fallback = _fallback_choice_pick(client, question, image_path, is_vqa)
-        if fallback:
-            return fallback, all_ctx
-        return "", all_ctx
+        return (fallback or ""), []
 
     if is_multi:
-        return "".join(sorted(correct_letters)), all_ctx
-    # 单选：如果模型判定多个为"正确"，让模型在这些里挑一个
-    if len(correct_letters) == 1:
-        return correct_letters[0], all_ctx
-    # 多个候选 → 让模型二次裁决
-    cand_str = ", ".join(f"{l}. {dict(options)[l]}" for l in correct_letters)
-    user = (
-        f"[题干] {question}\n\n"
-        f"上一步初筛后剩下候选：{cand_str}\n"
-        f"请从候选中选出最贴切的【唯一】答案，仅输出字母："
-    )
-    try:
-        from .prompts import SYS_CHOICE_DIRECT
-        raw = client.generate(SYS_CHOICE_DIRECT, user, image_path,
-                              temperature=0.0, max_tokens=8)
-        ans = normalize_answer(section, raw)
-        if ans and ans[0] in correct_letters:
-            return ans[0], all_ctx
-    except Exception:
-        pass
-    return correct_letters[0], all_ctx
+        answer = "".join(sorted(correct_letters))
+    elif len(correct_letters) == 1:
+        answer = correct_letters[0]
+    else:
+        # 单选多候选 → 带 RAG 证据的对比裁决
+        cands = [(l, dict(options)[l]) for l in correct_letters]
+        answer = _single_contrast_pick(
+            client, question, cands, ctx_per_letter, image_path, is_vqa,
+        )
+
+    # 答案反思：检测明显错误（漏选/错选）
+    if answer:
+        ok = _reflect_answer(
+            retriever, client, question, section, answer,
+            options, image_path, is_vqa, topk,
+        )
+        print(f"  [reflect] ans={answer} -> {'OK' if ok else 'RETRY'}", flush=True)
+        if not ok and not is_multi:
+            # 单选反思失败 → 兜底重选
+            fallback = _fallback_choice_pick(client, question, image_path, is_vqa)
+            if fallback and fallback != answer:
+                answer = fallback
+
+    return answer, []
 
 
 def _fallback_choice_pick(client, question: str, image_path, is_vqa: bool) -> str:
