@@ -207,6 +207,18 @@ def _filter_noise(contexts: list, keep_min: int = 2) -> list:
     return filtered
 
 
+def _is_inscription_char_recognition(question: str) -> bool:
+    """简答VQA 题面问'铭文字识别' 且不问'代表/称谓' 时返回 True。
+    用途: 这类题加 fewshot 反而让模型在视觉判断时被无关示例带偏。
+    """
+    if "字" not in question:
+        return False
+    bias_words = ("代表", "称谓", "含义", "意思", "意义", "象征")
+    if any(w in question for w in bias_words):
+        return False
+    return True
+
+
 # ============================================================================
 # 题干自含答案抽取（T2）：简答 QA 前置短路
 # ============================================================================
@@ -994,7 +1006,11 @@ def run(args: argparse.Namespace) -> None:
             system = system_prompt_for(section)
             user = build_user_message(section, question, contexts)
             if not args.no_fewshot:
-                user = fewshot_block(section) + user
+                # 简答VQA 铭文字识别题：fewshot 会带偏视觉判断 → 跳过
+                if is_short_vqa and _is_inscription_char_recognition(question):
+                    pass
+                else:
+                    user = fewshot_block(section) + user
 
             # ---- 推理 ----
             t1 = time.perf_counter()
