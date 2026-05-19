@@ -1,15 +1,19 @@
 """
 LLM 客户端 —— 本地 transformers + DashScope API 双模式。
 
-自动选择：
-  - 设置 QWEN_API_KEY → ApiQwenVL（开发期方便）
-  - 否则 → LocalQwenVL（评测环境，离线本地推理）
+优先级：
+  - QWEN_MODEL_PATH 存在 → LocalQwenVL（默认，评测/本地均优先）
+  - 显式 --llm api 或 prefer="api" → ApiQwenVL（需 QWEN_API_KEY）
+  - auto 模式：本地模型优先，无 QWEN_MODEL_PATH 才考虑 API
 
 环境变量：
-  QWEN_API_KEY     : DashScope API Key（dev 用，可选）
+  QWEN_MODEL_PATH  : 本地模型路径（优先，有此路径默认走本地）
+  QWEN_API_KEY     : DashScope LLM API Key（仅 --llm api 时使用）
   QWEN_BASE_URL    : 默认 https://dashscope.aliyuncs.com/compatible-mode/v1
   QWEN_MODEL_NAME  : API 模式下模型名，默认 qwen2.5-vl-7b-instruct
-  QWEN_MODEL_PATH  : 本地模型路径，评测环境必填
+
+注意：DASHSCOPE_API_KEY / DASHVECTOR_API_KEY 是向量库/embedding 专用 key，
+      不用于 LLM 推理选择。
 """
 from __future__ import annotations
 
@@ -146,7 +150,6 @@ class ApiQwenVL(BaseQwenVL):
         self.api_key = (
             api_key
             or os.environ.get("QWEN_API_KEY")
-            or os.environ.get("DASHSCOPE_API_KEY")
             or ""
         )
         self.base_url = base_url or os.environ.get("QWEN_BASE_URL", DEFAULT_API_BASE)
@@ -409,21 +412,23 @@ class LocalQwenVL(BaseQwenVL):
 
 def build_client(prefer: Optional[str] = None) -> BaseQwenVL:
     """
-    自动选择客户端：
-      - prefer="api" 强制走 API
-      - prefer="local" 强制走本地
-      - prefer=None：QWEN_API_KEY 优先 API，否则本地
+    选择 LLM 客户端：
+      - prefer="local"  强制本地（默认行为）
+      - prefer="api"    强制 API（需 QWEN_API_KEY）
+      - prefer=None/auto：本地模型优先；无 QWEN_MODEL_PATH 时才走 API
     """
     if prefer == "api":
         return ApiQwenVL()
     if prefer == "local":
         return LocalQwenVL()
 
-    # 有任意一个 API key → 走 API 做生成；GME 模型只用于 embedding（retriever.py）
-    if (
-        os.environ.get("QWEN_API_KEY")
-        or os.environ.get("DASHSCOPE_API_KEY")
-    ):
+    # auto 模式：本地模型优先
+    local_path = os.environ.get("QWEN_MODEL_PATH", "")
+    if local_path and Path(local_path).exists():
+        return LocalQwenVL()
+
+    # 无本地模型 → 尝试 API（仅 QWEN_API_KEY，不用 DashScope/DashVector key）
+    if os.environ.get("QWEN_API_KEY"):
         try:
             return ApiQwenVL()
         except Exception as e:

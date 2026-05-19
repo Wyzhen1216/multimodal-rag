@@ -1,31 +1,19 @@
 """
-检索器 —— DashVector + 多模态 embedding。
+检索器 —— DashVector + 本地 GME embedding。
 
-embedder 三档自动选择（按可用性）：
-  1. LocalGMEEmbedder       : 评测环境，QWEN_MODEL_PATH 指向本地 GME-Qwen2-VL（3584 维，与集合匹配）
-  2. DashScopeApiEmbedder   : 本地 dev，走 DashScope multimodal-embedding-v1 / text-embedding-v3
-                              （维度由 API 决定，启动时与集合做兼容性校验）
-  3. **失败** —— 抛 RetrievalUnavailableError，由 main 决定是 fail-loud 还是降级闭卷
+embedder 优先级：
+  1. LocalGMEEmbedder  : GME_MODEL_PATH 指向本地 GME-Qwen2-VL（3584 维，与集合匹配）
+  2. **失败** —— 禁用检索（闭卷推理），不 fallback 到任何 API
 
 环境变量：
-  DASHVECTOR_ENDPOINT       : DashVector endpoint
-  DASHVECTOR_API_KEY        : DashVector api key
+  DASHVECTOR_ENDPOINT       : DashVector endpoint（向量库连接，与 LLM key 无关）
+  DASHVECTOR_API_KEY        : DashVector api key（向量库专用，不用于 LLM）
   DASHVECTOR_COLLECTION     : collection 名
   DASHVECTOR_VECTOR_FIELD   : 多向量集合的字段名，默认 'text'（可选 'image'/'fused'）
 
-  GME_MODEL_PATH            : 本地 GME 模型路径（评测环境必填，本地 dev 留空）
-  DASHSCOPE_API_KEY         : DashScope API Key（fallback：用 QWEN_API_KEY 同一把）
-  DASHSCOPE_EMBED_MODEL     : DashScope 模型名（默认 multimodal-embedding-v1）
+  GME_MODEL_PATH            : 本地 GME 模型路径（必填，缺失则禁用检索）
 
   DISABLE_RETRIEVAL=1       : 强制走 NullRetriever（最快闭卷推理；仅用于调试）
-
-设计原则（v3 修订）：
-  - **不静默降级**：检索系统真坏掉时抛 RetrievalUnavailableError
-  - 维度不匹配视为"系统不可用"，必须显式告知调用方
-  - 调用方（main.py）拿到异常后决定：
-      * 默认 → 直接 sys.exit(1)，避免误以为在做 RAG
-      * --allow-closed-book → 切到 NullRetriever，明确进入闭卷模式
-  - 调用方负责计时
 """
 from __future__ import annotations
 
