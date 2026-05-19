@@ -88,8 +88,14 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--workers",
         type=int,
-        default=4,
-        help="并发线程数（传给 solution.main --workers，默认 4）",
+        default=1,
+        help="并发线程数（传给 solution.main --workers）。本地模型下默认 1（GPU 争用）",
+    )
+    p.add_argument(
+        "--llm",
+        choices=("auto", "api", "local"),
+        default="local",
+        help="LLM 模式：local=本地 Qwen2.5-VL（默认），api=DashScope API",
     )
     p.add_argument(
         "--vqa-samples",
@@ -157,7 +163,7 @@ def _build_cmd(args: argparse.Namespace, input_path: Path, pred_path: Path) -> l
         "--input", str(input_path),
         "--output", str(pred_path),
         "--topk", str(args.topk),
-        "--llm", "api",
+        "--llm", args.llm,
         "--workers", str(args.workers),
     ]
     if args.mode == "baseline":
@@ -249,6 +255,8 @@ def main() -> int:
     env.setdefault("PYTHONUNBUFFERED", "1")
     env.setdefault("QWEN_API_KEY", "sk-REPLACE-WITH-YOUR-OWN-QWEN-KEY")
     env.setdefault("QWEN_MODEL_NAME", "qwen2.5-vl-7b-instruct")
+    # 本地 Qwen2.5-VL chat 模型（--llm local 必需）
+    env.setdefault("QWEN_MODEL_PATH", "/root/autodl-fs/model/Qwen2.5-VL-7B-Instruct")
     env.setdefault(
         "DASHVECTOR_ENDPOINT",
         "vrs-cn-71j49hani00061.dashvector.cn-hangzhou.aliyuncs.com",

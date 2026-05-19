@@ -8,3 +8,7 @@ transformers>=4.49.0
 dashvector>=1.0.23
 dashscope>=1.20.0
 openai>=1.30.0
+
+# BM25 稀疏检索（与向量检索 RRF 融合，见 solution/bm25_retriever.py、hybrid_retriever.py）
+rank-bm25>=0.2.2
+jieba>=0.42.1
