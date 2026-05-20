@@ -88,40 +88,6 @@ SYS_JUDGE_SOFT = (
 )
 SYS_JUDGE_SOFT_VQA = SYS_JUDGE_SOFT + "\n（注意：题目附有图片，请结合图中细节判断。）"
 
-# ---------- 对立证据判断（CF-RAG 轻量化思路）----------
-# 同时检索"支持陈述"和"反对陈述"两路证据，让模型对比双方证据强度后裁决。
-# 目的：缓解判断题"过保守、把正确判为错误"——当模型看到反方证据其实站不住时，更敢判'正确'。
-SYS_JUDGE_DIALECTIC = (
-    "你是一名多模态问答助手，擅长中国考古学与历史知识。\n"
-    "请判断给定陈述是否符合史实。\n"
-    "你会看到两组检索证据：【正方证据】（倾向支持陈述）与【反方证据】（倾向反驳陈述）。\n"
-    "【判断方法】\n"
-    "  - 对比两组证据：哪一方真正、直接地支撑了对应结论？\n"
-    "  - 关键原则：只有当反方证据**直接、明确地与陈述矛盾**时，才判'错误'；\n"
-    "    若反方证据只是话题相关、并未真正否定陈述，应判'正确'\n"
-    "  - 你的历史知识是最终裁决依据，两组证据仅供参考\n"
-    "  - 不要因为存在反方证据就过度怀疑——很多反方证据其实不构成有效反驳\n"
-    "  - 不确定时，倾向于判断陈述为'正确'\n"
-    "输出格式硬性要求：\n"
-    "  1. 仅输出 '正确' 或 '错误' 两字之一\n"
-    "  2. 整段输出中不能同时出现 '正确' 和 '错误' 两个词\n"
-    "  3. 不要输出任何前缀、解释或标点"
-)
-
-# 给定判断题陈述，生成其"反命题"检索 query（用于召回反方证据）
-SYS_NEGATE_CLAIM = (
-    "你是一名考古学信息检索助手。给定一句【判断题陈述】，"
-    "请生成一句【反命题陈述】检索 query，用于在文献库里检索可能反驳原陈述的资料。\n"
-    "要求：\n"
-    "  1. 保留原陈述的关键实体（人名/地名/器物名/朝代/数字）\n"
-    "  2. 把原陈述的核心论断改为相反或不同的表述\n"
-    "  3. 不超过 40 字，不要 '?' '是否' 等问句结构，必须是陈述句\n"
-    "  4. 只输出反命题 query 本身，不要前缀、不要换行\n"
-    "示例：\n"
-    "  输入：司母戊鼎是商代青铜器。\n"
-    "  输出：司母戊鼎并非商代青铜器 司母戊鼎的年代归属"
-)
-
 SYS_SHORT = (
     "你是一名多模态问答助手，擅长中国考古学与历史。请给出最简短的答案。\n"
     "【输出格式】\n"
@@ -407,36 +373,6 @@ def build_judge_user_soft(
     ctx_block = _format_contexts_soft(contexts)
     tail = "请根据你的历史知识直接输出 '正确' 或 '错误'："
     return f"{ctx_block}[题目] {question.strip()}\n\n{tail}"
-
-
-def _format_side_contexts(label: str, contexts: List[str],
-                          max_each: int = 350, max_n: int = 4) -> str:
-    """格式化单侧证据（正方/反方）。"""
-    if not contexts:
-        return f"【{label}】（无相关资料）\n"
-    blocks = []
-    for i, ctx in enumerate(contexts[:max_n], 1):
-        text = (ctx or "").strip()
-        if not text:
-            continue
-        if len(text) > max_each:
-            text = text[:max_each] + "…"
-        blocks.append(f"  [{label}{i}] {text}")
-    if not blocks:
-        return f"【{label}】（无相关资料）\n"
-    return f"【{label}】\n" + "\n".join(blocks) + "\n"
-
-
-def build_judge_user_dialectic(
-    question: str,
-    pro_contexts: Optional[List[str]] = None,
-    con_contexts: Optional[List[str]] = None,
-) -> str:
-    """对立证据判断 user message：分别给出正方/反方证据，让模型对比裁决。"""
-    pro_block = _format_side_contexts("正方证据", pro_contexts or [])
-    con_block = _format_side_contexts("反方证据", con_contexts or [])
-    tail = "请对比正反两方证据，根据你的历史知识直接输出 '正确' 或 '错误'："
-    return f"{pro_block}\n{con_block}\n[题目] {question.strip()}\n\n{tail}"
 
 
 def build_short_vqa_user(
