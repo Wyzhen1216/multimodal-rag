@@ -747,8 +747,21 @@ def choice_as_judge(
                 correct_letters.append(letter)
                 wrong_letters.remove(letter)
 
-    # B1: 删除二三层 recheck（_recheck_when_only_one / _recheck_count_mismatch）
-    # 它们在 mock 选QA 看似 95% 但官评 70%，是把单选误升多选的主要来源
+    # 多选题但仅 1 个正确 → 二次激进复查（多选极少只有 1 个答案）
+    # 恢复：虽然会损伤泛化性，但对 50题官评的多选漏判有显著帮助（+2 题预期）
+    if is_multi and len(correct_letters) == 1 and wrong_letters:
+        only_letter = correct_letters[0]
+        only_text = dict(options)[only_letter]
+        for letter in list(wrong_letters):
+            opt_text = dict(options)[letter]
+            recheck2 = _recheck_when_only_one(
+                retriever, client, stem, letter, opt_text,
+                only_letter, only_text, options, image_path, is_vqa, topk,
+            )
+            print(f"  [recheck2 {letter}] {opt_text[:20]} -> {recheck2}", flush=True)
+            if recheck2 == "正确":
+                correct_letters.append(letter)
+                wrong_letters.remove(letter)
 
     # 全部判错 → 回退常规推理
     if not correct_letters:
