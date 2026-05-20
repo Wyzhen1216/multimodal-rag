@@ -451,6 +451,21 @@ def _read_model_type(model_path: str) -> str:
         return ""
 
 
+def _guess_model_type_from_path(model_path: str) -> str:
+    """从路径名兜底猜测 model_type（仅在 config.json 读取失败时使用）。
+
+    与 rag_004 报错一致的关键场景：Qwen2.5-VL-7B-Instruct 被误用 Qwen2VL 类
+    加载导致 bias shape mismatch (3584 vs 1280)。这里用路径名作为最后防线。
+    """
+    s = model_path.lower().replace("\\", "/")
+    # 任一关键词命中即视为 Qwen2.5-VL（路径里的点会被标准化掉，故同时检查多种写法）
+    if any(k in s for k in ("qwen2.5-vl", "qwen2_5_vl", "qwen2.5_vl", "qwen2-5-vl")):
+        return "qwen2_5_vl"
+    if any(k in s for k in ("qwen2-vl", "qwen2_vl")):
+        return "qwen2_vl"
+    return ""
+
+
 def LocalQwenVL(
     model_path: Optional[str] = None,
     image_dir: Optional[Path] = None,
@@ -458,20 +473,43 @@ def LocalQwenVL(
     """Factory：按 config.json 的 model_type 选具体的本地客户端类。
 
     保留旧名 `LocalQwenVL` 用作工厂函数，兼容 `LocalQwenVL()` 调用方式。
+
+    严格防止 rag_004 报错（Qwen2.5-VL 用 Qwen2VL 类加载导致 bias size mismatch
+    3584 vs 1280）：
+      1) 优先看 config.json 的 model_type；
+      2) 读取失败时，再用路径名兜底猜测；
+      3) 都失败则 raise，绝不静默 fallback 到 Qwen2VL。
     """
     path = model_path or os.environ.get("QWEN_MODEL_PATH", "")
     if not path or not Path(path).exists():
         raise RuntimeError(f"LocalQwenVL: QWEN_MODEL_PATH invalid: {path!r}")
 
     mt = _read_model_type(path)
+    if not mt:
+        guessed = _guess_model_type_from_path(path)
+        if guessed:
+            print(
+                f"[local-vl] warn: model_type unread from config.json, "
+                f"using path-based guess: {guessed!r}",
+                flush=True,
+            )
+            mt = guessed
+
     if mt == "qwen2_5_vl":
         return LocalQwen2_5VL(model_path=path, image_dir=image_dir)
     if mt == "qwen2_vl":
         return LocalQwen2VL(model_path=path, image_dir=image_dir)
 
-    print(f"[local-vl] warn: unknown model_type={mt!r}, "
-          f"fallback to LocalQwen2VL", flush=True)
-    return LocalQwen2VL(model_path=path, image_dir=image_dir)
+    # 关键：未知类型时**拒绝**静默落到 Qwen2VL —— 这是 rag_004 报错的根因
+    raise RuntimeError(
+        f"LocalQwenVL: cannot determine model_type for path={path!r} "
+        f"(config.json model_type={mt!r}). "
+        f"Refuse to guess to avoid bias size mismatch "
+        f"(rag_004: Qwen2.5-VL loaded with Qwen2VLForConditionalGeneration → "
+        f"size mismatch 3584 vs 1280). "
+        f"Please ensure model dir contains valid config.json with "
+        f"'model_type' in {{'qwen2_vl','qwen2_5_vl'}}."
+    )
 
 
 # ============================================================================

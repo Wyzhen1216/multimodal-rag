@@ -4,6 +4,9 @@ student_package/outputs/
 outputs/
 output/
 
+# ---- 提交快照（远程评测打包产物，源码已在 solution/，无需入库） ----
+student_package/submissions/
+
 # ---- Python ----
 __pycache__/
 *.py[cod]
