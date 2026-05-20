@@ -156,8 +156,13 @@ class DashVectorRetriever:
         text: str,
         image_path: Optional[str] = None,
         topk: Optional[int] = None,
+        filter: Optional[str] = None,
     ) -> List[str]:
-        """检索 top-k 文档文本。失败时返回 []。"""
+        """检索 top-k 文档文本。失败时返回 []。
+
+        filter: DashVector SQL-like 表达式（type='paragraph' / page<10 / document='X' 等）。
+                None 表示不加约束。schema 字段：content/type/document/page/seq（INVERT 索引）。
+        """
         if self._disabled:
             return []
         self._ensure_collection()
@@ -175,10 +180,13 @@ class DashVectorRetriever:
             return []
 
         try:
-            resp = self._collection.query(
-                vector={self.vector_field: list(vec)},
-                topk=k,
-            )
+            kwargs = {
+                "vector": {self.vector_field: list(vec)},
+                "topk": k,
+            }
+            if filter:
+                kwargs["filter"] = filter
+            resp = self._collection.query(**kwargs)
             if not getattr(resp, "output", None):
                 return []
             docs: List[str] = []
@@ -194,6 +202,66 @@ class DashVectorRetriever:
                 if txt:
                     docs.append(str(txt))
             return docs
+        except Exception as e:
+            print(f"[retriever] query failed: {e}", flush=True)
+            return []
+
+    def search_with_meta(
+        self,
+        text: str,
+        image_path: Optional[str] = None,
+        topk: Optional[int] = None,
+        filter: Optional[str] = None,
+    ) -> List[dict]:
+        """检索 top-k 文档，返回 [{'content','type','document','page','seq'}, ...]。
+
+        失败时返回 []。供多跳/邻接扩展使用 — 需要 document/seq 锚点。
+        """
+        if self._disabled:
+            return []
+        self._ensure_collection()
+        if self._disabled:
+            return []
+        self._ensure_embedder()
+        if self._disabled:
+            return []
+
+        k = topk or self.topk
+        try:
+            vec = self._embedder.encode(text=text, image_path=image_path)
+        except Exception as e:
+            print(f"[retriever] embed failed: {e}", flush=True)
+            return []
+
+        try:
+            kwargs = {
+                "vector": {self.vector_field: list(vec)},
+                "topk": k,
+            }
+            if filter:
+                kwargs["filter"] = filter
+            resp = self._collection.query(**kwargs)
+            if not getattr(resp, "output", None):
+                return []
+            out: List[dict] = []
+            for doc in resp.output:
+                fields = dict(getattr(doc, "fields", None) or {})
+                content = (
+                    fields.get(self.text_field)
+                    or fields.get("content")
+                    or fields.get("text")
+                    or ""
+                )
+                if not content:
+                    continue
+                out.append({
+                    "content": str(content),
+                    "type": fields.get("type"),
+                    "document": fields.get("document"),
+                    "page": fields.get("page"),
+                    "seq": fields.get("seq"),
+                })
+            return out
         except Exception as e:
             print(f"[retriever] query failed: {e}", flush=True)
             return []
@@ -286,7 +354,12 @@ def _to_list(vec) -> list:
 class NullRetriever:
     """空检索器，所有 search 返回 []。"""
 
-    def search(self, text: str, image_path: Optional[str] = None, topk: Optional[int] = None) -> List[str]:
+    def search(self, text: str, image_path: Optional[str] = None,
+               topk: Optional[int] = None, filter: Optional[str] = None) -> List[str]:
+        return []
+
+    def search_with_meta(self, text: str, image_path: Optional[str] = None,
+                         topk: Optional[int] = None, filter: Optional[str] = None) -> List[dict]:
         return []
 
 

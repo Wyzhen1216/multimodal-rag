@@ -35,6 +35,7 @@ if str(_ROOT) not in sys.path:
 
 from .normalization import normalize_answer  # noqa: E402
 
+from .doc_neighbor import doc_neighbor_expand_multi, type_filter_for_section  # noqa: E402
 from .entity_extractor import extract_entities  # noqa: E402
 from .llm_client import build_client, resolve_local_image  # noqa: E402
 from .prompts import (  # noqa: E402
@@ -252,12 +253,52 @@ def _is_visual_direct_read(question: str) -> bool:
 # 实体提取召回（默认开启；DISABLE_ENTITY_RETRIEVAL=1 关闭）
 # ============================================================================
 
-_ENTITY_RETRIEVER = None  # 全局 entity 路径：始终走 BM25+Vector hybrid，绕过 fusion router 的 HyDE
+_ENTITY_RETRIEVER = None  # 全局 entity 路径：用于多跳邻接，需要 search_with_meta（DashVectorRetriever）
+_NEIGHBOR_RETRIEVER = None  # 全局多跳路径：必须是 DashVectorRetriever（用 search_with_meta）
 
 
 def set_entity_retriever(r) -> None:
     global _ENTITY_RETRIEVER
     _ENTITY_RETRIEVER = r
+
+
+def set_neighbor_retriever(r) -> None:
+    global _NEIGHBOR_RETRIEVER
+    _NEIGHBOR_RETRIEVER = r
+
+
+def doc_neighbor_contexts(
+    question: str, image_path, section: str, visual_direct: bool = False,
+    neighbor_window: int = 2, max_total: int = 6,
+) -> list:
+    """实体抽取 → 同文献邻段拉取（多跳）。
+
+    DISABLE_DOC_NEIGHBOR=1 短路。需要 _NEIGHBOR_RETRIEVER（DashVectorRetriever）支持 search_with_meta。
+    """
+    if os.environ.get("DISABLE_DOC_NEIGHBOR") == "1":
+        return []
+    r = _NEIGHBOR_RETRIEVER
+    if r is None:
+        return []
+    entities = extract_entities(question)
+    if not entities:
+        return []
+    t_filter = type_filter_for_section(section, visual_direct=visual_direct)
+    try:
+        docs = doc_neighbor_expand_multi(
+            r, entities,
+            image_path=str(image_path) if image_path else None,
+            neighbor_window=neighbor_window,
+            max_per_anchor=3,
+            max_total=max_total,
+            type_filter=t_filter,
+        )
+    except Exception as e:
+        print(f"  [doc_neighbor] error: {e}", flush=True)
+        return []
+    if docs:
+        print(f"  [doc_neighbor] entities={entities} type_filter={t_filter!r} got {len(docs)} segs", flush=True)
+    return docs
 
 
 def entity_search_contexts(
@@ -761,6 +802,15 @@ def choice_as_judge(
     # entity_search_contexts 内部已对 DISABLE_ENTITY_RETRIEVAL 短路
     _t = time.perf_counter()
     stem_entity_docs = entity_search_contexts(question, image_path, topk_per_entity=2, max_total=4)
+    # 多跳邻接：实体 anchor → 同文献 seq±N 段（对多选同文多号题如 [5462] 救援）
+    nbr_docs = doc_neighbor_contexts(question, image_path, section,
+                                     neighbor_window=2, max_total=4)
+    if nbr_docs:
+        seen_e = set(stem_entity_docs)
+        for d in nbr_docs:
+            if d not in seen_e:
+                seen_e.add(d)
+                stem_entity_docs.append(d)
     ret_cost_total += time.perf_counter() - _t
 
     # 4 选项并行判定（_judge_one_option 内部 retriever+LLM 均线程安全）
@@ -1107,9 +1157,16 @@ def _process_one_item(
                     if d not in seen:
                         seen.add(d)
                         merged.append(d)
+                # 文献多跳邻接：实体 → 同文献 seq±N 段（取同文背景，对冷僻知识题救援）
+                nbr_docs = doc_neighbor_contexts(question, None, section,
+                                                 neighbor_window=2, max_total=6)
+                for d in nbr_docs:
+                    if d not in seen:
+                        seen.add(d)
+                        merged.append(d)
                 merged = _filter_noise(merged, keep_min=4)
-                contexts = merged[:12]
-                print(f"[idx={idx}] diverged {len(queries)} queries + {len(ent_docs)} entity docs, ctx={len(contexts)} (filtered)", flush=True)
+                contexts = merged[:14]
+                print(f"[idx={idx}] diverged {len(queries)} queries + {len(ent_docs)} entity + {len(nbr_docs)} neighbor docs, ctx={len(contexts)} (filtered)", flush=True)
             elif is_short_vqa:
                 # 简答VQA：以图像为主，RAG 仅辅助——直接用题干做轻量检索，不调 describe_image
                 base_q = build_query(question, section=section)
@@ -1118,6 +1175,19 @@ def _process_one_item(
                     image_path=str(image_path) if image_path else None,
                     topk=args.topk,
                 )
+                # 视觉直读题（识字/数数/方向）→ 加一路 type='image'/'table' 邻接召回
+                # VLM 主动描述的 image/table content 可能直接包含识字答案
+                if _is_visual_direct_read(question):
+                    seen_v: set = set(contexts)
+                    nbr_docs = doc_neighbor_contexts(
+                        question, image_path, section,
+                        visual_direct=True,
+                        neighbor_window=1, max_total=4,
+                    )
+                    for d in nbr_docs:
+                        if d not in seen_v:
+                            seen_v.add(d)
+                            contexts.append(d)
                 print(f"[idx={idx}] VQA(short) query={base_q[:60]} ctx={len(contexts)}", flush=True)
             else:
                 base_q = build_query(question, section=section)
@@ -1243,6 +1313,9 @@ def run(args: argparse.Namespace) -> None:
 
     # 一次性初始化
     retriever = build_retriever()
+    # 多跳邻接专用：直接保留原始 DashVectorRetriever（带 search_with_meta + filter）
+    # router/hybrid 包装后丢失 meta 字段，邻接扩展拿不到 (document, seq)
+    set_neighbor_retriever(retriever)
     client = build_client(prefer=None if args.llm == "auto" else args.llm)
     # 题型路由（默认开启）：判断QA/VQA → BM25 hybrid（专名精确命中），简答QA → HyDE+IB rerank（mock +20pp），其他 → vector
     # DISABLE_ROUTER=1 可强制关闭（fallback 到 vector-only）
