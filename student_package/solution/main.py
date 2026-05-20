@@ -747,43 +747,8 @@ def choice_as_judge(
                 correct_letters.append(letter)
                 wrong_letters.remove(letter)
 
-    # 多选题但仅 1 个正确 → 二次激进复查（多选极少只有 1 个答案）
-    if is_multi and len(correct_letters) == 1 and wrong_letters:
-        only_letter = correct_letters[0]
-        only_text = dict(options)[only_letter]
-        for letter in list(wrong_letters):
-            opt_text = dict(options)[letter]
-            recheck2 = _recheck_when_only_one(
-                retriever, client, stem, letter, opt_text,
-                only_letter, only_text, options, image_path, is_vqa, topk,
-            )
-            print(f"  [recheck2 {letter}] {opt_text[:20]} -> {recheck2}", flush=True)
-            if recheck2 == "正确":
-                correct_letters.append(letter)
-                wrong_letters.remove(letter)
-
-    # 数量不足复查（T5）：多选题预测有 N 个答案，目前仅判出 M<N 个
-    # 当前正确数 <= 2 时一律触发（多选答案数均值 2.5-3，过短大概率漏选）
-    if is_multi and wrong_letters and 1 <= len(correct_letters) <= 2:
-        expected = predict_answer_count(client, question, options)
-        # floor: current<=2 时至少认为有 3 个答案
-        threshold = max(expected, 3)
-        if threshold > len(correct_letters):
-            print(
-                f"  [count_predict] predicted={expected} threshold={threshold} "
-                f"current={len(correct_letters)} → recheck",
-                flush=True,
-            )
-            for letter in list(wrong_letters):
-                opt_text = dict(options)[letter]
-                v3 = _recheck_count_mismatch(
-                    retriever, client, stem, letter, opt_text,
-                    correct_letters, threshold, options, image_path, is_vqa, topk,
-                )
-                print(f"  [recheck3 {letter}] {opt_text[:20]} -> {v3}", flush=True)
-                if v3 == "正确":
-                    correct_letters.append(letter)
-                    wrong_letters.remove(letter)
+    # B1: 删除二三层 recheck（_recheck_when_only_one / _recheck_count_mismatch）
+    # 它们在 mock 选QA 看似 95% 但官评 70%，是把单选误升多选的主要来源
 
     # 全部判错 → 回退常规推理
     if not correct_letters:
@@ -990,7 +955,8 @@ def _process_one_item(
     # ---- 分支 2: 判断 / 简答 ----
     if section == "简答QA":
         short_circuit_ans = extract_answer_from_question(client, question)
-        if short_circuit_ans:
+        # B2 guard: 仅当抽出答案 ≤4 字时才采纳；长答案有很大概率是题干字面抄取而非真实答案
+        if short_circuit_ans and len(short_circuit_ans) <= 4:
             t0 = time.perf_counter()
             answer = pick_answer(short_circuit_ans, section)
             infer_cost = time.perf_counter() - t0
