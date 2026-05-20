@@ -36,7 +36,7 @@ if str(_ROOT) not in sys.path:
 from .normalization import normalize_answer  # noqa: E402
 
 from .doc_neighbor import doc_neighbor_expand_multi, type_filter_for_section  # noqa: E402
-from .entity_extractor import extract_entities  # noqa: E402
+from .entity_extractor import extract_entities, extract_visual_entities  # noqa: E402
 from .llm_client import build_client, resolve_local_image  # noqa: E402
 from .prompts import (  # noqa: E402
     SYS_ANSWER_REFLECT,
@@ -270,9 +270,11 @@ def set_neighbor_retriever(r) -> None:
 def doc_neighbor_contexts(
     question: str, image_path, section: str, visual_direct: bool = False,
     neighbor_window: int = 2, max_total: int = 6,
+    extra_entities: Optional[list] = None,
 ) -> list:
     """实体抽取 → 同文献邻段拉取（多跳）。
 
+    extra_entities: 调用方追加的实体（如 VQA 视觉实体）
     DISABLE_DOC_NEIGHBOR=1 短路。需要 _NEIGHBOR_RETRIEVER（DashVectorRetriever）支持 search_with_meta。
     """
     if os.environ.get("DISABLE_DOC_NEIGHBOR") == "1":
@@ -281,6 +283,12 @@ def doc_neighbor_contexts(
     if r is None:
         return []
     entities = extract_entities(question)
+    if extra_entities:
+        seen_e = set(entities)
+        for e in extra_entities:
+            if e and e not in seen_e:
+                entities.append(e)
+                seen_e.add(e)
     if not entities:
         return []
     t_filter = type_filter_for_section(section, visual_direct=visual_direct)
@@ -303,9 +311,11 @@ def doc_neighbor_contexts(
 
 def entity_search_contexts(
     question: str, image_path, topk_per_entity: int = 2, max_total: int = 6,
+    extra_entities: Optional[list] = None,
 ) -> list:
     """对题干抽实体 → 用 hybrid retriever 逐实体检索 → 合并去重。
 
+    extra_entities: 调用方追加的实体（如 VQA 的 VLM 视觉抽取结果）
     短路：DISABLE_ENTITY_RETRIEVAL=1 / 抽不到实体 / 全局 retriever 未设置 → 返回 []
     """
     if os.environ.get("DISABLE_ENTITY_RETRIEVAL") == "1":
@@ -314,6 +324,13 @@ def entity_search_contexts(
     if r is None:
         return []
     entities = extract_entities(question)
+    if extra_entities:
+        # 视觉实体追加在文本实体后；去重保留顺序
+        seen_e = set(entities)
+        for e in extra_entities:
+            if e and e not in seen_e:
+                entities.append(e)
+                seen_e.add(e)
     if not entities:
         return []
     print(f"  [entity] {entities}", flush=True)
@@ -801,10 +818,23 @@ def choice_as_judge(
     # 题干实体检索：一次抽实体（M16/朱郎埠墓群/...），共享给所有选项的 _judge_one_option
     # entity_search_contexts 内部已对 DISABLE_ENTITY_RETRIEVAL 短路
     _t = time.perf_counter()
-    stem_entity_docs = entity_search_contexts(question, image_path, topk_per_entity=2, max_total=4)
+    # VQA 同模态匹配增强：VLM 看图抽视觉实体（器物名/铭文/纹饰）追加到 entity list
+    # 绕开"跨模态对齐"问题，让纯文路径在 image-type VLM 描述上做同模态匹配
+    visual_ents: list = []
+    if is_vqa and image_path is not None and os.environ.get("DISABLE_VISUAL_ENTITY") != "1":
+        visual_ents = extract_visual_entities(client, image_path, question, max_entities=4)
+        if visual_ents:
+            print(f"  [visual_entity] {visual_ents}", flush=True)
+    stem_entity_docs = entity_search_contexts(
+        question, image_path, topk_per_entity=2, max_total=4,
+        extra_entities=visual_ents,
+    )
     # 多跳邻接：实体 anchor → 同文献 seq±N 段（对多选同文多号题如 [5462] 救援）
-    nbr_docs = doc_neighbor_contexts(question, image_path, section,
-                                     neighbor_window=2, max_total=4)
+    nbr_docs = doc_neighbor_contexts(
+        question, image_path, section,
+        neighbor_window=2, max_total=4,
+        extra_entities=visual_ents,
+    )
     if nbr_docs:
         seen_e = set(stem_entity_docs)
         for d in nbr_docs:
@@ -1179,10 +1209,17 @@ def _process_one_item(
                 # VLM 主动描述的 image/table content 可能直接包含识字答案
                 if _is_visual_direct_read(question):
                     seen_v: set = set(contexts)
+                    # VLM 抽视觉实体（器物名/铭文片段），作为额外 anchor 走同模态匹配
+                    visual_ents = []
+                    if image_path is not None and os.environ.get("DISABLE_VISUAL_ENTITY") != "1":
+                        visual_ents = extract_visual_entities(client, image_path, question, max_entities=4)
+                        if visual_ents:
+                            print(f"  [visual_entity] {visual_ents}", flush=True)
                     nbr_docs = doc_neighbor_contexts(
                         question, image_path, section,
                         visual_direct=True,
                         neighbor_window=1, max_total=4,
+                        extra_entities=visual_ents,
                     )
                     for d in nbr_docs:
                         if d not in seen_v:
@@ -1198,6 +1235,20 @@ def _process_one_item(
                     image_path=str(image_path) if image_path else None,
                     topk=args.topk,
                 )
+                # 判断VQA: VLM 抽视觉实体 → 同模态匹配补充 ctx
+                if image_path is not None and os.environ.get("DISABLE_VISUAL_ENTITY") != "1":
+                    visual_ents = extract_visual_entities(client, image_path, question, max_entities=3)
+                    if visual_ents:
+                        print(f"  [visual_entity] {visual_ents}", flush=True)
+                        ent_docs = entity_search_contexts(
+                            question, image_path, topk_per_entity=2, max_total=3,
+                            extra_entities=visual_ents,
+                        )
+                        seen_v = set(contexts)
+                        for d in ent_docs:
+                            if d not in seen_v:
+                                seen_v.add(d)
+                                contexts.append(d)
                 print(f"[idx={idx}] VQA query={query[:80]} ctx={len(contexts)}", flush=True)
         except Exception as e:
             print(f"[idx={idx}] retrieval error: {e}", flush=True)

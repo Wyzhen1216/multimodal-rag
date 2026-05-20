@@ -169,3 +169,60 @@ def build_entity_query(entities: List[str]) -> str:
     空格分隔即可：BM25 词袋模型对空格切分友好；jieba 在 BM25Retriever 内部会再分一遍。
     """
     return " ".join(entities)
+
+
+# ============================================================================
+# 视觉实体抽取（VQA 同模态匹配增强）
+# ============================================================================
+
+def extract_visual_entities(
+    client, image_path, question: str = "", max_entities: int = 4,
+) -> List[str]:
+    """让 VLM 从图中抽视觉实体名词（器物/铭文/纹饰），用于 image-type content 同模态匹配。
+
+    严格 prompt 控制：只输出实体名词，禁止描述句/答案。失败/无图 → 返回 []。
+    """
+    if image_path is None or client is None:
+        return []
+    try:
+        from .prompts import SYS_VISUAL_ENTITY_EXTRACT
+    except Exception:
+        return []
+
+    user = f"题目: {question}\n请列出图中可作为检索关键词的视觉实体（逗号分隔，≤5 个）："
+    try:
+        raw = client.generate(
+            SYS_VISUAL_ENTITY_EXTRACT, user, image_path,
+            temperature=0.0, max_tokens=40,
+        )
+    except Exception:
+        return []
+    if not raw:
+        return []
+
+    # 取第一行，按中英文逗号/顿号切分
+    line = raw.strip().splitlines()[0].strip()
+    # 过滤明显的描述句开头（防止 VLM 不守规则）
+    bad_starts = ("图中", "图片", "这是", "答案", "答：", "图为", "可以看到")
+    if any(line.startswith(s) for s in bad_starts):
+        return []
+
+    import re as _re
+    parts = _re.split(r"[,，、;；\s]+", line)
+    out: List[str] = []
+    seen: set = set()
+    for p in parts:
+        p = p.strip(" \t\n、。，,.；;:'\"`'\"《》【】[]()")
+        if not p or len(p) < 2 or len(p) > 8:
+            continue
+        # 过滤明显的非实体词（动词/形容词常见前缀）
+        if p in ("无", "未知", "不确定", "暂无", "无法识别"):
+            continue
+        if p in seen:
+            continue
+        seen.add(p)
+        out.append(p)
+        if len(out) >= max_entities:
+            break
+    return out
+
