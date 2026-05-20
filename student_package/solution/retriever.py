@@ -157,11 +157,15 @@ class DashVectorRetriever:
         image_path: Optional[str] = None,
         topk: Optional[int] = None,
         filter: Optional[str] = None,
+        vector_field: Optional[str] = None,
     ) -> List[str]:
         """检索 top-k 文档文本。失败时返回 []。
 
         filter: DashVector SQL-like 表达式（type='paragraph' / page<10 / document='X' 等）。
                 None 表示不加约束。schema 字段：content/type/document/page/seq（INVERT 索引）。
+        vector_field: 'text' (默认) / 'image' / 'fused'。
+                'image': 用 image_path 编码做图-图同模态匹配；
+                'fused': 用图+文融合编码查 collection 的融合向量。
         """
         if self._disabled:
             return []
@@ -173,15 +177,20 @@ class DashVectorRetriever:
             return []
 
         k = topk or self.topk
+        vf = vector_field or self.vector_field
+        # 'image' 模式：只用图编码，不带文字
         try:
-            vec = self._embedder.encode(text=text, image_path=image_path)
+            if vf == "image":
+                vec = self._embedder.encode(text="", image_path=image_path)
+            else:
+                vec = self._embedder.encode(text=text, image_path=image_path)
         except Exception as e:
             print(f"[retriever] embed failed: {e}", flush=True)
             return []
 
         try:
             kwargs = {
-                "vector": {self.vector_field: list(vec)},
+                "vector": {vf: list(vec)},
                 "topk": k,
             }
             if filter:
@@ -212,6 +221,7 @@ class DashVectorRetriever:
         image_path: Optional[str] = None,
         topk: Optional[int] = None,
         filter: Optional[str] = None,
+        vector_field: Optional[str] = None,
     ) -> List[dict]:
         """检索 top-k 文档，返回 [{'content','type','document','page','seq'}, ...]。
 
@@ -227,15 +237,19 @@ class DashVectorRetriever:
             return []
 
         k = topk or self.topk
+        vf = vector_field or self.vector_field
         try:
-            vec = self._embedder.encode(text=text, image_path=image_path)
+            if vf == "image":
+                vec = self._embedder.encode(text="", image_path=image_path)
+            else:
+                vec = self._embedder.encode(text=text, image_path=image_path)
         except Exception as e:
             print(f"[retriever] embed failed: {e}", flush=True)
             return []
 
         try:
             kwargs = {
-                "vector": {self.vector_field: list(vec)},
+                "vector": {vf: list(vec)},
                 "topk": k,
             }
             if filter:

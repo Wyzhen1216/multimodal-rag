@@ -267,6 +267,87 @@ def set_neighbor_retriever(r) -> None:
     _NEIGHBOR_RETRIEVER = r
 
 
+def image_query_contexts(
+    image_path, *, topk_per_field: int = 2, max_total: int = 4,
+    with_neighbor: bool = True, neighbor_window: int = 1,
+) -> list:
+    """图-图 / 图-融合 同模态匹配（VQA 题专用）。
+
+    流程：
+      1) image vec → image field 查 top-k（图-图视觉同模态）
+      2) image vec → fused field 查 top-k（图查融合编码，跨模态语义对齐）
+      3) 命中 top1 后做同文献 seq±N 邻接扩展（拿到完整释读上下文）
+
+    opt-in: ENABLE_IMAGE_QUERY=1 才启用；image_path 为空时返回 []。
+    """
+    if os.environ.get("ENABLE_IMAGE_QUERY") != "1":
+        return []
+    if not image_path:
+        return []
+    r = _NEIGHBOR_RETRIEVER
+    if r is None or not hasattr(r, "search_with_meta"):
+        return []
+
+    seen: set = set()
+    out: list = []
+    anchor_info = None  # (document, seq) 用于多跳
+
+    # 1) image vec → image field
+    try:
+        hits = r.search_with_meta(
+            text="", image_path=str(image_path),
+            topk=topk_per_field, vector_field="image",
+        )
+    except Exception as e:
+        print(f"  [image_query] image→image FAIL: {e}", flush=True)
+        hits = []
+    for h in hits:
+        c = h.get("content") or ""
+        if c and c not in seen:
+            seen.add(c)
+            out.append(c)
+            if anchor_info is None and h.get("document") and h.get("seq") is not None:
+                anchor_info = (str(h["document"]), int(h["seq"]))
+
+    # 2) image vec → fused field
+    try:
+        hits = r.search_with_meta(
+            text="", image_path=str(image_path),
+            topk=topk_per_field, vector_field="fused",
+        )
+    except Exception as e:
+        print(f"  [image_query] image→fused FAIL: {e}", flush=True)
+        hits = []
+    for h in hits:
+        c = h.get("content") or ""
+        if c and c not in seen:
+            seen.add(c)
+            out.append(c)
+
+    # 3) 多跳邻接：image→image 锚点的同文献相邻段
+    if with_neighbor and anchor_info:
+        doc_id, seq_i = anchor_info
+        try:
+            from .doc_neighbor import _shape_filter
+            nb_filter = _shape_filter(doc_id, seq_i - neighbor_window, seq_i + neighbor_window)
+            nbrs = r.search_with_meta(
+                text="", image_path=str(image_path),
+                topk=4, filter=nb_filter, vector_field="image",
+            )
+        except Exception:
+            nbrs = []
+        nbrs_sorted = sorted(nbrs, key=lambda d: (d.get("seq") or 0))
+        for h in nbrs_sorted:
+            c = h.get("content") or ""
+            if c and c not in seen:
+                seen.add(c)
+                out.append(c)
+
+    if out:
+        print(f"  [image_query] got {len(out)} docs (anchor={anchor_info})", flush=True)
+    return out[:max_total]
+
+
 def doc_neighbor_contexts(
     question: str, image_path, section: str, visual_direct: bool = False,
     neighbor_window: int = 2, max_total: int = 6,
@@ -845,6 +926,16 @@ def choice_as_judge(
             if d not in seen_e:
                 seen_e.add(d)
                 stem_entity_docs.append(d)
+    # VQA 图-图同模态匹配（opt-in via ENABLE_IMAGE_QUERY=1）
+    # image vec → image/fused field + 多跳邻接，命中 [2137] 等器物识别题
+    if is_vqa and image_path is not None:
+        img_docs = image_query_contexts(image_path, topk_per_field=2, max_total=4)
+        if img_docs:
+            seen_e = set(stem_entity_docs)
+            for d in img_docs:
+                if d not in seen_e:
+                    seen_e.add(d)
+                    stem_entity_docs.append(d)
     ret_cost_total += time.perf_counter() - _t
 
     # 4 选项并行判定（_judge_one_option 内部 retriever+LLM 均线程安全）
@@ -1229,6 +1320,14 @@ def _process_one_item(
                         if d not in seen_v:
                             seen_v.add(d)
                             contexts.append(d)
+                    # 图-图同模态匹配（opt-in via ENABLE_IMAGE_QUERY=1）
+                    # 对 [6319] 这种铭文识字题尤其有价值：图查 image field 直接命中铭文释读
+                    if image_path is not None:
+                        img_docs = image_query_contexts(image_path, topk_per_field=2, max_total=4)
+                        for d in img_docs:
+                            if d not in seen_v:
+                                seen_v.add(d)
+                                contexts.append(d)
                 print(f"[idx={idx}] VQA(short) query={base_q[:60]} ctx={len(contexts)}", flush=True)
             else:
                 base_q = build_query(question, section=section)
@@ -1250,6 +1349,16 @@ def _process_one_item(
                         )
                         seen_v = set(contexts)
                         for d in ent_docs:
+                            if d not in seen_v:
+                                seen_v.add(d)
+                                contexts.append(d)
+                # 判断VQA: 图-图同模态匹配（opt-in via ENABLE_IMAGE_QUERY=1）
+                # 对 [2137] 作册般甗这类器物名识别题，图-图命中可直接拉到正确文献
+                if image_path is not None:
+                    img_docs = image_query_contexts(image_path, topk_per_field=2, max_total=4)
+                    if img_docs:
+                        seen_v = set(contexts)
+                        for d in img_docs:
                             if d not in seen_v:
                                 seen_v.add(d)
                                 contexts.append(d)
