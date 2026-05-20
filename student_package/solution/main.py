@@ -43,6 +43,7 @@ from .prompts import (  # noqa: E402
     SYS_EXTRACT_ANSWER_IN_Q,
     SYS_IMAGE_AS_QUERY,
     SYS_IMAGE_DESC,
+    SYS_JUDGE,
     SYS_JUDGE_SOFT,
     SYS_JUDGE_SOFT_VQA,
     SYS_OPTION_AS_JUDGE,
@@ -763,6 +764,31 @@ def choice_as_judge(
                 correct_letters.append(letter)
                 wrong_letters.remove(letter)
 
+    # T5: 数量不足复查（opt-in via ENABLE_COUNT_RECHECK=1）
+    # 多选题预测有 N 个答案，目前仅判出 M<N 个；current<=2 时强制 threshold=max(predicted,3)
+    if (
+        os.environ.get("ENABLE_COUNT_RECHECK") == "1"
+        and is_multi and wrong_letters and 1 <= len(correct_letters) <= 2
+    ):
+        expected = predict_answer_count(client, question, options)
+        threshold = max(expected, 3)  # current<=2 时至少认为有 3 个
+        if threshold > len(correct_letters):
+            print(
+                f"  [count_predict] predicted={expected} threshold={threshold} "
+                f"current={len(correct_letters)} → recheck",
+                flush=True,
+            )
+            for letter in list(wrong_letters):
+                opt_text = dict(options)[letter]
+                v3 = _recheck_count_mismatch(
+                    retriever, client, stem, letter, opt_text,
+                    correct_letters, threshold, options, image_path, is_vqa, topk,
+                )
+                print(f"  [recheck3 {letter}] {opt_text[:20]} -> {v3}", flush=True)
+                if v3 == "正确":
+                    correct_letters.append(letter)
+                    wrong_letters.remove(letter)
+
     # 全部判错 → 回退常规推理
     if not correct_letters:
         fallback = _fallback_choice_pick(client, question, image_path, is_vqa)
@@ -1045,15 +1071,29 @@ def _process_one_item(
 
     # ---- Prompt ----
     # 判断题：使用软化 RAG（RAG 结果仅作参考，模型自身知识为主）
+    # JUDGE_PROMPT=strong 时，判断QA 切回高准确率版的 SYS_JUDGE；VQA 仍走 SOFT_VQA（保留视觉优先规则）
     if "判断" in section:
-        system = SYS_JUDGE_SOFT_VQA if "VQA" in section else SYS_JUDGE_SOFT
-        user = build_judge_user_soft(section, question, contexts)
+        if os.environ.get("JUDGE_PROMPT") == "strong" and "VQA" not in section:
+            system = SYS_JUDGE
+            user = build_user_message(section, question, contexts)
+        else:
+            system = SYS_JUDGE_SOFT_VQA if "VQA" in section else SYS_JUDGE_SOFT
+            user = build_judge_user_soft(section, question, contexts)
     elif is_short_vqa:
         # 简答VQA：图像优先，RAG 仅作辅助背景参考
         # 识字/数数/方向/握持等视觉直读型题：检索已做（满足赛题要求），但不注入 context 防止噪音
-        vqa_ctx = [] if _is_visual_direct_read(question) else contexts
+        is_visual_direct = _is_visual_direct_read(question)
+        vqa_ctx = [] if is_visual_direct else contexts
         system = system_prompt_for(section)
-        user = build_short_vqa_user(question, vqa_ctx)
+        # VQA_INJECT_KNOWLEDGE=1: 非视觉直读题走标准 ctx 注入（高准确率版策略，针对 mock 知识类）
+        if (
+            os.environ.get("VQA_INJECT_KNOWLEDGE") == "1"
+            and not is_visual_direct
+            and vqa_ctx
+        ):
+            user = build_user_message(section, question, vqa_ctx)
+        else:
+            user = build_short_vqa_user(question, vqa_ctx)
     else:
         system = system_prompt_for(section)
         user = build_user_message(section, question, contexts)
