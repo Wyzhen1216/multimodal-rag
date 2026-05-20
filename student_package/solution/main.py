@@ -351,9 +351,10 @@ def doc_neighbor_contexts(
     """实体抽取 → 同文献邻段拉取（多跳）。
 
     extra_entities: 调用方追加的实体（如 VQA 视觉实体）
-    DISABLE_DOC_NEIGHBOR=1 短路。需要 _NEIGHBOR_RETRIEVER（DashVectorRetriever）支持 search_with_meta。
+    opt-in via ENABLE_DOC_NEIGHBOR=1：官方 50 题 [5462]+1 但 [1866]-1，净 0；
+    保留代码栈但默认关闭，避免对判断题"主要分布在 X"类陈述反噬。
     """
-    if os.environ.get("DISABLE_DOC_NEIGHBOR") == "1":
+    if os.environ.get("ENABLE_DOC_NEIGHBOR") != "1":
         return []
     r = _NEIGHBOR_RETRIEVER
     if r is None:
