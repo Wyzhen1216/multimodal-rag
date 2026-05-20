@@ -35,6 +35,7 @@ if str(_ROOT) not in sys.path:
 
 from .normalization import normalize_answer  # noqa: E402
 
+from .entity_extractor import extract_entities  # noqa: E402
 from .llm_client import build_client, resolve_local_image  # noqa: E402
 from .prompts import (  # noqa: E402
     SYS_ANSWER_REFLECT,
@@ -248,6 +249,55 @@ def _is_visual_direct_read(question: str) -> bool:
 
 
 # ============================================================================
+# 实体提取召回（默认开启；DISABLE_ENTITY_RETRIEVAL=1 关闭）
+# ============================================================================
+
+_ENTITY_RETRIEVER = None  # 全局 entity 路径：始终走 BM25+Vector hybrid，绕过 fusion router 的 HyDE
+
+
+def set_entity_retriever(r) -> None:
+    global _ENTITY_RETRIEVER
+    _ENTITY_RETRIEVER = r
+
+
+def entity_search_contexts(
+    question: str, image_path, topk_per_entity: int = 2, max_total: int = 6,
+) -> list:
+    """对题干抽实体 → 用 hybrid retriever 逐实体检索 → 合并去重。
+
+    短路：DISABLE_ENTITY_RETRIEVAL=1 / 抽不到实体 / 全局 retriever 未设置 → 返回 []
+    """
+    if os.environ.get("DISABLE_ENTITY_RETRIEVAL") == "1":
+        return []
+    r = _ENTITY_RETRIEVER
+    if r is None:
+        return []
+    entities = extract_entities(question)
+    if not entities:
+        return []
+    print(f"  [entity] {entities}", flush=True)
+    seen: set = set()
+    out: list = []
+    for ent in entities:
+        try:
+            docs = r.search(
+                text=ent,
+                image_path=str(image_path) if image_path else None,
+                topk=topk_per_entity,
+            )
+        except Exception:
+            docs = []
+        for d in docs:
+            if d not in seen:
+                seen.add(d)
+                out.append(d)
+                if len(out) >= max_total:
+                    return out
+    return out
+
+
+
+# ============================================================================
 # 题干自含答案抽取（T2）：简答 QA 前置短路
 # ============================================================================
 
@@ -403,10 +453,12 @@ def detect_multi_select(question: str, client) -> bool:
 def _judge_one_option(
     retriever, client, question_stem: str, letter: str, opt_text: str,
     image_path, is_vqa: bool, topk: int,
+    entity_docs: Optional[list] = None,
 ) -> tuple[str, list, float]:
     """对单个选项做一次 RAG + 判断；返回 (verdict, contexts, retrieval_cost)。
 
     T1/T3: 扩大召回 topk * 3 → 噪声过滤 → 合并反向 query 检索 → 取 topk。
+    entity_docs: 题干级实体检索结果（choice_as_judge 在入口一次抽取，跨选项共享）。
     retrieval_cost 累计本选项所有 retriever.search 耗时（供选择题 time_cost 上报）。
     """
     ret_cost = 0.0
@@ -440,10 +492,11 @@ def _judge_one_option(
             rev_docs = []
         ret_cost += time.perf_counter() - _t
 
-    # 合并 → 噪声过滤 → 去重 → 取 topk
+    # 合并 fwd + rev + entity → 噪声过滤 → 去重 → 取 topk
+    # entity_docs 作为题干级补充，对所有选项共享
     seen = set()
     merged: list = []
-    for d in fwd_docs + rev_docs:
+    for d in fwd_docs + rev_docs + (entity_docs or []):
         if d in seen:
             continue
         seen.add(d)
@@ -704,13 +757,19 @@ def choice_as_judge(
     ctx_per_letter: dict = {}
     ret_cost_total: float = 0.0
 
+    # 题干实体检索：一次抽实体（M16/朱郎埠墓群/...），共享给所有选项的 _judge_one_option
+    # entity_search_contexts 内部已对 DISABLE_ENTITY_RETRIEVAL 短路
+    _t = time.perf_counter()
+    stem_entity_docs = entity_search_contexts(question, image_path, topk_per_entity=2, max_total=4)
+    ret_cost_total += time.perf_counter() - _t
+
     # 4 选项并行判定（_judge_one_option 内部 retriever+LLM 均线程安全）
     with ThreadPoolExecutor(max_workers=len(options)) as pool:
         future_map = {
             pool.submit(
                 _judge_one_option,
                 retriever, client, stem, letter, opt_text,
-                image_path, is_vqa, topk,
+                image_path, is_vqa, topk, stem_entity_docs,
             ): (letter, opt_text)
             for letter, opt_text in options
         }
@@ -1042,9 +1101,15 @@ def _process_one_item(
                         if d not in seen:
                             seen.add(d)
                             merged.append(d)
+                # 实体提取召回：追加 BM25+vector hybrid 在题干实体上的命中
+                ent_docs = entity_search_contexts(question, None, topk_per_entity=2, max_total=6)
+                for d in ent_docs:
+                    if d not in seen:
+                        seen.add(d)
+                        merged.append(d)
                 merged = _filter_noise(merged, keep_min=4)
                 contexts = merged[:12]
-                print(f"[idx={idx}] diverged {len(queries)} queries, ctx={len(contexts)} (filtered)", flush=True)
+                print(f"[idx={idx}] diverged {len(queries)} queries + {len(ent_docs)} entity docs, ctx={len(contexts)} (filtered)", flush=True)
             elif is_short_vqa:
                 # 简答VQA：以图像为主，RAG 仅辅助——直接用题干做轻量检索，不调 describe_image
                 base_q = build_query(question, section=section)
@@ -1193,6 +1258,9 @@ def run(args: argparse.Namespace) -> None:
             hybrid = HybridRetriever(retriever, bm25)
             hyde = HyDERetriever(retriever, client)
             hyde_ib = IBRerankRetriever(hyde, client, max_rerank=4, keep_min=2)
+            # 实体路径：始终走 hybrid（BM25 强字面命中 + vector 语义兜底）
+            # 即使顶层 router 把简答QA 路由到 hyde_ib，实体查询也绕过 HyDE
+            set_entity_retriever(hybrid)
             retriever = RouterRetriever(
                 default=retriever,
                 routes={
@@ -1202,6 +1270,7 @@ def run(args: argparse.Namespace) -> None:
                 },
             )
             print("[main] router enabled: 判断QA/VQA→BM25 hybrid, 简答QA→HyDE+IB rerank", flush=True)
+            print(f"[main] entity retriever: {type(hybrid).__name__} (BM25+Vector)", flush=True)
         except Exception as e:
             print(f"[main] router init failed: {e}; vector-only fallback", flush=True)
     print(f"[main] llm={client.name}  retriever={type(retriever).__name__}", flush=True)
