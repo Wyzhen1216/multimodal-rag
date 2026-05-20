@@ -45,12 +45,15 @@ from .prompts import (  # noqa: E402
     SYS_IMAGE_DESC,
     SYS_JUDGE_SOFT,
     SYS_JUDGE_SOFT_VQA,
+    SYS_JUDGE_DIALECTIC,
+    SYS_NEGATE_CLAIM,
     SYS_OPTION_AS_JUDGE,
     SYS_OPTION_AS_JUDGE_VQA,
     SYS_PREDICT_COUNT,
     SYS_REVERSE_QUERY,
     SYS_SINGLE_CONTRAST,
     build_judge_user_soft,
+    build_judge_user_dialectic,
     build_short_vqa_user,
     build_user_message,
     fallback_answer,
@@ -167,6 +170,20 @@ def rewrite_query(client, question: str, section: str) -> str:
         return s if s else base
     except Exception:
         return base
+
+
+def negate_claim_query(client, question: str) -> str:
+    """生成判断题陈述的反命题检索 query（用于召回反方证据）。失败时返回空串。"""
+    base = (question or "").strip()
+    if not base:
+        return ""
+    try:
+        r = client.generate(SYS_NEGATE_CLAIM, f"陈述：{base}\n输出：",
+                            temperature=0.0, max_tokens=60)
+        s = r.strip().splitlines()[0].strip()
+        return s
+    except Exception:
+        return ""
 
 
 def extract_valid_options(question: str) -> set:
@@ -1043,11 +1060,33 @@ def _process_one_item(
             contexts = []
     retrieval_cost = time.perf_counter() - t0
 
+    # ---- 对立证据检索（CF-RAG 轻量化，仅判断QA，默认开启）----
+    # 额外召回一路"反方证据"，让模型对比正反证据强度后裁决，缓解判断题过保守（实测 50 题官评 +1）。
+    # 仅用于纯文本判断QA：判断VQA 应以图像为准，对立证据 + 倾向正确会覆盖正确的视觉否定（实测 -1）。
+    # DISABLE_DIALECTIC=1 可强制关闭。
+    con_contexts: List[str] = []
+    if section == "判断QA" and os.environ.get("DISABLE_DIALECTIC") != "1":
+        try:
+            neg_q = negate_claim_query(client, question)
+            if neg_q:
+                con_raw = retriever.search(text=neg_q, topk=8)
+                # 去掉与正方完全重复的片段，保留真正"对立"的证据
+                pro_set = set(contexts)
+                con_contexts = [c for c in con_raw if c not in pro_set][:4]
+                print(f"[idx={idx}] dialectic neg_q={neg_q[:50]} con_ctx={len(con_contexts)}", flush=True)
+        except Exception as e:
+            print(f"[idx={idx}] dialectic retrieval error: {e}", flush=True)
+            con_contexts = []
+
     # ---- Prompt ----
-    # 判断题：使用软化 RAG（RAG 结果仅作参考，模型自身知识为主）
+    # 判断题：默认软化 RAG；判断QA 召回到反方证据时走 dialectic 对比裁决
     if "判断" in section:
-        system = SYS_JUDGE_SOFT_VQA if "VQA" in section else SYS_JUDGE_SOFT
-        user = build_judge_user_soft(section, question, contexts)
+        if con_contexts:
+            system = SYS_JUDGE_DIALECTIC
+            user = build_judge_user_dialectic(question, contexts, con_contexts)
+        else:
+            system = SYS_JUDGE_SOFT_VQA if "VQA" in section else SYS_JUDGE_SOFT
+            user = build_judge_user_soft(section, question, contexts)
     elif is_short_vqa:
         # 简答VQA：图像优先，RAG 仅作辅助背景参考
         # 识字/数数/方向/握持等视觉直读型题：检索已做（满足赛题要求），但不注入 context 防止噪音
