@@ -819,9 +819,13 @@ def choice_as_judge(
     # entity_search_contexts 内部已对 DISABLE_ENTITY_RETRIEVAL 短路
     _t = time.perf_counter()
     # VQA 同模态匹配增强：VLM 看图抽视觉实体（器物名/铭文/纹饰）追加到 entity list
-    # 绕开"跨模态对齐"问题，让纯文路径在 image-type VLM 描述上做同模态匹配
+    # opt-in: 官方 50 题净 -2（VLM 错认器物污染检索，如 [2137] 作册般甗被识别为汉高祖）
+    # 留作 mock 知识类 VQA 题（需识别器物名→查文献）的潜在工具
     visual_ents: list = []
-    if is_vqa and image_path is not None and os.environ.get("DISABLE_VISUAL_ENTITY") != "1":
+    if (
+        is_vqa and image_path is not None
+        and os.environ.get("ENABLE_VISUAL_ENTITY") == "1"
+    ):
         visual_ents = extract_visual_entities(client, image_path, question, max_entities=4)
         if visual_ents:
             print(f"  [visual_entity] {visual_ents}", flush=True)
@@ -1209,9 +1213,9 @@ def _process_one_item(
                 # VLM 主动描述的 image/table content 可能直接包含识字答案
                 if _is_visual_direct_read(question):
                     seen_v: set = set(contexts)
-                    # VLM 抽视觉实体（器物名/铭文片段），作为额外 anchor 走同模态匹配
+                    # VLM 抽视觉实体（opt-in via ENABLE_VISUAL_ENTITY=1）
                     visual_ents = []
-                    if image_path is not None and os.environ.get("DISABLE_VISUAL_ENTITY") != "1":
+                    if image_path is not None and os.environ.get("ENABLE_VISUAL_ENTITY") == "1":
                         visual_ents = extract_visual_entities(client, image_path, question, max_entities=4)
                         if visual_ents:
                             print(f"  [visual_entity] {visual_ents}", flush=True)
@@ -1235,8 +1239,8 @@ def _process_one_item(
                     image_path=str(image_path) if image_path else None,
                     topk=args.topk,
                 )
-                # 判断VQA: VLM 抽视觉实体 → 同模态匹配补充 ctx
-                if image_path is not None and os.environ.get("DISABLE_VISUAL_ENTITY") != "1":
+                # 判断VQA: VLM 抽视觉实体（opt-in via ENABLE_VISUAL_ENTITY=1）
+                if image_path is not None and os.environ.get("ENABLE_VISUAL_ENTITY") == "1":
                     visual_ents = extract_visual_entities(client, image_path, question, max_entities=3)
                     if visual_ents:
                         print(f"  [visual_entity] {visual_ents}", flush=True)
