@@ -941,6 +941,10 @@ def _process_one_item(
     skip_retrieval = is_choice  # 简答VQA 现在也做轻量 RAG
     valid_options = extract_valid_options(question) if is_choice else None
 
+    # 题型路由：若 retriever 是 RouterRetriever，按 section 选用对应增强
+    if hasattr(retriever, "for_section"):
+        retriever = retriever.for_section(section)
+
     # ---- 分支 1: 选择题 ----
     if is_choice:
         t0 = time.perf_counter()
@@ -1160,6 +1164,31 @@ def run(args: argparse.Namespace) -> None:
     # 一次性初始化
     retriever = build_retriever()
     client = build_client(prefer=None if args.llm == "auto" else args.llm)
+    # 题型路由（默认开启）：判断QA/VQA → BM25 hybrid（专名精确命中），简答QA → HyDE+IB rerank（mock +20pp），其他 → vector
+    # DISABLE_ROUTER=1 可强制关闭（fallback 到 vector-only）
+    # BM25 索引或依赖缺失时各 wrapper 内部 silent fallback，路由依然安全
+    if os.environ.get("DISABLE_ROUTER") != "1":
+        try:
+            from .bm25_retriever import BM25Retriever
+            from .hybrid_retriever import HybridRetriever
+            from .hyde_retriever import HyDERetriever
+            from .ib_rerank_retriever import IBRerankRetriever
+            from .router_retriever import RouterRetriever
+            bm25 = BM25Retriever()
+            hybrid = HybridRetriever(retriever, bm25)
+            hyde = HyDERetriever(retriever, client)
+            hyde_ib = IBRerankRetriever(hyde, client, max_rerank=4, keep_min=2)
+            retriever = RouterRetriever(
+                default=retriever,
+                routes={
+                    "判断QA": hybrid,
+                    "判断VQA": hybrid,
+                    "简答QA": hyde_ib,
+                },
+            )
+            print("[main] router enabled: 判断QA/VQA→BM25 hybrid, 简答QA→HyDE+IB rerank", flush=True)
+        except Exception as e:
+            print(f"[main] router init failed: {e}; vector-only fallback", flush=True)
     print(f"[main] llm={client.name}  retriever={type(retriever).__name__}", flush=True)
 
     # 启动自检：验证 LLM / 检索 / 归一化在正式跑题前均可用
