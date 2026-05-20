@@ -43,7 +43,6 @@ from .prompts import (  # noqa: E402
     SYS_EXTRACT_ANSWER_IN_Q,
     SYS_IMAGE_AS_QUERY,
     SYS_IMAGE_DESC,
-    SYS_JUDGE,
     SYS_JUDGE_SOFT,
     SYS_JUDGE_SOFT_VQA,
     SYS_OPTION_AS_JUDGE,
@@ -764,10 +763,11 @@ def choice_as_judge(
                 correct_letters.append(letter)
                 wrong_letters.remove(letter)
 
-    # T5: 数量不足复查（opt-in via ENABLE_COUNT_RECHECK=1）
+    # T5: 数量不足复查（默认开启；DISABLE_COUNT_RECHECK=1 关闭）
     # 多选题预测有 N 个答案，目前仅判出 M<N 个；current<=2 时强制 threshold=max(predicted,3)
+    # 实测官方 50 题 A/B：救回 [5462] 选择QA gold=ABCD baseline=CD → ABCD（净 +1，干净命中）
     if (
-        os.environ.get("ENABLE_COUNT_RECHECK") == "1"
+        os.environ.get("DISABLE_COUNT_RECHECK") != "1"
         and is_multi and wrong_letters and 1 <= len(correct_letters) <= 2
     ):
         expected = predict_answer_count(client, question, options)
@@ -1071,14 +1071,10 @@ def _process_one_item(
 
     # ---- Prompt ----
     # 判断题：使用软化 RAG（RAG 结果仅作参考，模型自身知识为主）
-    # JUDGE_PROMPT=strong 时，判断QA 切回高准确率版的 SYS_JUDGE；VQA 仍走 SOFT_VQA（保留视觉优先规则）
+    # A/B 实测：强势 SYS_JUDGE 在 [1031][1866] 把对的判错 -2 题，SOFT 是对的选择
     if "判断" in section:
-        if os.environ.get("JUDGE_PROMPT") == "strong" and "VQA" not in section:
-            system = SYS_JUDGE
-            user = build_user_message(section, question, contexts)
-        else:
-            system = SYS_JUDGE_SOFT_VQA if "VQA" in section else SYS_JUDGE_SOFT
-            user = build_judge_user_soft(section, question, contexts)
+        system = SYS_JUDGE_SOFT_VQA if "VQA" in section else SYS_JUDGE_SOFT
+        user = build_judge_user_soft(section, question, contexts)
     elif is_short_vqa:
         # 简答VQA：图像优先，RAG 仅作辅助背景参考
         # 识字/数数/方向/握持等视觉直读型题：检索已做（满足赛题要求），但不注入 context 防止噪音
