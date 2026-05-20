@@ -269,14 +269,15 @@ def set_neighbor_retriever(r) -> None:
 
 def image_query_contexts(
     image_path, *, topk_per_field: int = 2, max_total: int = 4,
-    with_neighbor: bool = True, neighbor_window: int = 1,
+    with_neighbor: bool = True, neighbor_window: int = 2,
 ) -> list:
-    """图-图 / 图-融合 同模态匹配（VQA 题专用）。
+    """图-图同模态匹配 — 只拿 anchor 拉 paragraph，不取 image type content。
 
-    流程：
-      1) image vec → image field 查 top-k（图-图视觉同模态）
-      2) image vec → fused field 查 top-k（图查融合编码，跨模态语义对齐）
-      3) 命中 top1 后做同文献 seq±N 邻接扩展（拿到完整释读上下文）
+    流程（P1 策略，避免 image VLM 描述反噬）：
+      1) image vec → image field 取 top-1 拿 (document, seq) 作锚点
+      2) 用锚点拉 type='paragraph' AND document=X AND seq±N 的原文段
+      3) 跳过 image/table type content（VLM 写的描述容易让 judge 受干扰，
+         如 [2137] image content 含'舞敄'让模型误判)
 
     opt-in: ENABLE_IMAGE_QUERY=1 才启用；image_path 为空时返回 []。
     """
@@ -288,11 +289,8 @@ def image_query_contexts(
     if r is None or not hasattr(r, "search_with_meta"):
         return []
 
-    seen: set = set()
-    out: list = []
-    anchor_info = None  # (document, seq) 用于多跳
-
-    # 1) image vec → image field
+    # 1) image vec → image field 取 top-1 锚点
+    anchor_info = None
     try:
         hits = r.search_with_meta(
             text="", image_path=str(image_path),
@@ -300,52 +298,49 @@ def image_query_contexts(
         )
     except Exception as e:
         print(f"  [image_query] image→image FAIL: {e}", flush=True)
-        hits = []
+        return []
     for h in hits:
-        c = h.get("content") or ""
-        if c and c not in seen:
-            seen.add(c)
-            out.append(c)
-            if anchor_info is None and h.get("document") and h.get("seq") is not None:
+        if h.get("document") and h.get("seq") is not None:
+            try:
                 anchor_info = (str(h["document"]), int(h["seq"]))
+                break
+            except (TypeError, ValueError):
+                continue
+    if anchor_info is None:
+        return []
 
-    # 2) image vec → fused field
+    # 2) 用锚点拉同文献 paragraph 邻段（跳过 image/table type 的 VLM 描述）
+    doc_id, seq_i = anchor_info
+    from .doc_neighbor import _shape_filter
+    nb_filter = _shape_filter(
+        doc_id, seq_i - neighbor_window, seq_i + neighbor_window,
+        type_filter="type='paragraph'",
+    )
     try:
-        hits = r.search_with_meta(
+        nbrs = r.search_with_meta(
             text="", image_path=str(image_path),
-            topk=topk_per_field, vector_field="fused",
+            topk=max_total + 2, filter=nb_filter, vector_field="image",
         )
-    except Exception as e:
-        print(f"  [image_query] image→fused FAIL: {e}", flush=True)
-        hits = []
-    for h in hits:
+    except Exception:
+        nbrs = []
+
+    if not nbrs:
+        # paragraph 邻段为空 → 整张文献当时可能全是 image type 拓片，没原文
+        print(f"  [image_query] anchor={anchor_info} but no paragraph found", flush=True)
+        return []
+
+    nbrs_sorted = sorted(nbrs, key=lambda d: (d.get("seq") or 0))
+    out: list = []
+    seen: set = set()
+    for h in nbrs_sorted:
         c = h.get("content") or ""
         if c and c not in seen:
             seen.add(c)
             out.append(c)
-
-    # 3) 多跳邻接：image→image 锚点的同文献相邻段
-    if with_neighbor and anchor_info:
-        doc_id, seq_i = anchor_info
-        try:
-            from .doc_neighbor import _shape_filter
-            nb_filter = _shape_filter(doc_id, seq_i - neighbor_window, seq_i + neighbor_window)
-            nbrs = r.search_with_meta(
-                text="", image_path=str(image_path),
-                topk=4, filter=nb_filter, vector_field="image",
-            )
-        except Exception:
-            nbrs = []
-        nbrs_sorted = sorted(nbrs, key=lambda d: (d.get("seq") or 0))
-        for h in nbrs_sorted:
-            c = h.get("content") or ""
-            if c and c not in seen:
-                seen.add(c)
-                out.append(c)
-
-    if out:
-        print(f"  [image_query] got {len(out)} docs (anchor={anchor_info})", flush=True)
-    return out[:max_total]
+            if len(out) >= max_total:
+                break
+    print(f"  [image_query] anchor={anchor_info} → {len(out)} paragraph docs", flush=True)
+    return out
 
 
 def doc_neighbor_contexts(
