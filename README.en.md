@@ -1,36 +1,44 @@
-# 多模态RAG
+# Multimodal History QA RAG Agent
 
-#### Description
-SII多模态RAG
+An end-to-end multimodal RAG agent for archaeology / history question answering. Given a question with an optional image, the system routes it to a task-specific retrieval strategy, recalls evidence from a history knowledge base, and generates a normalized answer with Qwen2.5-VL. Six question types are supported (judgement / multiple-choice / short-answer, with text-only and image variants).
 
-#### Software Architecture
-Software architecture description
+**Team project note:** I was responsible for the **retrieval layer and knowledge-base tagging** — question-type routing, BM25 hybrid retrieval, HyDE query expansion, IB relevance reranking, entity extraction and the tagging scheme. Prompt engineering, evaluation scripts and the frontend were shared with teammates.
 
-#### Installation
+## Highlights
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- **Per-question-type retrieval routing**: judgement questions go through BM25 hybrid retrieval, short-answer questions through HyDE + IB rerank, VQA and choice questions through dense retrieval with image context.
+- **Hybrid sparse + dense search**: a local BM25 index over 5472 passages fused with remote DashVector embeddings via Reciprocal Rank Fusion (k=60).
+- **HyDE query expansion plus LLM-based binary relevance reranking**, improving context quality rather than recall volume.
+- **Domain entity extraction and tagging** over the corpus, used to constrain retrieval scope and resolve cross-passage references.
 
-#### Instructions
+## Results
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- Official 50-question benchmark: **80%** accuracy, up from a 76% baseline.
+- 120-question stratified mock set: **51.7%**, up from 48.3%; short-answer QA improved from 30% to 55%.
+- Cost trade-off: +5% latency on 50 questions, +22% on 120 questions, driven by extra LLM calls on the short-answer path.
 
-#### Contribution
+## Layout
 
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
+```
+student_package/solution/     core implementation (entry point: main.py)
+student_package/src/          answer normalization
+student_package/configs/      environment variable templates
+student_package/data/         sample data and images
+student_package/docs/         task, scoring and data-format docs
+student_package/findings/     technical report, error and performance analysis
+student_package/test/         self-test and A/B comparison scripts
+student_package/frontend/     demo frontend
+```
 
+## Running
 
-#### Gitee Feature
+```bash
+export QWEN_API_KEY=sk-your-own-key
+export DASHVECTOR_API_KEY=sk-your-own-key
+export DASHVECTOR_ENDPOINT=<your-dashvector-endpoint>
 
-1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+bash run_eval.sh
+```
+
+Python dependencies are declared in `student_package/solution/requirements.txt`.
+
